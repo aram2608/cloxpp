@@ -1,0 +1,36 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+Language: Cpp
+
+# K&R style (old C style)
+BreakBeforeBraces: Attach
+
+# keep it deterministic & readable
+ColumnLimit: 100
+ReflowComments: true
+
+# includes
+SortIncludes: true
+IncludeBlocks: Regroup
+
+# spacing & alignment
+SpacesInParentheses: false
+SpaceAfterCStyleCast: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+SpaceBeforeParens: ControlStatements
+
+# keep diffs tidy; avoid one-liners
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+InsertTrailingCommas: Wrapped
+
+# namespaces/classes
+NamespaceIndentation: None
+
+# needed to avoid the bin packing error for trailing comma wrapped
+BinPackArguments: false
+BinPackParameters: false
