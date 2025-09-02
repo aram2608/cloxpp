@@ -18,7 +18,7 @@ class Lox {
 
   public:
     Lox();
-    void run();
+    void run(string code);
     void run_file(const string &filename);
     void run_prompt();
 

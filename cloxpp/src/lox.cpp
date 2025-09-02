@@ -2,27 +2,47 @@
 
 using namespace lox;
 
+// Empty contsructor for now
 Lox::Lox() {
 }
 
-void Lox::run() {
+// The main logic for our Lox program, handles scanning, parsing, etc.
+void Lox::run(string code) {
+    // For now just print out
+    cout << code << endl;
 }
 
 // Function to wrap the run function around file contents
 void Lox::run_file(const string &filename) {
+    // Slurp up file contents into a string
     string contents = slurp_file(filename);
-    cout << contents << endl;
+
+    // Run our main logic
+    run(contents);
 }
 
+// Function for main REPL logic
 void Lox::run_prompt() {
+    /*
+        We start by running the REPL in an infinite loop
+        We exit the loop as soon as exit() is used.
+        Otherwise we evalutate the input
+    */
     while (true) {
         string contents;
         cin >> contents;
 
+        // Exit loop
         if (contents == "exit()") {
             std::exit(EXIT_SUCCESS);
+
+            // Ignore empty values
+        } else if (contents == "") {
+            continue;
+
+            // Evaulate text contents
         } else {
-            cout << contents << endl;
+            run(contents);
         }
     }
 }
