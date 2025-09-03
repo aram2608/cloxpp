@@ -1,4 +1,5 @@
 #pragma once
+#include "error.hpp"
 #include "tokens.hpp"
 
 #include <any>
@@ -23,10 +24,14 @@ class Scanner {
     vector<Token> scan_tokens();
     void          scan();
     char          advance();
-    bool match(char expected);
+    bool          match(char expected);
+    char          peek();
+    void          add_string();
 
     void add_token(TokenType type, std::any literal);
     void add_token(TokenType type);
+
+    LoxError errors;
 
   private:
     bool is_end();

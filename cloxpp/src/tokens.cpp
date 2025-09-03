@@ -48,11 +48,39 @@ string Token::to_string() const {
         break;
     case (TokenType::EQUAL):
         literal_txt = "nil";
-        tok_type = "EQUAL";
+        tok_type    = "EQUAL";
         break;
     case (TokenType::EQUAL_EQUAL):
         literal_txt = "nil";
-        tok_type = "EQUAL_EQUAL";
+        tok_type    = "EQUAL_EQUAL";
+        break;
+    case (TokenType::LEFT_PAREN):
+        literal_txt = "nil";
+        tok_type    = "LEFT_PAREN";
+        break;
+    case (TokenType::RIGHT_PAREN):
+        literal_txt = "nil";
+        tok_type    = "RIGHT_PAREN";
+        break;
+    case (TokenType::LEFT_BRACE):
+        literal_txt = "nil";
+        tok_type    = "LEFT_BRACE";
+        break;
+    case (TokenType::RIGHT_BRACE):
+        literal_txt = "nil";
+        tok_type    = "RIGHT_BRACE";
+        break;
+    case (TokenType::BANG):
+        literal_txt = "nil";
+        tok_type    = "BANG";
+        break;
+    case (TokenType::BANG_EQUAL):
+        literal_txt = "nil";
+        tok_type    = "BANG_EQUAL";
+        break;
+    case (TokenType::STAR):
+        literal_txt = "nil";
+        tok_type    = "STAR";
         break;
     case (TokenType::eof):
         literal_txt = "nil";
