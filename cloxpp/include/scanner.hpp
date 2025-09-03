@@ -36,8 +36,9 @@ class Scanner {
   private:
     bool is_end();
 
-    // Attributes to keep track of string index
-
+    /* 
+      Attributes to keep track of string index
+    */
     // Start of string
     int start = 0;
     // Current token

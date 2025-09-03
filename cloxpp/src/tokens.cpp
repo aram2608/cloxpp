@@ -82,6 +82,34 @@ string Token::to_string() const {
         literal_txt = "nil";
         tok_type    = "STAR";
         break;
+    case (TokenType::PLUS):
+        literal_txt = "nil";
+        tok_type    = "PLUS";
+        break;
+    case (TokenType::MINUS):
+        literal_txt = "nil";
+        tok_type    = "STAR";
+        break;
+    case (TokenType::SLASH):
+        literal_txt = "nil";
+        tok_type    = "SLASH";
+        break;
+    case (TokenType::GREATER):
+        literal_txt = "nil";
+        tok_type    = "GREATER";
+        break;
+    case (TokenType::GREATER_EQUAL):
+        literal_txt = "nil";
+        tok_type    = "GREATER_EQUAL";
+        break;
+    case (TokenType::LESS):
+        literal_txt = "nil";
+        tok_type    = "LESS";
+        break;
+    case (TokenType::LESS_EQUAL):
+        literal_txt = "nil";
+        tok_type    = "LESS_EQUAL";
+        break;
     case (TokenType::eof):
         literal_txt = "nil";
         tok_type    = "EOF";

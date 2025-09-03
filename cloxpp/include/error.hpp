@@ -6,11 +6,13 @@
 using std::cerr;
 using std::string_view;
 
+namespace lox {
+
 class LoxError {
-    public:
+  public:
     // Default constructor so the compiler does not yell at me
     LoxError() = default;
-    bool err = false;
+    bool err   = false;
 
     // A function to report errors to stderr
     void report(int line, string_view where, string_view message) {
@@ -24,3 +26,5 @@ class LoxError {
         report(line, "", message);
     }
 };
+
+} // namespace lox
