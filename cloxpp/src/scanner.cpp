@@ -52,6 +52,18 @@ void Scanner::scan() {
     case '*':
         add_token(TokenType::STAR);
         break;
+    case '!':
+        add_token(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG);
+        break;
+    case '=':
+        add_token(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL);
+        break;
+    case '<':
+        add_token(match('=') ? TokenType::LESS_EQUAL : TokenType::LESS);
+        break;
+    case '>':
+        add_token(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
+        break;
     // Ignore whitespaces
     case ' ':
     case '\r':
@@ -70,8 +82,23 @@ char Scanner::advance() {
     return source[current++];
 }
 
+// Function to handle multicharacter operators
+bool Scanner::match(char expected) {
+    // Test to see if the end of file is reached
+    if (is_end()) {
+    return false;
+    }
+    // Test to see if the current tok_type is expected for multichar operator
+    if (source[current] != expected) {
+    return false;
+}
+    // Otherwise pre increment current character and return true
+    ++current;
+    return true;
+}
+
 // Overload to handle literal tokens
-void Scanner::add_token(TokenType type, any literal) {
+void Scanner::add_token(TokenType type, std::any literal) {
     string text = source.substr(start, current - start);
     tokens.emplace_back(type, text, literal, line);
 }

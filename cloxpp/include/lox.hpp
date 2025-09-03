@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scanner.hpp"
+
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -22,10 +24,11 @@ class Lox {
     void run_prompt();
 
   private:
-    void   run(string code);
-    string slurp_file(const string &filename);
-    void   error(int line, string message);
-    void   report(int line, string where, string message);
+    Scanner scanner;
+    void    run(string code);
+    string  slurp_file(const string &filename);
+    void    error(int line, string message);
+    void    report(int line, string where, string message);
 
     bool err;
 };

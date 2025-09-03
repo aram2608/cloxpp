@@ -39,6 +39,7 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "cstddef": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "any": "cpp"
     }
 }

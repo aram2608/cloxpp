@@ -3,7 +3,6 @@
 #include <any>
 #include <iostream>
 
-using std::any;
 using std::cout;
 using std::endl;
 using std::string;
@@ -63,8 +62,7 @@ enum class TokenType {
 
 class Token {
   public:
-    Token(TokenType type, string lexeme, any literal, int line);
-    ~Token();
+    Token(TokenType type, string lexeme, std::any literal, int line);
 
     // Function to turn Tokens into strings
     // We do not want to modify anything so we declare this as a const member
@@ -72,7 +70,7 @@ class Token {
 
     TokenType type;
     string    lexeme;
-    any       literal;
+    std::any  literal;
     int       line;
 
   private:

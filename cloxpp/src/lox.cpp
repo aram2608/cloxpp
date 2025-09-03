@@ -9,8 +9,15 @@ Lox::Lox() {
 
 // The main logic for our Lox program, handles scanning, parsing, etc.
 void Lox::run(string code) {
-    // For now just print out
-    cout << code << endl;
+    // Create out Scanner instance
+    Scanner scanner(code);
+    // Create tokens from source code
+    std::vector<Token> tokens = scanner.scan_tokens();
+
+    // For now we will just print the tokens
+    for (const Token &token : tokens) {
+        std::cout << token.to_string() << "\n";
+    }
 }
 
 // Function to wrap the run function around file contents

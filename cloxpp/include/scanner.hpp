@@ -5,14 +5,17 @@
 #include <iostream>
 #include <vector>
 
-using std::any;
 using std::string;
 using std::vector;
 
 namespace lox {
 class Scanner {
   public:
+    // Constructor for parsing code
     Scanner(string source);
+    // Default constructor
+    Scanner() : source("") {
+    }
 
     string        source;
     vector<Token> tokens{};
@@ -20,8 +23,9 @@ class Scanner {
     vector<Token> scan_tokens();
     void          scan();
     char          advance();
+    bool match(char expected);
 
-    void add_token(TokenType type, any literal);
+    void add_token(TokenType type, std::any literal);
     void add_token(TokenType type);
 
   private:
