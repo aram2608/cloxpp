@@ -1,0 +1,4 @@
+(EQUAL , = , nil)
+(STRING , "lox" , lox)
+(SEMICOLON , ; , nil)
+(EOF ,  , nil)
