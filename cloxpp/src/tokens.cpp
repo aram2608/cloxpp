@@ -16,8 +16,8 @@ Token::Token(TokenType type, string lexeme, std::any literal, int line) {
 string Token::to_string() const {
 
     // Define our literal text and tok_type as strings
-    std::string literal_txt;
-    std::string tok_type;
+    string literal_txt;
+    string tok_type;
 
     // We need to set the literal text to the string representation
     // of each data type
@@ -27,7 +27,7 @@ string Token::to_string() const {
         tok_type    = "IDENTIFIER";
         break;
     case (TokenType::STRING):
-        literal_txt = std::any_cast<std::string>(literal);
+        literal_txt = std::any_cast<string>(literal);
         tok_type    = "STRING";
         break;
     case (TokenType::NUMBER):

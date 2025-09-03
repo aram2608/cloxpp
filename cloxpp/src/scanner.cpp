@@ -10,17 +10,25 @@ Scanner::Scanner(string source) {
     this->source = source;
 }
 
+// Function to scan tokens and return them as a vector
 vector<Token> Scanner::scan_tokens() {
+    // We run the function until we meet the end of the file
     while (!is_end()) {
+        // Our start position is recorded as the current position
         start = current;
+        // We can now call our scan method for each token
         scan();
     }
+    // At the end we append an EOF token
     tokens.emplace_back(TokenType::eof, "", nullptr, line);
     return tokens;
 }
 
+// Function to handle scanning of tokens
 void Scanner::scan() {
+    // The current character is the next character which is then consumed
     char c = advance();
+    // Match the character to each case and add to vector
     switch (c) {
     case '(':
         add_token(TokenType::LEFT_PAREN);
@@ -52,6 +60,7 @@ void Scanner::scan() {
     case '*':
         add_token(TokenType::STAR);
         break;
+    // Multicharacter lexemes need the match helper method
     case '!':
         add_token(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG);
         break;
@@ -89,7 +98,13 @@ void Scanner::scan() {
         break;
     // This should be an error but I am not adding that yet
     default:
-        errors.error(line, "Unexpected character.");
+        // Rob stuffed the numbers in the default case which kinda bugs me
+        // but I can't think of a solution so ill leave it here for now too
+        if (is_digit(c)) {
+            add_number();
+        } else {
+            errors.error(line, "Unexpected character.");
+        }
         break;
     }
 }
@@ -98,6 +113,17 @@ void Scanner::scan() {
 char Scanner::advance() {
     // We index the source string by incrementing the current position
     return source[current++];
+}
+
+// Overload to handle literal tokens
+void Scanner::add_token(TokenType type, std::any literal) {
+    string text = source.substr(start, current - start);
+    tokens.emplace_back(type, text, literal, line);
+}
+
+// Creates new token from lexeme
+void Scanner::add_token(TokenType type) {
+    add_token(type, nullptr);
 }
 
 // Function to handle multicharacter operators
@@ -128,6 +154,13 @@ char Scanner::peek() {
     return source[current];
 }
 
+// Function to peek ahead two characters for longer lexemes
+char Scanner::peek_next() {
+    if (current + 1 >= source.length())
+        return '\0';
+    return source[current + 1];
+}
+
 // Function to handle string token types
 void lox::Scanner::add_string() {
     // We need to peek forward until we meet the end of file or the closing quote
@@ -140,30 +173,47 @@ void lox::Scanner::add_string() {
         advance();
     }
     if (is_end()) {
-        cout << "Error: unterminated string." << endl;
+        errors.error(line, "Unterminated string.");
         return;
     }
 
     // Closing "
     advance();
 
-    // We trim quotes and save the substring
+    // We trim quotes and save the substring to use downstream
     string value = source.substr(start + 1, current - 2 - start);
     add_token(TokenType::STRING, value);
 }
 
-// Overload to handle literal tokens
-void Scanner::add_token(TokenType type, std::any literal) {
-    string text = source.substr(start, current - start);
-    tokens.emplace_back(type, text, literal, line);
-}
+// Function to handle adding number tokens
+void Scanner::add_number() {
+    // What is this syntax?
+    while (is_digit(peek()))
+        advance();
 
-// Creates new token from lexeme
-void Scanner::add_token(TokenType type) {
-    add_token(type, nullptr);
+    // We first need to look for the fractional part
+    if (peek() == '.' && is_digit(peek_next())) {
+
+        // Consume the .
+        advance();
+
+        while (is_digit(peek()))
+            advance();
+    }
+
+    // We add the token
+    add_token(TokenType::NUMBER,
+              // We first collect the substring
+              // We need to use the stod method to parse a string and return a double
+              std::stod(std::string{source.substr(start, current - start)}));
 }
 
 // A helper function to test if we are at the end of the file
 bool Scanner::is_end() {
     return current >= source.length();
+}
+
+// Utility function to test if a value is a digit
+bool Scanner::is_digit(char c) {
+    return c >= '0' && c <= '9';
 }

@@ -22,21 +22,23 @@ class Scanner {
     vector<Token> tokens{};
 
     vector<Token> scan_tokens();
-    void          scan();
-    char          advance();
-    bool          match(char expected);
-    char          peek();
-    void          add_string();
-
-    void add_token(TokenType type, std::any literal);
-    void add_token(TokenType type);
 
     LoxError errors;
 
   private:
+    void scan();
+    char advance();
+    void add_token(TokenType type, std::any literal);
+    void add_token(TokenType type);
+    bool match(char expected);
+    char peek();
+    char peek_next();
+    void add_string();
+    void add_number();
     bool is_end();
+    bool is_digit(char c);
 
-    /* 
+    /*
       Attributes to keep track of string index
     */
     // Start of string
