@@ -4,6 +4,7 @@ using namespace lox;
 
 // Empty contsructor for now
 Lox::Lox() {
+    err = false;
 }
 
 // The main logic for our Lox program, handles scanning, parsing, etc.
@@ -19,6 +20,11 @@ void Lox::run_file(const string &filename) {
 
     // Run our main logic
     run(contents);
+
+    // Catch any errors in our code
+    if (err) {
+        std::exit(EXIT_FAILURE);
+    }
 }
 
 // Function for main REPL logic
@@ -29,20 +35,21 @@ void Lox::run_prompt() {
         Otherwise we evalutate the input
     */
     while (true) {
-        string contents;
-        cin >> contents;
+        string code;
+        cin >> code;
 
         // Exit loop
-        if (contents == "exit()") {
+        if (code == "exit()") {
             std::exit(EXIT_SUCCESS);
 
             // Ignore empty values
-        } else if (contents == "") {
+        } else if (code == "") {
             continue;
 
             // Evaulate text contents
         } else {
-            run(contents);
+            run(code);
+            err = false;
         }
     }
 }
@@ -66,4 +73,15 @@ string Lox::slurp_file(const string &filename) {
     // Close file to prevent leaks
     file.close();
     return content;
+}
+
+// Function to handle error output
+void Lox::error(int line, string message) {
+    report(line, "", message);
+}
+
+// Simple helper function to report errors and their location
+void Lox::report(int line, string where, string message) {
+    cout << "[line " << line << "] Error" << where << ": " << message;
+    err = true;
 }

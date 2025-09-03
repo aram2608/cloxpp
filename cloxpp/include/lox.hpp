@@ -18,13 +18,16 @@ class Lox {
 
   public:
     Lox();
-    void run(string code);
     void run_file(const string &filename);
     void run_prompt();
 
-    string slurp_file(const string &filename);
-
   private:
+    void   run(string code);
+    string slurp_file(const string &filename);
+    void   error(int line, string message);
+    void   report(int line, string where, string message);
+
+    bool err;
 };
 
 } // namespace lox
