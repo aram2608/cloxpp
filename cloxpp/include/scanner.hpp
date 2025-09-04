@@ -35,6 +35,8 @@ class Scanner {
     char peek();
     char peek_next();
     void add_string();
+    void comment();
+    void multiline_comment();
     void add_number();
     void add_identifier();
     bool is_end();

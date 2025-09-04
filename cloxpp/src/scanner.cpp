@@ -95,10 +95,9 @@ void Scanner::scan() {
     // Slashes need to be handled in a special way since comments will be C style
     case '/':
         if (match('/')) {
-            // A comment goes until the end of the line
-            // so continue until we get to a newline
-            while (peek() != '\n' && !is_end())
-                advance();
+            comment();
+        } else if (match('*')) {
+            multiline_comment();
         } else {
             add_token(TokenType::SLASH);
         }
@@ -193,6 +192,7 @@ void lox::Scanner::add_string() {
         // We advance forwards
         advance();
     }
+    // If we reach the end of file with no terminating "
     if (is_end()) {
         errors.error(line, "Unterminated string.");
         return;
@@ -204,6 +204,33 @@ void lox::Scanner::add_string() {
     // We trim quotes and save the substring to use downstream
     string value = source.substr(start + 1, current - 2 - start);
     add_token(TokenType::STRING, value);
+}
+
+// Function to wrap comment method
+void Scanner::comment() {
+    // A comment goes until the end of the line
+    // so continue until we get to a newline
+    while (peek() != '\n' && !is_end())
+        advance();
+}
+
+// Function to handle multiline comments
+void Scanner::multiline_comment() {
+    // Multiline comments go up until the last /
+    while (peek() != '/' && !is_end()) {
+        // We skip past new lines
+        if (peek() == '\n') {
+            line++;
+        // If we come across the closing *, we advance once and break out
+        } else if (peek() == '*') {
+            advance();
+            break;
+        }
+        // Advance until we break out of loop
+        advance();
+    }
+    // We advance past the last /
+    advance();
 }
 
 // Function to handle adding number tokens
@@ -247,15 +274,15 @@ void Scanner::add_identifier() {
         If found, .find() returns an iterator pointing to the element (a std::pair of key and value)
         If not found, .find() returns an iterator to std::map::end().
     */
-    auto      match = keywords.find(text);
-    /* 
+    auto match = keywords.find(text);
+    /*
         The map.end() method returns an interator that points past the end of the map
         Meaning if our match is equal to it, then it is not found in the map at all
         We can consider that as an identifier
     */
     if (match == keywords.end()) {
         type = TokenType::IDENTIFIER;
-    // If it it does not match we can 
+        // If it it does not match we can
     } else {
         // We assign match to the second value of the std::pair
         type = match->second;
