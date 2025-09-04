@@ -216,21 +216,26 @@ void Scanner::comment() {
 
 // Function to handle multiline comments
 void Scanner::multiline_comment() {
-    // Multiline comments go up until the last /
-    while (peek() != '/' && !is_end()) {
-        // We skip past new lines
+    // Multiline comments can go until the end of file
+    while (!is_end()) {
+        // Skip past new lines
         if (peek() == '\n') {
             line++;
-        // If we come across the closing *, we advance once and break out
-        } else if (peek() == '*') {
             advance();
-            break;
         }
-        // Advance until we break out of loop
-        advance();
+        // We try to catch the full "*/" sequence
+        else if (peek() == '*' && peek_next() == '/') {
+            // consume '*'
+            advance();
+            // consume '/'
+            advance();
+            // Break out of comment
+            return;
+        } else {
+            // We skip everything else
+            advance();
+        }
     }
-    // We advance past the last /
-    advance();
 }
 
 // Function to handle adding number tokens
