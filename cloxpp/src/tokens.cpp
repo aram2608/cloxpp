@@ -13,117 +13,36 @@ Token::Token(TokenType type, string lexeme, std::any literal, int line) {
 }
 
 // A helper function to convert our Token into a string
-string Token::to_string() const {
+std::string Token::to_string() const {
+    // Convert enum to string with magic_enum at compile time
+    string tok_type = string(magic_enum::enum_name(type));
 
-    // Define our literal text and tok_type as strings
-    string literal_txt;
-    string tok_type;
+    // Default literal text
+    string literal_txt = "nil";
 
-    // We need to set the literal text to the string representation
-    // of each data type
     switch (type) {
-    case (TokenType::IDENTIFIER):
-        literal_txt = lexeme;
-        tok_type    = "IDENTIFIER";
-        break;
-    case (TokenType::STRING):
-        literal_txt = std::any_cast<string>(literal);
-        tok_type    = "STRING";
-        break;
-    case (TokenType::NUMBER):
-        literal_txt = std::to_string(std::any_cast<double>(literal));
-        tok_type    = "NUMBER";
-        break;
-    case (TokenType::TRUE):
-        literal_txt = "true";
-        tok_type    = "TRUE";
-        break;
-    case (TokenType::FALSE):
-        literal_txt = "false";
-        tok_type    = "FALSE";
-        break;
-    case (TokenType::SEMICOLON):
-        literal_txt = "nil";
-        tok_type    = "SEMICOLON";
-        break;
-    case (TokenType::EQUAL):
-        literal_txt = "nil";
-        tok_type    = "EQUAL";
-        break;
-    case (TokenType::EQUAL_EQUAL):
-        literal_txt = "nil";
-        tok_type    = "EQUAL_EQUAL";
-        break;
-    case (TokenType::LEFT_PAREN):
-        literal_txt = "nil";
-        tok_type    = "LEFT_PAREN";
-        break;
-    case (TokenType::RIGHT_PAREN):
-        literal_txt = "nil";
-        tok_type    = "RIGHT_PAREN";
-        break;
-    case (TokenType::LEFT_BRACE):
-        literal_txt = "nil";
-        tok_type    = "LEFT_BRACE";
-        break;
-    case (TokenType::RIGHT_BRACE):
-        literal_txt = "nil";
-        tok_type    = "RIGHT_BRACE";
-        break;
-    case (TokenType::BANG):
-        literal_txt = "nil";
-        tok_type    = "BANG";
-        break;
-    case (TokenType::BANG_EQUAL):
-        literal_txt = "nil";
-        tok_type    = "BANG_EQUAL";
-        break;
-    case (TokenType::STAR):
-        literal_txt = "nil";
-        tok_type    = "STAR";
-        break;
-    case (TokenType::PLUS):
-        literal_txt = "nil";
-        tok_type    = "PLUS";
-        break;
-    case (TokenType::MINUS):
-        literal_txt = "nil";
-        tok_type    = "STAR";
-        break;
-    case (TokenType::SLASH):
-        literal_txt = "nil";
-        tok_type    = "SLASH";
-        break;
-    case (TokenType::GREATER):
-        literal_txt = "nil";
-        tok_type    = "GREATER";
-        break;
-    case (TokenType::GREATER_EQUAL):
-        literal_txt = "nil";
-        tok_type    = "GREATER_EQUAL";
-        break;
-    case (TokenType::LESS):
-        literal_txt = "nil";
-        tok_type    = "LESS";
-        break;
-    case (TokenType::LESS_EQUAL):
-        literal_txt = "nil";
-        tok_type    = "LESS_EQUAL";
-        break;
-    case (TokenType::COMMA):
-        literal_txt = "nil";
-        tok_type    = "COMMA";
-        break;
-    case (TokenType::DOT):
-        literal_txt = "nil";
-        tok_type    = "DOT";
-        break;
-    case (TokenType::eof):
-        literal_txt = "nil";
-        tok_type    = "EOF";
-        break;
-    default:
-        literal_txt = "nil";
+        case TokenType::IDENTIFIER:
+            literal_txt = lexeme;
+            break;
+        case TokenType::STRING:
+            literal_txt = std::any_cast<string>(literal);
+            break;
+        case TokenType::NUMBER:
+            literal_txt = std::to_string(std::any_cast<double>(literal));
+            break;
+        case TokenType::TRUE:
+            literal_txt = "true";
+            break;
+        case TokenType::FALSE:
+            literal_txt = "false";
+            break;
+        case TokenType::NIL:
+            literal_txt = "nil";
+            break;
+        // Instead of defaulting to nil we override for each case
+        default:
+            break;
     }
+
     return "(" + tok_type + " , " + lexeme + " , " + literal_txt + ")";
 }

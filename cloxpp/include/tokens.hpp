@@ -2,6 +2,7 @@
 
 #include <any>
 #include <iostream>
+#include <magic_enum/magic_enum.hpp>
 
 using std::cout;
 using std::endl;

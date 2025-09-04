@@ -1,6 +1,6 @@
-(IDENTIFIER , var , var)
+(VAR , var , nil)
 (IDENTIFIER , language , language)
 (EQUAL , = , nil)
 (STRING , "lox" , lox)
 (SEMICOLON , ; , nil)
-(EOF ,  , nil)
+(eof ,  , nil)

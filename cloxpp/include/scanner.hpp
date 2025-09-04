@@ -4,6 +4,7 @@
 
 #include <any>
 #include <iostream>
+#include <map>
 #include <vector>
 
 using std::string;
@@ -50,6 +51,9 @@ class Scanner {
     int current = 0;
     // Line number
     int line = 1;
+
+    // Reserved keywords
+    const std::map<std::string, TokenType> keywords;
 };
 
 } // namespace lox
