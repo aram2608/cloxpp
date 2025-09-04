@@ -1,3 +1,5 @@
+(IDENTIFIER , var , var)
+(IDENTIFIER , language , language)
 (EQUAL , = , nil)
 (STRING , "lox" , lox)
 (SEMICOLON , ; , nil)

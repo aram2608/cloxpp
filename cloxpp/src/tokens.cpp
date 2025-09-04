@@ -110,6 +110,14 @@ string Token::to_string() const {
         literal_txt = "nil";
         tok_type    = "LESS_EQUAL";
         break;
+    case (TokenType::COMMA):
+        literal_txt = "nil";
+        tok_type    = "COMMA";
+        break;
+    case (TokenType::DOT):
+        literal_txt = "nil";
+        tok_type    = "DOT";
+        break;
     case (TokenType::eof):
         literal_txt = "nil";
         tok_type    = "EOF";

@@ -35,8 +35,11 @@ class Scanner {
     char peek_next();
     void add_string();
     void add_number();
+    void add_identifier();
     bool is_end();
     bool is_digit(char c);
+    bool is_alpha_num(char c);
+    bool is_alpha(char c);
 
     /*
       Attributes to keep track of string index

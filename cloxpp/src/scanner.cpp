@@ -102,6 +102,8 @@ void Scanner::scan() {
         // but I can't think of a solution so ill leave it here for now too
         if (is_digit(c)) {
             add_number();
+        } else if (is_alpha(c)) {
+            add_identifier();
         } else {
             errors.error(line, "Unexpected character.");
         }
@@ -187,7 +189,7 @@ void lox::Scanner::add_string() {
 
 // Function to handle adding number tokens
 void Scanner::add_number() {
-    // What is this syntax?
+    // We peek ahead and confirm the next character is a digit and advance
     while (is_digit(peek()))
         advance();
 
@@ -208,6 +210,15 @@ void Scanner::add_number() {
               std::stod(std::string{source.substr(start, current - start)}));
 }
 
+// Function to handle tokenization of identifier
+void Scanner::add_identifier() {
+    // Check if character is alphanumeric and advance
+    while (is_alpha_num(peek()))
+        advance();
+
+    add_token(TokenType::IDENTIFIER);
+}
+
 // A helper function to test if we are at the end of the file
 bool Scanner::is_end() {
     return current >= source.length();
@@ -216,4 +227,15 @@ bool Scanner::is_end() {
 // Utility function to test if a value is a digit
 bool Scanner::is_digit(char c) {
     return c >= '0' && c <= '9';
+}
+
+// Helper function to catch characters that are letters
+bool Scanner::is_alpha(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+}
+
+// Helper function to catch both numbers and letters
+bool Scanner::is_alpha_num(char c) {
+    // We use the or operator || to satisfy either conditions
+    return is_alpha(c) || is_digit(c);
 }
