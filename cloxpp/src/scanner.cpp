@@ -216,7 +216,9 @@ void Scanner::comment() {
 
 // Function to handle multiline comments
 void Scanner::multiline_comment() {
-    // Multiline comments can go until the end of file
+    // We store the start of the multiline comment
+    int mlc_line = line;
+    // Multiline comments should not go until the end of the file
     while (!is_end()) {
         // Skip past new lines
         if (peek() == '\n') {
@@ -236,6 +238,8 @@ void Scanner::multiline_comment() {
             advance();
         }
     }
+    // We throw an error if we don't close comments
+    errors.error(mlc_line, "Multiline comment unterminated.");
 }
 
 // Function to handle adding number tokens
