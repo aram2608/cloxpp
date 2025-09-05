@@ -7,14 +7,13 @@
 #include <iostream>
 #include <sstream>
 
+namespace lox {
 using std::cin;
 using std::cout;
 using std::endl;
 using std::ifstream;
 using std::istreambuf_iterator;
 using std::string;
-
-namespace lox {
 
 class Lox {
 

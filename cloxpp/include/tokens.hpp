@@ -4,11 +4,10 @@
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
 
+namespace lox {
 using std::cout;
 using std::endl;
 using std::string;
-
-namespace lox {
 
 enum class TokenType {
     // Single-character tokens.

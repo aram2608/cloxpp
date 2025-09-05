@@ -7,10 +7,9 @@
 #include <map>
 #include <vector>
 
+namespace lox {
 using std::string;
 using std::vector;
-
-namespace lox {
 class Scanner {
   public:
     // Constructor for parsing code

@@ -3,10 +3,10 @@
 #include <iostream>
 #include <string_view>
 
+namespace lox {
+
 using std::cerr;
 using std::string_view;
-
-namespace lox {
 
 class LoxError {
   public:

@@ -7,11 +7,10 @@
 #include <utility>
 #include <vector>
 
+namespace lox {
 using std::any;
 using std::move;
 using std::unique_ptr;
-
-namespace lox {
 
 // Forward declarations
 struct Binary;
@@ -133,7 +132,7 @@ struct Unary : Expr {
     }
 
     // Operator token
-    Token            op;
+    Token op;
     // Right expression
     unique_ptr<Expr> right;
 };
