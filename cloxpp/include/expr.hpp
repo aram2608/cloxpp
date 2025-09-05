@@ -29,10 +29,10 @@ struct ExprVisitor {
         return type is std::any since it is type safe and allows for storage
         of unknown types similarly to void *
     */
-    virtual any visitBinaryExpr(Binary& expr)     = 0;
-    virtual any visitUnaryExpr(Unary& expr)       = 0;
-    virtual any visitGroupingExpr(Grouping& expr) = 0;
-    virtual any visitLiteralExpr(Literal& expr)   = 0;
+    virtual any visitBinaryExpr( Binary& expr)     = 0;
+    virtual any visitUnaryExpr( Unary& expr)       = 0;
+    virtual any visitGroupingExpr( Grouping& expr) = 0;
+    virtual any visitLiteralExpr( Literal& expr)   = 0;
 };
 
 // Abstract base class, requires at least one virtual method
@@ -56,7 +56,7 @@ struct Expr {
         which we do not want to copy
     */
     Expr(const Expr&) = delete;
-    // We also delete the copy assignment operator
+    // We also delete the copy assignment operator for the same reason
     Expr& operator=(const Expr&) = delete;
 
     // Now we can request a move constructor

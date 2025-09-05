@@ -4,13 +4,15 @@
 #include <cstdlib>
 #include <iostream>
 
+using namespace lox;
+
 using std::cout;
 using std::endl;
 
 int main(int argc, char* argv[]) {
 
     // Create our Lox lang instance
-    lox::Lox lox = lox::Lox();
+    Lox lox = Lox();
 
     /*
         We need to catch the number of command line arguments
@@ -33,8 +35,8 @@ int main(int argc, char* argv[]) {
         // Otherwise we run the REPL
     } else {
         cout << "Welcome to the Lox REPL!\n" << endl;
-        // lox.run_prompt();
-        lox::make_test_tree();
+        //lox.run_prompt();
+        make_test_tree();
     }
     return 0;
 }
