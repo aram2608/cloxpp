@@ -14,13 +14,13 @@ void Lox::run(string code) {
     std::vector<Token> tokens = scanner.scan_tokens();
 
     // For now we will just print the tokens
-    for (const Token &token : tokens) {
+    for (const Token& token : tokens) {
         std::cout << token.to_string() << "\n";
     }
 }
 
 // Function to wrap the run function around file contents
-void Lox::run_file(const string &filename) {
+void Lox::run_file(const string& filename) {
     // Slurp up file contents into a string
     string contents = slurp_file(filename);
 
@@ -61,7 +61,7 @@ void Lox::run_prompt() {
 }
 
 // Function to slurp a files contents
-string Lox::slurp_file(const string &filename) {
+string Lox::slurp_file(const string& filename) {
     // We first create an ifstream object called file()
     ifstream file(filename);
 

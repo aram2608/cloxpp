@@ -7,11 +7,13 @@ from typing_extensions import Annotated
 
 app = typer.Typer()
 
+
 # Helper function to extract files from a path
 def extract_files(path: Path) -> list:
     # glob for lox files
     files = path.glob("*.lox")
     return files
+
 
 def orchestrator(files: list, path: Path, dry: bool) -> None:
     file_count = 1
@@ -36,6 +38,7 @@ def orchestrator(files: list, path: Path, dry: bool) -> None:
         # We increment file count to create a new output file
         file_count += 1
 
+
 # Helper function to write output
 def write_log(file_count: int, output: Path, stdout: str) -> None:
     # We first need to create a new file using the file count and _expected.tokens extension
@@ -46,6 +49,7 @@ def write_log(file_count: int, output: Path, stdout: str) -> None:
     with open(log, "w") as f:
         f.write(stdout)
 
+
 # Helper function to write stderr
 def write_stderr(file_count: int, output: Path, stderr: str):
     # We first need to create a new file using the file count and _expected.tokens extension
@@ -55,6 +59,7 @@ def write_stderr(file_count: int, output: Path, stderr: str):
     # We can now open the new file in write mode and dump the stdout contents
     with open(log, "w") as f:
         f.write(stderr)
+
 
 @app.command()
 def main(path: Path, dry: Annotated[bool, typer.Option("-d")] = False) -> None:

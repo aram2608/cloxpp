@@ -20,13 +20,13 @@ class Lox {
 
   public:
     Lox();
-    void run_file(const string &filename);
+    void run_file(const string& filename);
     void run_prompt();
 
   private:
     Scanner scanner;
     void    run(string code);
-    string  slurp_file(const string &filename);
+    string  slurp_file(const string& filename);
 };
 
 } // namespace lox

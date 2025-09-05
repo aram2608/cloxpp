@@ -6,7 +6,7 @@
 using std::cout;
 using std::endl;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 
     // Create out Lox lang instance
     lox::Lox lox = lox::Lox();

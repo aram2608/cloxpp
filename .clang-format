@@ -21,6 +21,8 @@ SpaceAfterCStyleCast: true
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
 SpaceBeforeParens: ControlStatements
+PointerAlignment: Left
+ReferenceAlignment: Left
 
 # keep diffs tidy; avoid one-liners
 AllowShortIfStatementsOnASingleLine: false
