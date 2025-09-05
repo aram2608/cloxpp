@@ -47,11 +47,10 @@ struct Binary : Expr {
         Constructor for Binary class
         left and right are passed as unique_ptr from Expr as the temporary owner
         In our initialization list, we move ownership of left and right
-        to the Binary class and copy construct op to operator_, we pass in a
-        const-reference since its cheaper than copying the entire token twice
+        to the Binary class and copy construct op to operator_
     */
-    Binary(unique_ptr<Expr> left, const Token& op, unique_ptr<Expr> right)
-        : left(move(left)), operator_(op), right(move(right)) {
+    Binary(unique_ptr<Expr> left, Token& op, unique_ptr<Expr> right)
+        : left(move(left)), op(op), right(move(right)) {
     }
 
     // We override the virtual method from the ExprVisitor
@@ -64,7 +63,7 @@ struct Binary : Expr {
     // Left expression
     unique_ptr<Expr> left;
     // Operator token
-    Token operator_;
+    Token op;
     // Right expression
     unique_ptr<Expr> right;
 };
@@ -77,7 +76,7 @@ struct Grouping : Expr {
         and in our list initialization we move ownership of the expression
         to our member
     */
-    Grouping(unique_ptr<Expr> expression) : expression(move(expression)) {
+    Grouping(unique_ptr<Expr> expr) : expr(move(expr)) {
     }
 
     // We override the virtual method from the ExprVisitor
@@ -88,7 +87,7 @@ struct Grouping : Expr {
     }
 
     // Member expression
-    unique_ptr<Expr> expression;
+    unique_ptr<Expr> expr;
 };
 
 // Literal node, inheritting from Expr
@@ -118,10 +117,9 @@ struct Unary : Expr {
     /*
         Unary op constructor, we pass in a Token and a unique_ptr to the right expression
         In our list initialization, we move ownership of the token and right expression
-        to the members, simiarly to our binary op node, we pass in a const-ref for our
-        token to prevent expensive double copies
+        to the members
     */
-    Unary(const Token& op, unique_ptr<Expr> right) : op(move(op)), right(move(right)) {
+    Unary(Token& op, unique_ptr<Expr> right) : op(move(op)), right(move(right)) {
     }
 
     // We override the virtual method from the ExprVisitor
