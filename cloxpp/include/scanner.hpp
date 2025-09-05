@@ -8,6 +8,7 @@
 #include <vector>
 
 namespace lox {
+// We scope our aliases
 using std::string;
 using std::vector;
 class Scanner {

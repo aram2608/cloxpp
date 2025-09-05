@@ -2,10 +2,11 @@
 
 #include <any>
 #include <iostream>
-//#include <magic_enum/magic_enum.hpp>
+// #include <magic_enum/magic_enum.hpp>
 #include "/Users/ja1473/dev/tools/vcpkg/installed/arm64-osx/include/magic_enum/magic_enum.hpp"
 
 namespace lox {
+// We scope our aliases
 using std::cout;
 using std::endl;
 using std::string;

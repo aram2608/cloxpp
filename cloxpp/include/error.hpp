@@ -4,7 +4,7 @@
 #include <string_view>
 
 namespace lox {
-
+// We scope our aliases
 using std::cerr;
 using std::string_view;
 

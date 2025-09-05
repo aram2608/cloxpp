@@ -10,12 +10,11 @@
 #include <typeinfo>
 
 namespace lox {
-using std::any_cast;
+// We scope our aliases
 using std::initializer_list;
 using std::ostringstream;
 using std::string;
 using std::string_view;
-using std::to_string;
 using std::unique_ptr;
 
 class AstPrinter : public ExprVisitor {
@@ -23,7 +22,7 @@ class AstPrinter : public ExprVisitor {
     // We can use any_cast to safely extract a value from std::any
     // We pass a reference to Expr and borrow the ast node
     string print(Expr& expr) {
-        return any_cast<string>(expr.accept(*this));
+        return std::any_cast<string>(expr.accept(*this));
     }
 
     // Function to stringify binary expr
@@ -48,10 +47,10 @@ class AstPrinter : public ExprVisitor {
             return string{"nil"};
         // We type check for a double
         if (expr.value.type() == typeid(double))
-            return to_string(any_cast<double>(expr.value));
+            return std::to_string(std::any_cast<double>(expr.value));
         // We type check for a string
         if (expr.value.type() == typeid(string))
-            return any_cast<std::string>(expr.value);
+            return std::any_cast<string>(expr.value);
         // We type check for booleans
         if (expr.value.type() == typeid(bool)) {
             return std::any_cast<bool>(expr.value) ? "true" : "false";
@@ -73,7 +72,7 @@ class AstPrinter : public ExprVisitor {
         // Iterate through our list
         for (Expr* child : children) {
             // Insert child nodes into buffer
-            out << " " << any_cast<string>(child->accept(*this));
+            out << " " << std::any_cast<string>(child->accept(*this));
         }
         // Close off parenthesis
         out << ")";

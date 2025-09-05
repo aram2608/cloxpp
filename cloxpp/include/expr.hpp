@@ -4,12 +4,14 @@
 
 #include <any>
 #include <memory>
-#include <utility>
+#include <utility> // for std::move
 #include <vector>
 
 namespace lox {
+// We scope our aliases
+// We dont alias std::move() to make sure it remains qualified
+// It should work in scope, but just to be safe
 using std::any;
-using std::move;
 using std::unique_ptr;
 
 // Forward declarations
@@ -49,8 +51,8 @@ struct Binary : Expr {
         In our initialization list, we move ownership of left and right
         to the Binary class and copy construct op to operator_
     */
-    Binary(unique_ptr<Expr> left, Token& op, unique_ptr<Expr> right)
-        : left(move(left)), op(op), right(move(right)) {
+    Binary(unique_ptr<Expr> left, Token op, unique_ptr<Expr> right)
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {
     }
 
     // We override the virtual method from the ExprVisitor
@@ -76,7 +78,7 @@ struct Grouping : Expr {
         and in our list initialization we move ownership of the expression
         to our member
     */
-    Grouping(unique_ptr<Expr> expr) : expr(move(expr)) {
+    Grouping(unique_ptr<Expr> expr) : expr(std::move(expr)) {
     }
 
     // We override the virtual method from the ExprVisitor
@@ -97,7 +99,7 @@ struct Literal : Expr {
         Constructor for our Literal node, it takes in any value and in
         the list initalization, we move ownership to the member value
     */
-    Literal(any value) : value(move(value)) {
+    Literal(any value) : value(std::move(value)) {
     }
 
     // We override the virtual method from the ExprVisitor
@@ -119,7 +121,7 @@ struct Unary : Expr {
         In our list initialization, we move ownership of the token and right expression
         to the members
     */
-    Unary(Token& op, unique_ptr<Expr> right) : op(move(op)), right(move(right)) {
+    Unary(Token op, unique_ptr<Expr> right) : op(std::move(op)), right(std::move(right)) {
     }
 
     // We override the virtual method from the ExprVisitor

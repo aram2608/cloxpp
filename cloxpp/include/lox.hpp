@@ -8,6 +8,7 @@
 #include <sstream>
 
 namespace lox {
+// We scope our aliases
 using std::cin;
 using std::cout;
 using std::endl;
