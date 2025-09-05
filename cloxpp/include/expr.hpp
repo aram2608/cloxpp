@@ -37,7 +37,33 @@ struct ExprVisitor {
 
 // Abstract base class, requires at least one virtual method
 struct Expr {
+    /*
+        We declare a virtual deconstructor
+        This ensures that the derived classes deconstructor is called
+
+        Expr* e = new Binary(...);
+        delete e; <- should call Binary::~Binary() I think
+    */
     virtual ~Expr() = default;
+
+    // We need a default constructor to get the compiler to stop complaining
+    Expr() = default;
+
+    /*
+        We delete the copy constructor
+        This should prevent making copies of Expr or its derived classes
+        Important because many nodes hold std::unique_ptr<Expr> children,
+        which we do not want to copy
+    */
+    Expr(const Expr&) = delete;
+    // We also delete the copy assignment operator
+    Expr& operator=(const Expr&) = delete;
+
+    // Now we can request a move constructor
+    Expr(Expr&&) = default;
+    // And a move assignment operator
+    Expr& operator=(Expr&&) = default;
+
     // accept() method for visiting nodes, we pass in a reference to ExprVisitor&
     virtual any accept(ExprVisitor& visitor) = 0;
 };

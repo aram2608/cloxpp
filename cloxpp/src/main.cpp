@@ -1,4 +1,5 @@
 #include "lox.hpp"
+#include "test_tree.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -8,14 +9,14 @@ using std::endl;
 
 int main(int argc, char* argv[]) {
 
-    // Create out Lox lang instance
+    // Create our Lox lang instance
     lox::Lox lox = lox::Lox();
 
     /*
         We need to catch the number of command line arguments
         More than 1 should exit with a failure status
-        In C++ argc is argument count and argv is argument vector, a vector containging
-        pointers the arguments themselves
+        In C++ argc is argument count and argv is argument vector, a vector containing
+        pointers to the arguments themselves
 
         argc is an integer and stores the number of arguments used including the name
         of the program itself. As such the default value of argc is always 1.
@@ -32,7 +33,8 @@ int main(int argc, char* argv[]) {
         // Otherwise we run the REPL
     } else {
         cout << "Welcome to the Lox REPL!\n" << endl;
-        lox.run_prompt();
+        // lox.run_prompt();
+        lox::make_test_tree();
     }
     return 0;
 }
