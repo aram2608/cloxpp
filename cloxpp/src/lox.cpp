@@ -6,7 +6,7 @@ using namespace lox;
 
 // Empty constructor for now
 // We initialize an empty parser to start off
-Lox::Lox() : parser(std::vector<Token>()) {
+Lox::Lox() : parser(std::vector<Token>{}) {
 }
 
 // The main logic for our Lox program, handles scanning, parsing, etc.
@@ -14,15 +14,14 @@ void Lox::run(string code) {
     // Create out Scanner instance
     Scanner scanner(code);
     // Create tokens from source code
-    std::vector<Token> tokens = scanner.scan_tokens();
-    parser                    = Parser(tokens);
-    auto  expr_ptr            = parser.parse();
-    Expr& expr_r              = *expr_ptr;
-    if (scanner.errors.err)
-        return;
-    if (parser.err.err)
-        return;
+    std::vector<Token> tokens      = scanner.scan_tokens();
+    parser                         = Parser(tokens);
+    std::unique_ptr<Expr> expr_ptr = parser.parse();
+    Expr&                 expr_r   = *expr_ptr;
 
+    // Catch scanner and parser errors
+    if (had_error())
+        return;
     std::cout << AstPrinter{}.print(expr_r) << "\n";
 }
 
@@ -35,7 +34,7 @@ void Lox::run_file(const string& filename) {
     run(contents);
 
     // Catch any errors in our code
-    if (scanner.errors.err) {
+    if (scanner.errors.had_error) {
         std::exit(EXIT_FAILURE);
     }
 }
@@ -43,13 +42,23 @@ void Lox::run_file(const string& filename) {
 // Function for main REPL logic
 void Lox::run_prompt() {
     /*
-        We start by running the REPL in an infinite loop
-        We exit the loop as soon as exit() is used.
-        Otherwise we evalutate the input
-    */
+     * We start by running the REPL in an infinite loop
+     * We exit the loop as soon as exit() is used.
+     * Otherwise we evalutate the input
+     */
     while (true) {
         string code;
-        cin >> code;
+        /*
+         * Read the whole line, spaces included
+         * We need to use getline() or else cin splits
+         * apart strings on newlines
+         * We ensure the getline() is succesful to catch EOF and keyboard exits
+         */
+        if (!std::getline(std::cin, code))
+            break;
+        // We retry the loop if no input is entered
+        if (code.empty())
+            continue;
 
         // Exit loop
         if (code == "exit()") {
@@ -62,9 +71,24 @@ void Lox::run_prompt() {
             // Evaulate text contents
         } else {
             run(code);
-            scanner.errors.err = false;
+            reset_errors();
         }
     }
+}
+
+// Helper method to wrap parser and scanner errors
+bool Lox::had_error() {
+    if (scanner.errors.had_error)
+        return true;
+    if (parser.errors.had_error)
+        return true;
+    return false;
+}
+
+// Helper method to reset errors after evaluation
+void Lox::reset_errors() {
+    scanner.errors.had_error = false;
+    parser.errors.had_error  = false;
 }
 
 // Function to slurp a files contents

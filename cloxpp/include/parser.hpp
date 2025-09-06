@@ -24,7 +24,7 @@ class Parser {
   public:
     Parser(vector<Token> tokens);
     std::unique_ptr<Expr> parse();
-    LoxError              err;
+    LoxError              errors;
 
   private:
     unique_ptr<Expr> expression();

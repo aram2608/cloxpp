@@ -3,9 +3,9 @@
 using namespace lox;
 
 /*
-    Constructor for our Scanner class
-    We pass in the source code as string
-*/
+ * Constructor for our Scanner class
+ * We pass in the source code as string
+ */
 Scanner::Scanner(string source)
     // We initialize our reserved keywords map
     : keywords{
@@ -163,10 +163,10 @@ bool Scanner::match(char expected) {
 }
 
 /*
-    Function to peek at next character for longer lexemes
-    It is similar to advance but we do not consume the character
-    This approach is a lookahead
-*/
+ * Function to peek at next character for longer lexemes
+ * It is similar to advance but we do not consume the character
+ * This approach is a lookahead
+ */
 char Scanner::peek() {
     // If we are at the end of the file we can return thi
     if (is_end())
@@ -278,17 +278,17 @@ void Scanner::add_identifier() {
     TokenType type;
 
     /*
-        We search our reserved keywords map to find the saved string
-        map.find() takes a key as an arg and searches for an element with a matching key
-        If found, .find() returns an iterator pointing to the element (a std::pair of key and value)
-        If not found, .find() returns an iterator to std::map::end().
-    */
+     * We search our reserved keywords map to find the saved string
+     * map.find() takes a key as an arg and searches for an element with a matching key
+     * If found, .find() returns an iterator pointing to the element (a std::pair of key and value)
+     * If not found, .find() returns an iterator to std::map::end().
+     */
     auto match = keywords.find(text);
     /*
-        The map.end() method returns an interator that points past the end of the map
-        Meaning if our match is equal to it, then it is not found in the map at all
-        We can consider that as an identifier
-    */
+     * The map.end() method returns an interator that points past the end of the map
+     * Meaning if our match is equal to it, then it is not found in the map at all
+     * We can consider that as an identifier
+     */
     if (match == keywords.end()) {
         type = TokenType::IDENTIFIER;
         // If it it does not match we can

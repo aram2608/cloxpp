@@ -8,9 +8,11 @@
 #include <vector>
 
 namespace lox {
-// We scope our aliases
-// We dont alias std::move() to make sure it remains qualified
-// It should work in scope, but just to be safe
+/*
+ * We scope our aliases
+ * We dont alias std::move() to make sure it remains qualified
+ * It should work in scope, but just to be safe
+ */
 using std::any;
 using std::unique_ptr;
 
@@ -25,10 +27,10 @@ struct ExprVisitor {
     virtual ~ExprVisitor() = default;
 
     /*
-        We pass in a reference to the expression
-        return type is std::any since it is type safe and allows for storage
-        of unknown types similarly to void *
-    */
+     * We pass in a reference to the expression
+     * return type is std::any since it is type safe and allows for storage
+     * of unknown types similarly to void *
+     */
     virtual any visitBinaryExpr(Binary& expr)     = 0;
     virtual any visitUnaryExpr(Unary& expr)       = 0;
     virtual any visitGroupingExpr(Grouping& expr) = 0;
@@ -38,11 +40,11 @@ struct ExprVisitor {
 // Abstract base class, requires at least one virtual method
 struct Expr {
     /*
-        We declare a virtual Destructor
-        This ensures that the derived classes Destructor is called
+        * We declare a virtual Destructor
+        * This ensures that the derived classes Destructor is called
 
-        Expr* e = new Binary(...);
-        delete e; <- should call Binary::~Binary() I think
+        * Expr* e = new Binary(...);
+        * delete e; <- should call Binary::~Binary() I think
     */
     virtual ~Expr() = default;
 
@@ -50,11 +52,11 @@ struct Expr {
     Expr() = default;
 
     /*
-        We delete the copy constructor
-        This should prevent making copies of Expr or its derived classes
-        Important because many nodes hold std::unique_ptr<Expr> children,
-        which we do not want to copy
-    */
+     * We delete the copy constructor
+     * This should prevent making copies of Expr or its derived classes
+     * Important because many nodes hold std::unique_ptr<Expr> children,
+     * which we do not want to copy
+     */
     Expr(const Expr&) = delete;
     // We also delete the copy assignment operator for the same reason
     Expr& operator=(const Expr&) = delete;
@@ -72,18 +74,20 @@ struct Expr {
 // allows us to use Binary anywhere Expr* and Expr& are
 struct Binary : Expr {
     /*
-        Constructor for Binary class
-        left and right are passed as unique_ptr from Expr as the temporary owner
-        In our initialization list, we move ownership of left and right
-        to the Binary class and copy construct op to operator_
-    */
+     * Constructor for Binary class
+     * left and right are passed as unique_ptr from Expr as the temporary owner
+     * In our initialization list, we move ownership of left and right
+     * to the Binary class and copy construct op to op
+     */
     Binary(unique_ptr<Expr> left, Token op, unique_ptr<Expr> right)
         : left(std::move(left)), op(std::move(op)), right(std::move(right)) {
     }
 
-    // We override the virtual method from the ExprVisitor
-    // and pass in a dereferenced pointer to the node object
-    // it should return a Binary&
+    /*
+     * We override the virtual method from the ExprVisitor
+     * and pass in a dereferenced pointer to the node object
+     * it should return a Binary&
+     */
     any accept(ExprVisitor& visitor) override {
         return visitor.visitBinaryExpr(*this);
     }
@@ -100,16 +104,18 @@ struct Binary : Expr {
 // allows us to use Binary anywhere Expr* and Expr& are
 struct Grouping : Expr {
     /*
-        Constructor for the Grouping expression, we pass in an expression
-        and in our list initialization we move ownership of the expression
-        to our member
-    */
+     * Constructor for the Grouping expression, we pass in an expression
+     * and in our list initialization we move ownership of the expression
+     * to our member
+     */
     Grouping(unique_ptr<Expr> expr) : expr(std::move(expr)) {
     }
 
-    // We override the virtual method from the ExprVisitor
-    // and pass in a dereferenced pointer to the node object,
-    // it should return a Grouping&
+    /*
+     * We override the virtual method from the ExprVisitor
+     * and pass in a dereferenced pointer to the node object,
+     * it should return a Grouping&
+     */
     any accept(ExprVisitor& visitor) override {
         return visitor.visitGroupingExpr(*this);
     }
@@ -122,15 +128,17 @@ struct Grouping : Expr {
 // allows us to use Binary anywhere Expr* and Expr& are
 struct Literal : Expr {
     /*
-        Constructor for our Literal node, it takes in any value and in
-        the list initalization, we move ownership to the member value
-    */
+     * Constructor for our Literal node, it takes in any value and in
+     * the list initalization, we move ownership to the member value
+     */
     Literal(any value) : value(std::move(value)) {
     }
 
-    // We override the virtual method from the ExprVisitor
-    // and pass in a dereferenced pointer to the node object
-    // it should return a Literal&
+    /*
+     * We override the virtual method from the ExprVisitor
+     * and pass in a dereferenced pointer to the node object
+     * it should return a Literal&
+     */
     any accept(ExprVisitor& visitor) override {
         return visitor.visitLiteralExpr(*this);
     }
@@ -143,16 +151,18 @@ struct Literal : Expr {
 // allows us to use Binary anywhere Expr* and Expr& are
 struct Unary : Expr {
     /*
-        Unary op constructor, we pass in a Token and a unique_ptr to the right expression
-        In our list initialization, we move ownership of the token and right expression
-        to the members
-    */
+     * Unary op constructor, we pass in a Token and a unique_ptr to the right expression
+     * In our list initialization, we move ownership of the token and right expression
+     * to the members
+     */
     Unary(Token op, unique_ptr<Expr> right) : op(std::move(op)), right(std::move(right)) {
     }
 
-    // We override the virtual method from the ExprVisitor
-    // and pass in a dereferenced pointer to the node object
-    // it should return a Unary&
+    /*
+     * We override the virtual method from the ExprVisitor
+     * and pass in a dereferenced pointer to the node object
+     * it should return a Unary&
+     */
     any accept(ExprVisitor& visitor) override {
         return visitor.visitUnaryExpr(*this);
     }

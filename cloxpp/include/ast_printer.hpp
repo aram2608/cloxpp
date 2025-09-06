@@ -65,10 +65,12 @@ class AstPrinter : public ExprVisitor {
     }
 
   private:
-    // A helper method to add parenthesis to the nodes in our pretty printer
-    // This will help us visualize the parse structure of the syntax trees
-    // We use an initializer list here since its lightweight and read only
-    // same concept for the string_view
+    /*
+     * A helper method to add parenthesis to the nodes in our pretty printer
+     * This will help us visualize the parse structure of the syntax trees
+     * We use an initializer list here since its lightweight and read only
+     * same concept for the string_view
+     */
     string parenthesize(string_view lexeme, initializer_list<Expr*> children) {
         // We start a string stream, it acts as buffer to store strings
         // the same way that cout << and ofstream do

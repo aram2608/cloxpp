@@ -151,10 +151,11 @@ Token Parser::advance() {
 bool Parser::is_end() {
     return peek().type == TokenType::eof;
 }
-
-// Function to peek at the current token
-// We return a read only reference since we don't
-// want an expensive copy everytime
+/*
+ * Function to peek at the current token
+ * We return a read only reference since we don't
+ * want an expensive copy everytime
+ */
 Token Parser::peek() {
     return tokens.at(current);
 }
@@ -164,7 +165,7 @@ Token Parser::previous() {
 }
 
 Parser::ParseError Parser::error(Token token, std::string_view message) {
-    err.error(token, message);
+    errors.error(token, message);
     return ParseError{""};
 }
 
@@ -175,9 +176,11 @@ void Parser::synchronize() {
         if (previous().type == TokenType::SEMICOLON)
             return;
 
-        // We synchronize on statements in lox
-        // After a semicolon, we can assume that we
-        // have started a new statement
+        /*
+         * We synchronize on statements in lox
+         * After a semicolon, we can assume that we
+         * have started a new statement
+         */
         switch (peek().type) {
         case TokenType::CLASS:
         case TokenType::FUN:

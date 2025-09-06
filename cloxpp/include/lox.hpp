@@ -23,6 +23,8 @@ class Lox {
     Lox();
     void run_file(const string& filename);
     void run_prompt();
+    bool had_error();
+    void reset_errors();
 
   private:
     Scanner scanner;
