@@ -19,7 +19,9 @@ std::unique_ptr<Expr> Parser::parse() {
 
 // Function to handle the first grammar rule, we simply match an equality
 unique_ptr<Expr> Parser::expression() {
-    return comma();
+    // challenge code
+    // return comma();
+    return equality();
 }
 
 // Function to handle multiple expressions separated by commas
@@ -40,14 +42,13 @@ unique_ptr<Expr> Parser::conditional() {
     if (match({TokenType::QUESTION})) {
         Token            op    = previous();
         unique_ptr<Expr> right = expression();
-        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+        expr                   = std::make_unique<Binary>(std::move(expr), op, std::move(right));
         if (match({TokenType::COLON})) {
-            Token op = previous();
+            Token            op    = previous();
             unique_ptr<Expr> right = conditional();
             expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
             return expr;
-        }
-        else {
+        } else {
             throw error(peek(), "Expect ':'.");
         }
     }

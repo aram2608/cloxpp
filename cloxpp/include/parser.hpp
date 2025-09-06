@@ -1,3 +1,5 @@
+#pragma once
+
 #include "error.hpp"
 #include "expr.hpp"
 #include "tokens.hpp"

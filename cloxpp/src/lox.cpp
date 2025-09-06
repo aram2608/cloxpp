@@ -14,15 +14,14 @@ void Lox::run(string code) {
     // Create out Scanner instance
     Scanner scanner(code);
     // Create tokens from source code
-    std::vector<Token> tokens      = scanner.scan_tokens();
-    parser                         = Parser(tokens);
-    std::unique_ptr<Expr> expr_ptr = parser.parse();
-    Expr&                 expr_r   = *expr_ptr;
+    std::vector<Token> tokens  = scanner.scan_tokens();
+    parser                     = Parser(tokens);
+    std::unique_ptr<Expr> expr = parser.parse();
 
     // Catch scanner and parser errors
     if (had_error())
         return;
-    std::cout << AstPrinter{}.print(expr_r) << "\n";
+    std::cout << AstPrinter{}.print(*expr) << "\n";
 }
 
 // Function to wrap the run function around file contents
