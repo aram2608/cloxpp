@@ -1,5 +1,8 @@
 #pragma once
+#include "error.hpp"
 #include "expr.hpp"
+#include "run_time_error.hpp"
+#include "tokens.hpp"
 
 #include <any>
 #include <memory>
@@ -15,7 +18,10 @@ class Interpreter : ExprVisitor {
   public:
     Interpreter();
 
-    any evaluate(Expr& expr);
+    void interpret(Expr& expr);
+    any  evaluate(Expr& expr);
+
+    LoxError errors;
 
   private:
     any visitBinaryExpr(Binary& expr) override;
@@ -25,6 +31,8 @@ class Interpreter : ExprVisitor {
 
     bool   is_truthy(const any& object);
     bool   is_equal(const any& me, const any& you);
+    void   check_num_operand(const Token& op, const any& operand);
+    void   check_num_operands(const Token& op, const any& op_a, const any& op_b);
     string make_string(const any& object);
 };
 

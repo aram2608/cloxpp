@@ -5,6 +5,15 @@ using namespace lox;
 Interpreter::Interpreter() {
 }
 
+void Interpreter::interpret(Expr& expr) {
+    try {
+        any value = evaluate(expr);
+        std::cout << make_string(value) << "\n";
+    } catch (RuntimeError error) {
+        errors.runtime_error(error);
+    }
+}
+
 // Helper method to send the expression back to visitor
 // implementation
 any Interpreter::evaluate(Expr& expr) {
@@ -25,12 +34,16 @@ any Interpreter::visitBinaryExpr(Binary& expr) {
         return is_equal(left, right);
         // Comparison operation
     case TokenType::GREATER:
+        check_num_operands(expr.op, left, right);
         return std::any_cast<double>(left) > std::any_cast<double>(right);
     case TokenType::GREATER_EQUAL:
+        check_num_operands(expr.op, left, right);
         return std::any_cast<double>(left) >= std::any_cast<double>(right);
     case TokenType::LESS:
+        check_num_operands(expr.op, left, right);
         return std::any_cast<double>(left) < std::any_cast<double>(right);
     case TokenType::LESS_EQUAL:
+        check_num_operands(expr.op, left, right);
         return std::any_cast<double>(left) <= std::any_cast<double>(right);
     // + is an overloaded operator that can handle both string concat
     // and division
@@ -45,15 +58,22 @@ any Interpreter::visitBinaryExpr(Binary& expr) {
             return std::any_cast<string>(left) + std::any_cast<string>(right);
         }
 
-        break;
+        // Catch operations where strings or nums are not used
+        throw RuntimeError(expr.op, "Operands must be two numbers or two strings.");
     case TokenType::MINUS:
         // cast to doubles and subtract
+        check_num_operands(expr.op, left, right);
         return std::any_cast<double>(left) - std::any_cast<double>(right);
     case TokenType::SLASH:
         // cast to doubles and divide
+        check_num_operands(expr.op, left, right);
+        if (std::any_cast<double>(right) == double(0)) {
+            throw RuntimeError(expr.op, "Division by 0.");
+        }
         return std::any_cast<double>(left) / std::any_cast<double>(right);
     case TokenType::STAR:
         // cast to doubles and multiply
+        check_num_operands(expr.op, left, right);
         return std::any_cast<double>(left) * std::any_cast<double>(right);
     }
 
@@ -69,6 +89,7 @@ any Interpreter::visitUnaryExpr(Unary& expr) {
     case TokenType::BANG:
         return !is_truthy(right);
     case TokenType::MINUS:
+        check_num_operand(expr.op, right);
         // We cast the value from the right expression to a double
         // then apply the unary op and return
         return -std::any_cast<double>(right);
@@ -129,6 +150,20 @@ bool Interpreter::is_equal(const any& me, const any& you) {
     }
     // Everything else is false
     return false;
+}
+
+// Function to test for numerical types, unary ops
+void Interpreter::check_num_operand(const Token& op, const any& operand) {
+    if (operand.type() == typeid(double))
+        return;
+    throw RuntimeError{op, "Operand must be a number."};
+}
+
+// Function to test for multiple numerical types, binary expressions
+void Interpreter::check_num_operands(const Token& op, const any& op_a, const any& op_b) {
+    if (op_a.type() == typeid(double) && op_b.type() == typeid(double))
+        return;
+    throw RuntimeError{op, "Operands must be a numbers."};
 }
 
 // Functions to convert types to strings

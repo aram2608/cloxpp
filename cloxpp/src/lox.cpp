@@ -21,7 +21,10 @@ void Lox::run(string code) {
     // Catch scanner and parser errors
     if (had_error())
         return;
-    std::cout << AstPrinter{}.print(*expr) << "\n";
+    // We interpret the AST
+    // We need to pass in a dereferenced pointer since we are using
+    // unique_ptrs
+    interpreter.interpret(*expr);
 }
 
 // Function to wrap the run function around file contents
@@ -35,6 +38,11 @@ void Lox::run_file(const string& filename) {
     // Catch any errors in our code
     if (scanner.errors.had_error) {
         std::exit(EXIT_FAILURE);
+    }
+
+    // Catch runtime errors in file
+    if (interpreter.errors.had_RuntimeError) {
+    std::exit(EXIT_FAILURE);
     }
 }
 
@@ -88,6 +96,7 @@ bool Lox::had_error() {
 void Lox::reset_errors() {
     scanner.errors.had_error = false;
     parser.errors.had_error  = false;
+    interpreter.errors.had_RuntimeError = false;
 }
 
 // Function to slurp a files contents
