@@ -23,6 +23,8 @@ enum class TokenType {
     SEMICOLON,
     SLASH,
     STAR,
+    COLON,
+    QUESTION,
 
     // One or two character tokens.
     BANG,

@@ -28,6 +28,8 @@ class Parser {
 
   private:
     unique_ptr<Expr> expression();
+    unique_ptr<Expr> comma();
+    unique_ptr<Expr> conditional();
     unique_ptr<Expr> equality();
     unique_ptr<Expr> comparison();
     unique_ptr<Expr> term();

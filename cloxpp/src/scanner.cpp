@@ -79,6 +79,12 @@ void Scanner::scan() {
     case '*':
         add_token(TokenType::STAR);
         break;
+    case ':':
+        add_token(TokenType::COLON);
+        break;
+    case '?':
+        add_token(TokenType::QUESTION);
+        break;
     // Multicharacter lexemes need the match helper method
     case '!':
         add_token(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG);
