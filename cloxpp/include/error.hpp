@@ -1,5 +1,7 @@
 #pragma once
 
+#include "tokens.hpp"
+
 #include <iostream>
 #include <string_view>
 
@@ -24,6 +26,14 @@ class LoxError {
     // the string itself and therefore do not need a copy
     void error(int line, string_view message) {
         report(line, "", message);
+    }
+    // Error overload
+    void error(Token token, string_view message) {
+        if (token.type == TokenType::eof) {
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, " at '" + token.lexeme + "'", message);
+        }
     }
 };
 

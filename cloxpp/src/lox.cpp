@@ -1,9 +1,12 @@
 #include "lox.hpp"
 
+#include "ast_printer.hpp"
+
 using namespace lox;
 
-// Empty contsructor for now
-Lox::Lox() {
+// Empty constructor for now
+// We initialize an empty parser to start off
+Lox::Lox() : parser(std::vector<Token>()) {
 }
 
 // The main logic for our Lox program, handles scanning, parsing, etc.
@@ -12,11 +15,15 @@ void Lox::run(string code) {
     Scanner scanner(code);
     // Create tokens from source code
     std::vector<Token> tokens = scanner.scan_tokens();
+    parser                    = Parser(tokens);
+    auto  expr_ptr            = parser.parse();
+    Expr& expr_r              = *expr_ptr;
+    if (scanner.errors.err)
+        return;
+    if (parser.err.err)
+        return;
 
-    // For now we will just print the tokens
-    for (const Token& token : tokens) {
-        std::cout << token.to_string() << "\n";
-    }
+    std::cout << AstPrinter{}.print(expr_r) << "\n";
 }
 
 // Function to wrap the run function around file contents

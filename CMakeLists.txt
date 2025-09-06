@@ -13,6 +13,7 @@ add_executable(${PROJECT_NAME}
     cloxpp/src/lox.cpp
     cloxpp/src/scanner.cpp
     cloxpp/src/tokens.cpp
+    cloxpp/src/parser.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/include)

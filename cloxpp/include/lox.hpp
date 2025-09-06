@@ -1,5 +1,6 @@
 #pragma once
 
+#include "parser.hpp"
 #include "scanner.hpp"
 
 #include <cstdlib>
@@ -25,6 +26,7 @@ class Lox {
 
   private:
     Scanner scanner;
+    Parser  parser;
     void    run(string code);
     string  slurp_file(const string& filename);
 };

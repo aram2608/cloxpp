@@ -12,15 +12,23 @@ namespace lox {
 using std::string;
 using std::vector;
 class Scanner {
+    // Source code and tokens
+    string        source;
+    vector<Token> tokens{};
+    // Attributes to keep track of string index
+    //  Start of string
+    int start = 0;
+    // Current token
+    int current = 0;
+    // Line number
+    int line = 1;
+
   public:
     // Constructor for parsing code
     Scanner(string source);
     // Default constructor
     Scanner() : source("") {
     }
-
-    string        source;
-    vector<Token> tokens{};
 
     vector<Token> scan_tokens();
 
@@ -43,16 +51,6 @@ class Scanner {
     bool is_digit(char c);
     bool is_alpha_num(char c);
     bool is_alpha(char c);
-
-    /*
-      Attributes to keep track of string index
-    */
-    // Start of string
-    int start = 0;
-    // Current token
-    int current = 0;
-    // Line number
-    int line = 1;
 
     // Reserved keywords
     const std::map<std::string, TokenType> keywords;
