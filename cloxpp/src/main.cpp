@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
         // Otherwise we run the REPL
     } else {
         cout << "Welcome to the Lox REPL!\n" << endl;
-        //lox.run_prompt();
-        make_test_tree();
+        lox.run_prompt();
+        // make_test_tree();
     }
     return 0;
 }

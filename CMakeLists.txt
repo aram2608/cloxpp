@@ -18,3 +18,6 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/include)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE magic_enum::magic_enum)
+
+target_compile_options(${PROJECT_NAME} 
+    PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
