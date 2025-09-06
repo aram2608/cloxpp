@@ -20,7 +20,7 @@ struct Unary;
 struct Grouping;
 struct Literal;
 
-// Visitor for different nodes
+// Abstract visitor for different nodes
 struct ExprVisitor {
     virtual ~ExprVisitor() = default;
 
@@ -29,17 +29,17 @@ struct ExprVisitor {
         return type is std::any since it is type safe and allows for storage
         of unknown types similarly to void *
     */
-    virtual any visitBinaryExpr( Binary& expr)     = 0;
-    virtual any visitUnaryExpr( Unary& expr)       = 0;
-    virtual any visitGroupingExpr( Grouping& expr) = 0;
-    virtual any visitLiteralExpr( Literal& expr)   = 0;
+    virtual any visitBinaryExpr(Binary& expr)     = 0;
+    virtual any visitUnaryExpr(Unary& expr)       = 0;
+    virtual any visitGroupingExpr(Grouping& expr) = 0;
+    virtual any visitLiteralExpr(Literal& expr)   = 0;
 };
 
 // Abstract base class, requires at least one virtual method
 struct Expr {
     /*
-        We declare a virtual deconstructor
-        This ensures that the derived classes deconstructor is called
+        We declare a virtual Destructor
+        This ensures that the derived classes Destructor is called
 
         Expr* e = new Binary(...);
         delete e; <- should call Binary::~Binary() I think
@@ -82,7 +82,7 @@ struct Binary : Expr {
     }
 
     // We override the virtual method from the ExprVisitor
-    // and pass in a dereferenced pointer the node object
+    // and pass in a dereferenced pointer to the node object
     // it should return a Binary&
     any accept(ExprVisitor& visitor) override {
         return visitor.visitBinaryExpr(*this);
@@ -108,7 +108,7 @@ struct Grouping : Expr {
     }
 
     // We override the virtual method from the ExprVisitor
-    // and pass in a dereferenced pointer the node object
+    // and pass in a dereferenced pointer to the node object,
     // it should return a Grouping&
     any accept(ExprVisitor& visitor) override {
         return visitor.visitGroupingExpr(*this);
@@ -129,7 +129,7 @@ struct Literal : Expr {
     }
 
     // We override the virtual method from the ExprVisitor
-    // and pass in a dereferenced pointer the node object
+    // and pass in a dereferenced pointer to the node object
     // it should return a Literal&
     any accept(ExprVisitor& visitor) override {
         return visitor.visitLiteralExpr(*this);
@@ -151,7 +151,7 @@ struct Unary : Expr {
     }
 
     // We override the virtual method from the ExprVisitor
-    // and pass in a dereferenced pointer the node object
+    // and pass in a dereferenced pointer to the node object
     // it should return a Unary&
     any accept(ExprVisitor& visitor) override {
         return visitor.visitUnaryExpr(*this);
