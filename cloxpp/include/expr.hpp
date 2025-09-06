@@ -44,7 +44,7 @@ struct Expr {
         * This ensures that the derived classes Destructor is called
 
         * Expr* e = new Binary(...);
-        * delete e; <- should call Binary::~Binary() I think
+        * delete e; <- should call Binary::~Binary()
     */
     virtual ~Expr() = default;
 
@@ -60,11 +60,6 @@ struct Expr {
     Expr(const Expr&) = delete;
     // We also delete the copy assignment operator for the same reason
     Expr& operator=(const Expr&) = delete;
-
-    // Now we can request a move constructor
-    Expr(Expr&&) = default;
-    // And a move assignment operator
-    Expr& operator=(Expr&&) = default;
 
     // accept() method for visiting nodes, we pass in a reference to ExprVisitor&
     virtual any accept(ExprVisitor& visitor) = 0;
