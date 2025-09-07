@@ -45,9 +45,11 @@ class Environment {
         auto element = values.find(identifier.lexeme);
         if (element != values.end()) {
             element->second = std::move(value);
+            return;
         }
 
-        // If our environment isnt empty we can reassign an identifier
+        // We can ealk the chain of environments and recursivley search for
+        // the variable, if we dont find it we can throw an error
         if (enclosing != nullptr) {
             enclosing->assign(identifier, std::move(value));
             return;
@@ -66,10 +68,11 @@ class Environment {
             return element->second;
         }
 
-        // If our environment is not empty, we can return identifiers by name if
-        // they are already defined
-        if (enclosing != nullptr)
+        // We can ealk the chain of environments and recursivley search for
+        // the variable, if we dont find it we can throw an error
+        if (enclosing != nullptr) {
             return enclosing->get(identifier);
+        }
 
         // Toss an error if the variable does not exists
         throw RuntimeError(identifier, "Undefined variable '" + identifier.lexeme + "'.");

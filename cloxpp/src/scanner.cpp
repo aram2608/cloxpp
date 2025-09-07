@@ -299,13 +299,13 @@ void Scanner::add_identifier() {
      */
     if (match == keywords.end()) {
         type = TokenType::IDENTIFIER;
-        // If it it does not match we can
     } else {
+        // If it does match we have a keyword
         // We assign match to the second value of the std::pair
         type = match->second;
     }
 
-    // We can now add the reserved keyword token
+    // We can now add the token
     add_token(type);
 }
 
