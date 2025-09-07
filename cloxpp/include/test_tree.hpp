@@ -1,7 +1,7 @@
 #pragma once
 #include "ast_printer.hpp"
 
-namespace lox {
+namespace CppLox {
 
 void make_test_tree() {
     // We first create a unique_ptr to Expr
@@ -20,4 +20,4 @@ void make_test_tree() {
     std::cout << AstPrinter{}.print(*expr) << "\n";
 };
 
-} // namespace lox
+} // namespace CppLox

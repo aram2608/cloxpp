@@ -9,7 +9,7 @@
 #include <string>
 #include <typeinfo>
 
-namespace lox {
+namespace CppLox {
 
 class AstPrinter : public ExprVisitor {
   public:
@@ -62,14 +62,17 @@ class AstPrinter : public ExprVisitor {
         return std::string{"Error in visitLiteralExpr: literal type not recognized."};
     }
 
+    std::any visitAssignExpr(Assign& expr) override {
+        return std::string{parenthesize(expr.identifier.to_string())};
+    }
+
   private:
     /*
      * A helper method to add parenthesis to the nodes in our pretty printer
      * This will help us visualize the parse structure of the syntax trees
      * We use an initializer list here since its lightweight and read only
-     * same concept for the string_view
      */
-    std::string parenthesize(std::string_view lexeme, std::initializer_list<Expr*> children) {
+    std::string parenthesize(std::string lexeme, std::initializer_list<Expr*> children) {
         // We start a string stream, it acts as buffer to store strings
         // the same way that cout << and ofstream do
         std::ostringstream out;
@@ -86,7 +89,7 @@ class AstPrinter : public ExprVisitor {
         return out.str();
     }
     // Overload for simply tokens
-    std::string parenthesize(std::string_view lexeme) {
+    std::string parenthesize(std::string lexeme) {
         // We start a string stream, it acts as buffer to store strings
         // the same way that cout << and ofstream do
         std::ostringstream out;
@@ -99,4 +102,4 @@ class AstPrinter : public ExprVisitor {
     }
 };
 
-} // namespace lox
+} // namespace CppLox

@@ -8,7 +8,7 @@
 #include <utility> // std::move
 #include <vector>
 
-namespace lox {
+namespace CppLox {
 
 struct Block;
 struct Expression;
@@ -100,4 +100,4 @@ struct Var : Stmt {
     Token                 identifier;
     std::unique_ptr<Expr> initializer;
 };
-} // namespace lox
+} // namespace CppLox

@@ -7,7 +7,7 @@
 #include <map>
 #include <vector>
 
-namespace lox {
+namespace CppLox {
 class Scanner {
     // Source code and tokens
     std::string        source;
@@ -53,4 +53,4 @@ class Scanner {
     const std::map<std::string, TokenType> keywords;
 };
 
-} // namespace lox
+} // namespace CppLox

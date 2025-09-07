@@ -1,10 +1,8 @@
 #include "lox.hpp"
 
-#include "ast_printer.hpp"
-
 #include <utility>
 
-using namespace lox;
+using namespace CppLox;
 using std::cin;
 using std::cout;
 using std::endl;

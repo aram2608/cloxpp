@@ -8,10 +8,9 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
-#include <string_view>
 #include <vector>
 
-namespace lox {
+namespace CppLox {
 
 class Parser {
     std::vector<Token> tokens;
@@ -33,6 +32,7 @@ class Parser {
     std::unique_ptr<Stmt> print_statement();
     std::unique_ptr<Stmt> expression_statement();
     std::unique_ptr<Expr> expression();
+    std::unique_ptr<Expr> assignment();
     std::unique_ptr<Expr> comma();
     std::unique_ptr<Expr> conditional();
     std::unique_ptr<Expr> equality();
@@ -48,7 +48,7 @@ class Parser {
     Token                 peek();
     Token                 previous();
     bool                  is_end();
-    ParseError            error(Token token, std::string_view message);
+    ParseError            error(Token token, std::string message);
     void                  synchronize();
 };
-} // namespace lox
+} // namespace CppLox

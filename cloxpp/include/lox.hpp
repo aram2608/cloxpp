@@ -9,7 +9,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace lox {
+namespace CppLox {
 
 class Lox {
 
@@ -28,4 +28,4 @@ class Lox {
     std::string slurp_file(const std::string& filename);
 };
 
-} // namespace lox
+} // namespace CppLox

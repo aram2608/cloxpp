@@ -4,7 +4,7 @@
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
 
-namespace lox {
+namespace CppLox {
 
 enum class TokenType {
     // Single-character tokens.
@@ -105,9 +105,9 @@ class Token {
         return "(" + tok_type + " , " + lexeme + " , " + literal_txt + ")";
     }
 
-    TokenType   type;
+    TokenType   type = TokenType::eof;
     std::string lexeme;
     std::any    literal;
-    int         line;
+    int         line = 0;
 };
-} // namespace lox
+} // namespace CppLox

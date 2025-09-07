@@ -1,6 +1,6 @@
 #include "scanner.hpp"
 
-using namespace lox;
+using namespace CppLox;
 using std::string;
 using std::vector;
 
@@ -190,7 +190,7 @@ char Scanner::peek_next() {
 }
 
 // Function to handle string token types
-void lox::Scanner::add_string() {
+void Scanner::add_string() {
     // We need to peek forward until we meet the end of file or the closing quote
     while (peek() != '"' && !is_end()) {
         // If we reach a new line we increment the line number

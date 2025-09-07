@@ -1,24 +1,79 @@
 #pragma once
 
+#include "run_time_error.hpp"
+#include "tokens.hpp"
+
 #include <any>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 
-namespace lox {
+namespace CppLox {
 
 class Environment {
-    std::unique_ptr<Environment>    enclosing;
+    // unique_ptr to the Environment
+    std::unique_ptr<Environment> enclosing;
+    // Ordered map of keys and values
     std::map<std::string, std::any> values;
 
-    // We create two overrides for our environment constructor
-    Environment() : enclosing(nullptr) {
+  public:
+    /*
+     * We pass in an Environment pointer and move ownership
+     * By default enclosing is a nullptr
+     * explicit prevents implicit conversions
+     */
+    explicit Environment(std::unique_ptr<Environment> enclosing = nullptr)
+        : enclosing(std::move(enclosing)) {
     }
 
-    // We pass in an Environment pointer and move ownership
-    Environment(std::unique_ptr<Environment> enclosing) : enclosing(std::move(enclosing)) {
+    // Function to define and store variables in the map
+    void define(std::string identifier, std::any value) {
+        // the value is oftentimes a pointer so we move ownership
+        // this method overrides id everytime however, since the [] operator does not
+        // care if the object already exists or not
+        values[identifier] = std::move(value);
+    }
+
+    void assign(Token identifier, std::any value) {
+        /*
+         * We check the internal identifiers string lexeme and make sure its
+         * in the map
+         * We use an iterator since the [] operators enable a second lookup
+         * With the iterator method we can simply look once with find
+         */
+        auto element = values.find(identifier.lexeme);
+        if (element != values.end()) {
+            element->second = std::move(value);
+        }
+
+        // If our environment isnt empty we can reassign an identifier
+        if (enclosing != nullptr) {
+            enclosing->assign(identifier, std::move(value));
+            return;
+        }
+
+        // We catch any undefined variables
+        throw RuntimeError(identifier, "Undefined variable '" + identifier.lexeme + "'.");
+    }
+
+    std::any get(Token identifier) {
+        // We check the internal identifiers string lexeme and make sure its
+        // in the map
+        auto element = values.find(identifier.lexeme);
+        if (element != values.end()) {
+            // we return the second value from the id iterator
+            return element->second;
+        }
+
+        // If our environment is not empty, we can return identifiers by name if
+        // they are already defined
+        if (enclosing != nullptr)
+            return enclosing->get(identifier);
+
+        // Toss an error if the variable does not exists
+        throw RuntimeError(identifier, "Undefined variable '" + identifier.lexeme + "'.");
     }
 };
 
-} // namespace lox
+} // namespace CppLox

@@ -7,9 +7,10 @@
 #include <utility> // for std::move
 #include <vector>
 
-namespace lox {
+namespace CppLox {
 
 // Forward declarations
+struct Assign;
 struct Binary;
 struct Unary;
 struct Grouping;
@@ -25,6 +26,7 @@ struct ExprVisitor {
      * return type is std::any since it is type safe and allows for storage
      * of unknown types similarly to void *
      */
+    virtual std::any visitAssignExpr(Assign& expr)     = 0;
     virtual std::any visitBinaryExpr(Binary& expr)     = 0;
     virtual std::any visitUnaryExpr(Unary& expr)       = 0;
     virtual std::any visitGroupingExpr(Grouping& expr) = 0;
@@ -58,6 +60,27 @@ struct Expr {
 
     // accept() method for visiting nodes, we pass in a reference to ExprVisitor&
     virtual std::any accept(ExprVisitor& visitor) = 0;
+};
+
+// Assignment node,
+struct Assign : Expr {
+    /*
+     * Assignment node constructor
+     *
+     */
+    Assign(Token identifier, std::unique_ptr<Expr> value)
+        : identifier(std::move(identifier)), value(std::move(value)) {
+    }
+
+    // Override the accept method from expr
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visitAssignExpr(*this);
+    }
+
+    // Token name
+    Token identifier;
+    // Pointer to value
+    std::unique_ptr<Expr> value;
 };
 
 // Binary node, inheritting from Expr
@@ -180,4 +203,4 @@ struct Variable : Expr {
     Token identifier;
 };
 
-} // namespace lox
+} // namespace CppLox

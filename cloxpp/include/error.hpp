@@ -4,9 +4,8 @@
 #include "tokens.hpp"
 
 #include <iostream>
-#include <string_view>
 
-namespace lox {
+namespace CppLox {
 
 class LoxError {
   public:
@@ -16,18 +15,18 @@ class LoxError {
     bool had_RuntimeError = false;
 
     // A function to report errors to stderr
-    void report(int line, std::string_view where, std::string_view message) {
+    void report(int line, std::string where, std::string message) {
         std::cerr << "[line " << line << "] Error" << where << ": " << message << "\n";
         had_error = true;
     }
 
     // A function to display errors, we use string view since we dont need to access
     // the string itself and therefore do not need a copy
-    void error(int line, std::string_view message) {
+    void error(int line, std::string message) {
         report(line, "", message);
     }
     // Error overload
-    void error(Token token, std::string_view message) {
+    void error(Token token, std::string message) {
         if (token.type == TokenType::eof) {
             report(token.line, " at end", message);
         } else {
@@ -35,10 +34,12 @@ class LoxError {
         }
     }
 
+    // Function to report runtime errors
     void runtime_error(const RuntimeError& error) {
+        std::cout << error.token.to_string() << std::endl;
         std::cerr << error.what() << "\n[line " << error.token.line << "]\n";
         had_RuntimeError = true;
     }
 };
 
-} // namespace lox
+} // namespace CppLox

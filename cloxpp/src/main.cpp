@@ -4,15 +4,13 @@
 #include <cstdlib>
 #include <iostream>
 
-using namespace lox;
-
 using std::cout;
 using std::endl;
 
 int main(int argc, char* argv[]) {
 
     // Create our Lox lang instance
-    Lox lox = Lox();
+    CppLox::Lox lox = CppLox::Lox();
 
     /*
         * We need to catch the number of command line arguments

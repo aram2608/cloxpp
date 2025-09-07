@@ -5,7 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace lox {
+namespace CppLox {
 
 // Class to handle Interpreter errors during runtime
 class RuntimeError : public std::runtime_error {
@@ -19,4 +19,4 @@ class RuntimeError : public std::runtime_error {
         : std::runtime_error{message.c_str()}, token{token} {
     }
 };
-} // namespace lox
+} // namespace CppLox

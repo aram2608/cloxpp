@@ -1,6 +1,6 @@
 #include "parser.hpp"
 
-using namespace lox;
+using namespace CppLox;
 using std::initializer_list;
 using std::unique_ptr;
 using std::vector;
@@ -40,7 +40,7 @@ unique_ptr<Stmt> Parser::declaration() {
 }
 
 // Function to handle var_declar
-unique_ptr<Stmt> lox::Parser::var_declaration() {
+unique_ptr<Stmt> Parser::var_declaration() {
     // Match an identifier token and consume it
     Token identifier = consume(TokenType::IDENTIFIER, "Expected identifier.");
 
@@ -87,42 +87,50 @@ unique_ptr<Stmt> Parser::expression_statement() {
     return std::make_unique<Expression>(std::move(expr));
 }
 
-// Function to handle the first grammar rule, we simply match an equality
+// Function to handle the parsing of expressions
 unique_ptr<Expr> Parser::expression() {
-    // challenge code
-    // return comma();
-    return equality();
+    return assignment();
 }
 
-// Function to handle multiple expressions separated by commas
-unique_ptr<Expr> lox::Parser::comma() {
-    unique_ptr<Expr> expr = conditional();
+/*
+ * Function to handle parsing assignments
+ * This is fairly tricky as we are using a single token recursive descent parser
+ * meaning we can not look far enough ahead to know we are parsing an assignment
+ * until after we reach the =
+ *
+ * var a = "before";
+ * a = "value";
+ *
+ * In this expression if we evaluate a we would return "before" which is not what we want
+ * This is the difference between an rvalue and an lvalue, an lvalue is a storage location for a
+ * value while an rvalue is simply a transient value we have evaluated
+ */
+unique_ptr<Expr> Parser::assignment() {
+    // We first need to initialize our expression
+    std::unique_ptr<Expr> expr = equality();
 
-    while (match({TokenType::COMMA})) {
-        Token            op    = previous();
-        unique_ptr<Expr> right = conditional();
-        expr                   = std::make_unique<Binary>(std::move(expr), op, std::move(right));
-    }
-    return expr;
-}
+    // We need to match and =
+    if (match({TokenType::EQUAL})) {
+        // If we match an = sign we need to save the token
+        Token equals = previous();
+        // We call assignment to recursivle parse the right hand side
+        std::unique_ptr<Expr> value = assignment();
 
-unique_ptr<Expr> Parser::conditional() {
-    unique_ptr<Expr> expr = equality();
-
-    if (match({TokenType::QUESTION})) {
-        Token            op    = previous();
-        unique_ptr<Expr> right = expression();
-        expr                   = std::make_unique<Binary>(std::move(expr), op, std::move(right));
-        if (match({TokenType::COLON})) {
-            Token            op    = previous();
-            unique_ptr<Expr> right = conditional();
-            expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
-            return expr;
-        } else {
-            throw error(peek(), "Expected ':'.");
+        /*
+         * We try and cast the expression, if it works we extract the token
+         * and create a new assignment node
+         * if it fails it returns a nullptr and that is falsy in C++
+         * In the process of this we convert the rvalue expression to an lvalue
+         * expression
+         */
+        if (Variable* var = dynamic_cast<Variable*>(expr.get())) {
+            Token identifier = var->identifier;
+            return std::make_unique<Assign>(std::move(identifier), std::move(value));
         }
-    }
 
+        error(equals, "Invalid assignment target.");
+    }
+    // We return the expression
     return expr;
 }
 
@@ -173,7 +181,9 @@ unique_ptr<Expr> Parser::term() {
     return expr;
 }
 
+// Function to visit factor node
 unique_ptr<Expr> Parser::factor() {
+    // We initialize our first expression
     unique_ptr<Expr> expr = unary();
     // Loop until we dont come across multi or division anymore
     while (match({TokenType::STAR, TokenType::SLASH})) {
@@ -183,11 +193,15 @@ unique_ptr<Expr> Parser::factor() {
         expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
     }
 
+    // Return og expr otherwise
     return expr;
 }
 
+// Function to visit the unary operation node
 unique_ptr<Expr> Parser::unary() {
+    // We can match either the - or ! operators
     if (match({TokenType::BANG, TokenType::MINUS})) {
+        // We store the token types and make a new unary node
         Token            op    = previous();
         unique_ptr<Expr> right = unary();
         return std::make_unique<Unary>(op, std::move(right));
@@ -195,22 +209,28 @@ unique_ptr<Expr> Parser::unary() {
     return primary();
 }
 
+// Function to handle the atomic units of Lox
 unique_ptr<Expr> Parser::primary() {
+    // Booleans
     if (match({TokenType::FALSE}))
         return std::make_unique<Literal>(false);
     if (match({TokenType::TRUE}))
         return std::make_unique<Literal>(true);
+    // Null value
     if (match({TokenType::NIL}))
         return std::make_unique<Literal>(nullptr);
 
+    // Strings and nums
     if (match({TokenType::NUMBER, TokenType::STRING})) {
         return std::make_unique<Literal>(previous().literal);
     }
 
+    // Identifiers
     if (match({TokenType::IDENTIFIER})) {
         return std::make_unique<Variable>(previous());
     }
 
+    // Parenthesis
     if (match({TokenType::LEFT_PAREN})) {
         unique_ptr<Expr> expr = expression();
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
@@ -274,7 +294,7 @@ Token Parser::previous() {
     return tokens.at(current - 1);
 }
 
-Parser::ParseError Parser::error(Token token, std::string_view message) {
+Parser::ParseError Parser::error(Token token, std::string message) {
     errors.error(token, message);
     return ParseError{""};
 }

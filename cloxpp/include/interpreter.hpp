@@ -1,4 +1,5 @@
 #pragma once
+#include "environment.hpp"
 #include "error.hpp"
 #include "expr.hpp"
 #include "run_time_error.hpp"
@@ -10,7 +11,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace lox {
+namespace CppLox {
 // We inherit the ExprVisitor class so now we need to override each visit method
 class Interpreter : ExprVisitor, StmtVisitor {
   public:
@@ -23,15 +24,17 @@ class Interpreter : ExprVisitor, StmtVisitor {
     LoxError errors;
 
   private:
-    std::any visitBinaryExpr(Binary& expr) override;
-    std::any visitUnaryExpr(Unary& expr) override;
-    std::any visitGroupingExpr(Grouping& expr) override;
-    std::any visitLiteralExpr(Literal& expr) override;
-    std::any visitBlockStmt(Block& stmt) override;
-    std::any visitExpressionStmt(Expression& stmt) override;
-    std::any visitPrintStmt(Print& stmt) override;
-    std::any visitVarStmt(Var& stmt) override;
-    std::any visitVariableExpr(Variable& var) override;
+    std::unique_ptr<Environment> environment = std::make_unique<Environment>();
+    std::any                     visitAssignExpr(Assign& expr) override;
+    std::any                     visitBinaryExpr(Binary& expr) override;
+    std::any                     visitUnaryExpr(Unary& expr) override;
+    std::any                     visitGroupingExpr(Grouping& expr) override;
+    std::any                     visitLiteralExpr(Literal& expr) override;
+    std::any                     visitBlockStmt(Block& stmt) override;
+    std::any                     visitExpressionStmt(Expression& stmt) override;
+    std::any                     visitPrintStmt(Print& stmt) override;
+    std::any                     visitVarStmt(Var& stmt) override;
+    std::any                     visitVariableExpr(Variable& var) override;
 
     bool        is_truthy(const std::any& object);
     bool        is_equal(const std::any& me, const std::any& you);
@@ -40,4 +43,4 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::string make_string(const std::any& object);
 };
 
-} // namespace lox
+} // namespace CppLox

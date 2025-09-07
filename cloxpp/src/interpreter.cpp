@@ -1,6 +1,6 @@
 #include "interpreter.hpp"
 
-using namespace lox;
+using namespace CppLox;
 using std::any;
 using std::string;
 using std::unique_ptr;
@@ -34,6 +34,17 @@ any Interpreter::evaluate(Expr& expr) {
     return expr.accept(*this);
 }
 
+// Function to visit Assignment nodes
+any Interpreter::visitAssignExpr(Assign& expr) {
+    // We evalute the expression and save its value
+    any value = evaluate(*expr.value);
+    // We need to assign the variable and identifier
+    environment->assign(expr.identifier, value);
+    // We return the value
+    return value;
+}
+
+// Function to visit binary expression nodes
 any Interpreter::visitBinaryExpr(Binary& expr) {
     // We evaluate left and right expressions
     // we need to dereference the unique_ptr
@@ -151,11 +162,24 @@ any Interpreter::visitPrintStmt(Print& stmt) {
 
 // Function to handle var stmt logic
 any Interpreter::visitVarStmt(Var& stmt) {
+    // We need to initialize a return value with null
+    any value = nullptr;
+    // We check if our value is null
+    if (stmt.initializer != nullptr) {
+        // If a vlue
+        value = evaluate(*stmt.initializer);
+    }
+
+    // We add our variable to the environment with its value if it has one
+    environment->define(stmt.identifier.lexeme, std::move(value));
+    // We then return an empty std::any
     return {};
 }
 
+// Function to handle variable expressions
 any Interpreter::visitVariableExpr(Variable& var) {
-    return {};
+    // We return a variable if its defined
+    return environment->get(var.identifier);
 }
 
 // Function to test logical operations
