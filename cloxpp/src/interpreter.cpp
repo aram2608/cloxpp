@@ -2,6 +2,7 @@
 
 using namespace CppLox;
 using std::any;
+using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
 using std::vector;
@@ -26,6 +27,69 @@ void Interpreter::interpret(vector<unique_ptr<Stmt>> stmts) {
 // Helper function to execute statemtent
 void Interpreter::execute(Stmt& stmt) {
     stmt.accept(*this);
+}
+
+// Function to iterate and execute over each statement in the block statement
+void Interpreter::execute_block(const vector<unique_ptr<Stmt>>& stmts,
+                                shared_ptr<Environment>         env) {
+    // We first need to store the first environment
+    shared_ptr<Environment> previous = this->environment;
+
+    // We transfer ownership of the passed in environment to the current
+    // environment
+    this->environment = std::move(env);
+
+    // We then try to iterate over the stmts in the vector
+    try {
+        for (const unique_ptr<Stmt>& stmt : stmts) {
+            execute(*stmt);
+        }
+    } catch (...) {
+        this->environment = std::move(previous);
+        throw;
+    }
+
+    this->environment = std::move(previous);
+}
+
+// Function to handle blockstm logic
+any Interpreter::visitBlockStmt(Block& stmt) {
+    execute_block(stmt.stmts, environment);
+    return {};
+}
+
+// Function to handle expression stmt logic
+any Interpreter::visitExpressionStmt(Expression& stmt) {
+    // We dereference the pointer and evaulate the underlying expression
+    evaluate(*stmt.expr);
+    // we then return an empty std::any{}
+    return {};
+}
+
+// Function to handle print stmt logic
+any Interpreter::visitPrintStmt(Print& stmt) {
+    // We evaluate the expression and store temporarily
+    any value = evaluate(*stmt.expr);
+    // We then display the value, the variable is destroyed after leaving scope
+    std::cout << make_string(value) << std::endl;
+    // We then return an empty std::any{}
+    return {};
+}
+
+// Function to handle var stmt logic
+any Interpreter::visitVarStmt(Var& stmt) {
+    // We need to initialize a return value with null
+    any value = nullptr;
+    // We check if our value is null
+    if (stmt.initializer != nullptr) {
+        // If a vlue
+        value = evaluate(*stmt.initializer);
+    }
+
+    // We add our variable to the environment with its value if it has one
+    environment->define(stmt.identifier.lexeme, std::move(value));
+    // We then return an empty std::any
+    return {};
 }
 
 // Helper method to send the expression back to visitor
@@ -135,45 +199,6 @@ any Interpreter::visitLiteralExpr(Literal& expr) {
     // We stuffed the value after scanning into the token so we can
     // simply retrieve it
     return expr.value;
-}
-
-// Function to handle blockstm logic
-any Interpreter::visitBlockStmt(Block& stmt) {
-    return {};
-}
-
-// Function to handle expression stmt logic
-any Interpreter::visitExpressionStmt(Expression& stmt) {
-    // We dereference the pointer and evaulate the underlying expression
-    evaluate(*stmt.expr);
-    // we then return an empty std::any{}
-    return {};
-}
-
-// Function to handle print stmt logic
-any Interpreter::visitPrintStmt(Print& stmt) {
-    // We evaluate the expression and store temporarily
-    any value = evaluate(*stmt.expr);
-    // We then display the value, the variable is destroyed after leaving scope
-    std::cout << make_string(value) << std::endl;
-    // We then return an empty std::any{}
-    return {};
-}
-
-// Function to handle var stmt logic
-any Interpreter::visitVarStmt(Var& stmt) {
-    // We need to initialize a return value with null
-    any value = nullptr;
-    // We check if our value is null
-    if (stmt.initializer != nullptr) {
-        // If a vlue
-        value = evaluate(*stmt.initializer);
-    }
-
-    // We add our variable to the environment with its value if it has one
-    environment->define(stmt.identifier.lexeme, std::move(value));
-    // We then return an empty std::any
-    return {};
 }
 
 // Function to handle variable expressions

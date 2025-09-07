@@ -13,7 +13,7 @@ namespace CppLox {
 
 class Environment {
     // unique_ptr to the Environment
-    std::unique_ptr<Environment> enclosing;
+    std::shared_ptr<Environment> enclosing;
     // Ordered map of keys and values
     std::map<std::string, std::any> values;
 
@@ -23,7 +23,7 @@ class Environment {
      * By default enclosing is a nullptr
      * explicit prevents implicit conversions
      */
-    explicit Environment(std::unique_ptr<Environment> enclosing = nullptr)
+    explicit Environment(std::shared_ptr<Environment> enclosing = nullptr)
         : enclosing(std::move(enclosing)) {
     }
 

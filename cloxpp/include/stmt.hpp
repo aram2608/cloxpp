@@ -50,6 +50,7 @@ struct Block : Stmt {
         return visitor.visitBlockStmt(*this);
     }
 
+    // A vector of pointers to the statements inside the block
     std::vector<std::unique_ptr<Stmt>> stmts;
 };
 

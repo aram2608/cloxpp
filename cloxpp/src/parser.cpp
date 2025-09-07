@@ -60,9 +60,16 @@ unique_ptr<Stmt> Parser::var_declaration() {
 // Lox programs are a series of statements so
 // all scripts start here defined by our grammar rules
 unique_ptr<Stmt> Parser::statement() {
-    if (match({TokenType::PRINT}))
+    if (match({TokenType::PRINT})) {
         return print_statement();
+    }
 
+    if (match({TokenType::LEFT_BRACE})) {
+        // We need to move ownership
+        return std::make_unique<Block>(std::move(block()));
+    }
+
+    // If we dont reach the predefined stmt types return a base expression stmt
     return expression_statement();
 }
 
@@ -85,6 +92,23 @@ unique_ptr<Stmt> Parser::expression_statement() {
     consume(TokenType::SEMICOLON, "Expect ';' after expression.");
     // We wrap our expression in the Expression statement and return it
     return std::make_unique<Expression>(std::move(expr));
+}
+
+// Function to handle block scopes
+vector<unique_ptr<Stmt>> Parser::block() {
+    // we create a list of statements
+    vector<unique_ptr<Stmt>> stmts;
+
+    // While we have not reached a right base add declarations
+    while (!check(TokenType::RIGHT_BRACE) && !is_end()) {
+        stmts.push_back(declaration());
+    }
+
+    // If a right brace is never reached toss an error
+    // If it is we consume it
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after block.");
+    // We can return our list of statments
+    return stmts;
 }
 
 // Function to handle the parsing of expressions
