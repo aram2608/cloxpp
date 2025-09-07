@@ -1,17 +1,31 @@
 #include "interpreter.hpp"
 
 using namespace lox;
+using std::any;
+using std::string;
+using std::unique_ptr;
+using std::vector;
 
 Interpreter::Interpreter() {
 }
 
-void Interpreter::interpret(Expr& expr) {
+// Main logic for interpreting a program
+// We pass in a vector of unique_ptrs to Stmts
+void Interpreter::interpret(vector<unique_ptr<Stmt>> stmts) {
     try {
-        any value = evaluate(expr);
-        std::cout << make_string(value) << "\n";
+        // We then iterate through them and execute one by one
+        for (const unique_ptr<Stmt>& stmt : stmts) {
+            // We need to dereference our pointer
+            execute(*stmt);
+        }
     } catch (RuntimeError error) {
         errors.runtime_error(error);
     }
+}
+
+// Helper function to execute statemtent
+void Interpreter::execute(Stmt& stmt) {
+    stmt.accept(*this);
 }
 
 // Helper method to send the expression back to visitor
@@ -105,11 +119,43 @@ any Interpreter::visitGroupingExpr(Grouping& expr) {
     return evaluate(*expr.expr);
 }
 
-// Functio to return a node's literal value
+// Function to return a node's literal value
 any Interpreter::visitLiteralExpr(Literal& expr) {
     // We stuffed the value after scanning into the token so we can
     // simply retrieve it
     return expr.value;
+}
+
+// Function to handle blockstm logic
+any Interpreter::visitBlockStmt(Block& stmt) {
+    return {};
+}
+
+// Function to handle expression stmt logic
+any Interpreter::visitExpressionStmt(Expression& stmt) {
+    // We dereference the pointer and evaulate the underlying expression
+    evaluate(*stmt.expr);
+    // we then return an empty std::any{}
+    return {};
+}
+
+// Function to handle print stmt logic
+any Interpreter::visitPrintStmt(Print& stmt) {
+    // We evaluate the expression and store temporarily
+    any value = evaluate(*stmt.expr);
+    // We then display the value, the variable is destroyed after leaving scope
+    std::cout << make_string(value) << std::endl;
+    // We then return an empty std::any{}
+    return {};
+}
+
+// Function to handle var stmt logic
+any Interpreter::visitVarStmt(Var& stmt) {
+    return {};
+}
+
+any Interpreter::visitVariableExpr(Variable& var) {
+    return {};
 }
 
 // Function to test logical operations

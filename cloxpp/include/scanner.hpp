@@ -8,13 +8,10 @@
 #include <vector>
 
 namespace lox {
-// We scope our aliases
-using std::string;
-using std::vector;
 class Scanner {
     // Source code and tokens
-    string        source;
-    vector<Token> tokens{};
+    std::string        source;
+    std::vector<Token> tokens{};
     // Attributes to keep track of string index
     //  Start of string
     int start = 0;
@@ -25,12 +22,12 @@ class Scanner {
 
   public:
     // Constructor for parsing code
-    Scanner(string source);
+    Scanner(std::string source);
     // Default constructor
     Scanner() : source("") {
     }
 
-    vector<Token> scan_tokens();
+    std::vector<Token> scan_tokens();
 
     LoxError errors;
 

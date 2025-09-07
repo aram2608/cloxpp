@@ -2,7 +2,17 @@
 
 #include "ast_printer.hpp"
 
+#include <utility>
+
 using namespace lox;
+using std::cin;
+using std::cout;
+using std::endl;
+using std::ifstream;
+using std::istreambuf_iterator;
+using std::string;
+using std::unique_ptr;
+using std::vector;
 
 // Empty constructor for now
 // We initialize an empty parser to start off
@@ -14,17 +24,16 @@ void Lox::run(string code) {
     // Create out Scanner instance
     Scanner scanner(code);
     // Create tokens from source code
-    std::vector<Token> tokens  = scanner.scan_tokens();
-    parser                     = Parser(tokens);
-    std::unique_ptr<Expr> expr = parser.parse();
+    vector<Token> tokens           = scanner.scan_tokens();
+    parser                         = Parser(tokens);
+    vector<unique_ptr<Stmt>> stmts = parser.parse();
 
     // Catch scanner and parser errors
     if (had_error())
         return;
     // We interpret the AST
-    // We need to pass in a dereferenced pointer since we are using
-    // unique_ptrs
-    interpreter.interpret(*expr);
+    // We need to move ownership to the interpreter
+    interpreter.interpret(std::move(stmts));
 }
 
 // Function to wrap the run function around file contents
@@ -42,7 +51,7 @@ void Lox::run_file(const string& filename) {
 
     // Catch runtime errors in file
     if (interpreter.errors.had_RuntimeError) {
-    std::exit(EXIT_FAILURE);
+        std::exit(EXIT_FAILURE);
     }
 }
 
@@ -94,8 +103,8 @@ bool Lox::had_error() {
 
 // Helper method to reset errors after evaluation
 void Lox::reset_errors() {
-    scanner.errors.had_error = false;
-    parser.errors.had_error  = false;
+    scanner.errors.had_error            = false;
+    parser.errors.had_error             = false;
     interpreter.errors.had_RuntimeError = false;
 }
 

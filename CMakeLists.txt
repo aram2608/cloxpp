@@ -12,7 +12,6 @@ add_executable(${PROJECT_NAME}
     cloxpp/src/main.cpp
     cloxpp/src/lox.cpp
     cloxpp/src/scanner.cpp
-    cloxpp/src/tokens.cpp
     cloxpp/src/parser.cpp
     cloxpp/src/interpreter.cpp
 )

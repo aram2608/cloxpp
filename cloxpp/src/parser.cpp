@@ -1,6 +1,9 @@
 #include "parser.hpp"
 
 using namespace lox;
+using std::initializer_list;
+using std::unique_ptr;
+using std::vector;
 
 // Constructor for Parser class
 // We take in a vector of tokens to consume
@@ -9,12 +12,79 @@ Parser::Parser(vector<Token> tokens) {
 }
 
 // Function to parse code
-std::unique_ptr<Expr> Parser::parse() {
+vector<unique_ptr<Stmt>> Parser::parse() {
+    // We create a new vector to store pointers to our statements
+    vector<unique_ptr<Stmt>> stmts;
+    while (!is_end()) {
+        stmts.push_back(declaration());
+    }
+    return stmts;
+}
+
+// Function for handling declarations
+unique_ptr<Stmt> Parser::declaration() {
     try {
-        return expression();
+        // We match a var keyword and return var_declaration
+        if (match({TokenType::VAR}))
+            return var_declaration();
+
+        // By default we return a statement
+        return statement();
+        // catch erros and get the parser to chill out
     } catch (ParseError error) {
+        synchronize();
+        // Since we are returning a pointer type
+        // we need to return nullptr instead of {}
         return nullptr;
     }
+}
+
+// Function to handle var_declar
+unique_ptr<Stmt> lox::Parser::var_declaration() {
+    // Match an identifier token and consume it
+    Token identifier = consume(TokenType::IDENTIFIER, "Expected identifier.");
+
+    // We initialize a value with nullptr
+    unique_ptr<Expr> initializer = nullptr;
+    // If we match an equal token bind initializer to the output of expression
+    if (match({TokenType::EQUAL})) {
+        initializer = expression();
+    }
+
+    // We match a semicolon and throw an error if the statement is not closed
+    consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
+    return std::make_unique<Var>(std::move(identifier), std::move(initializer));
+}
+
+// Function to handle parsing of statements
+// Lox programs are a series of statements so
+// all scripts start here defined by our grammar rules
+unique_ptr<Stmt> Parser::statement() {
+    if (match({TokenType::PRINT}))
+        return print_statement();
+
+    return expression_statement();
+}
+
+// Function to handel Lox's built in print statement
+unique_ptr<Stmt> Parser::print_statement() {
+    // We create our base expression
+    unique_ptr<Expr> value = expression();
+    // We then consume the semicolon and toss an error if the statement was not
+    // finished
+    consume(TokenType::SEMICOLON, "Expect ';' after value.");
+    // We wrap our expression in a statement and return it
+    return std::make_unique<Print>(std::move(value));
+}
+
+// Function to handle expression statement
+unique_ptr<Stmt> Parser::expression_statement() {
+    // Creates our base expressions
+    unique_ptr<Expr> expr = expression();
+    // Consume the end of the statement and toss an error otherwise
+    consume(TokenType::SEMICOLON, "Expect ';' after expression.");
+    // We wrap our expression in the Expression statement and return it
+    return std::make_unique<Expression>(std::move(expr));
 }
 
 // Function to handle the first grammar rule, we simply match an equality
@@ -49,7 +119,7 @@ unique_ptr<Expr> Parser::conditional() {
             expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
             return expr;
         } else {
-            throw error(peek(), "Expect ':'.");
+            throw error(peek(), "Expected ':'.");
         }
     }
 
@@ -137,6 +207,10 @@ unique_ptr<Expr> Parser::primary() {
         return std::make_unique<Literal>(previous().literal);
     }
 
+    if (match({TokenType::IDENTIFIER})) {
+        return std::make_unique<Variable>(previous());
+    }
+
     if (match({TokenType::LEFT_PAREN})) {
         unique_ptr<Expr> expr = expression();
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
@@ -159,6 +233,8 @@ bool Parser::match(initializer_list<TokenType> types) {
     return false;
 }
 
+// Function to a consume a token and return it
+// Useful for closing off statements or parenthesis, blocks, etc
 Token Parser::consume(TokenType type, std::string message) {
     if (check(type))
         return advance();

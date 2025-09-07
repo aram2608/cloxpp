@@ -5,10 +5,6 @@
 #include <magic_enum/magic_enum.hpp>
 
 namespace lox {
-// We scope our aliases
-using std::cout;
-using std::endl;
-using std::string;
 
 enum class TokenType {
     // Single-character tokens.
@@ -65,17 +61,53 @@ enum class TokenType {
 
 class Token {
   public:
-    Token(TokenType type, string lexeme, std::any literal, int line);
+    // Token(TokenType type, std::string lexeme, std::any literal, int line);
+    Token(TokenType type, std::string lexeme, std::any literal, int line) {
+        this->type    = type;
+        this->lexeme  = lexeme;
+        this->literal = literal;
+        this->line    = line;
+    }
 
     // Function to turn Tokens into strings
     // We do not want to modify anything so we declare this as a const member
-    string to_string() const;
+    std::string to_string() const {
+        // Convert enum to string with magic_enum at compile time
+        std::string tok_type = std::string(magic_enum::enum_name(type));
 
-    TokenType type;
-    string    lexeme;
-    std::any  literal;
-    int       line;
+        // Default literal text
+        std::string literal_txt = "nil";
 
-  private:
+        switch (type) {
+        case TokenType::IDENTIFIER:
+            literal_txt = lexeme;
+            break;
+        case TokenType::STRING:
+            literal_txt = std::any_cast<std::string>(literal);
+            break;
+        case TokenType::NUMBER:
+            literal_txt = std::to_string(std::any_cast<double>(literal));
+            break;
+        case TokenType::TRUE:
+            literal_txt = "true";
+            break;
+        case TokenType::FALSE:
+            literal_txt = "false";
+            break;
+        case TokenType::NIL:
+            literal_txt = "nil";
+            break;
+        // Instead of defaulting to nil we override for each case
+        default:
+            break;
+        }
+
+        return "(" + tok_type + " , " + lexeme + " , " + literal_txt + ")";
+    }
+
+    TokenType   type;
+    std::string lexeme;
+    std::any    literal;
+    int         line;
 };
 } // namespace lox

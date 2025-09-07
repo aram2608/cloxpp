@@ -8,19 +8,13 @@
 #include <vector>
 
 namespace lox {
-/*
- * We scope our aliases
- * We dont alias std::move() to make sure it remains qualified
- * It should work in scope, but just to be safe
- */
-using std::any;
-using std::unique_ptr;
 
 // Forward declarations
 struct Binary;
 struct Unary;
 struct Grouping;
 struct Literal;
+struct Variable;
 
 // Abstract visitor for different nodes
 struct ExprVisitor {
@@ -31,10 +25,11 @@ struct ExprVisitor {
      * return type is std::any since it is type safe and allows for storage
      * of unknown types similarly to void *
      */
-    virtual any visitBinaryExpr(Binary& expr)     = 0;
-    virtual any visitUnaryExpr(Unary& expr)       = 0;
-    virtual any visitGroupingExpr(Grouping& expr) = 0;
-    virtual any visitLiteralExpr(Literal& expr)   = 0;
+    virtual std::any visitBinaryExpr(Binary& expr)     = 0;
+    virtual std::any visitUnaryExpr(Unary& expr)       = 0;
+    virtual std::any visitGroupingExpr(Grouping& expr) = 0;
+    virtual std::any visitLiteralExpr(Literal& expr)   = 0;
+    virtual std::any visitVariableExpr(Variable& var)  = 0;
 };
 
 // Abstract base class, requires at least one virtual method
@@ -62,7 +57,7 @@ struct Expr {
     Expr& operator=(const Expr&) = delete;
 
     // accept() method for visiting nodes, we pass in a reference to ExprVisitor&
-    virtual any accept(ExprVisitor& visitor) = 0;
+    virtual std::any accept(ExprVisitor& visitor) = 0;
 };
 
 // Binary node, inheritting from Expr
@@ -74,7 +69,7 @@ struct Binary : Expr {
      * In our initialization list, we move ownership of left and right
      * to the Binary class and copy construct op to op
      */
-    Binary(unique_ptr<Expr> left, Token op, unique_ptr<Expr> right)
+    Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
         : left(std::move(left)), op(std::move(op)), right(std::move(right)) {
     }
 
@@ -83,16 +78,16 @@ struct Binary : Expr {
      * and pass in a dereferenced pointer to the node object
      * it should return a Binary&
      */
-    any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor& visitor) override {
         return visitor.visitBinaryExpr(*this);
     }
 
     // Left expression
-    unique_ptr<Expr> left;
+    std::unique_ptr<Expr> left;
     // Operator token
     Token op;
     // Right expression
-    unique_ptr<Expr> right;
+    std::unique_ptr<Expr> right;
 };
 
 // Grouping node, inheritting from Expr
@@ -103,7 +98,7 @@ struct Grouping : Expr {
      * and in our list initialization we move ownership of the expression
      * to our member
      */
-    Grouping(unique_ptr<Expr> expr) : expr(std::move(expr)) {
+    Grouping(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {
     }
 
     /*
@@ -111,12 +106,12 @@ struct Grouping : Expr {
      * and pass in a dereferenced pointer to the node object,
      * it should return a Grouping&
      */
-    any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor& visitor) override {
         return visitor.visitGroupingExpr(*this);
     }
 
     // Member expression
-    unique_ptr<Expr> expr;
+    std::unique_ptr<Expr> expr;
 };
 
 // Literal node, inheritting from Expr
@@ -126,7 +121,7 @@ struct Literal : Expr {
      * Constructor for our Literal node, it takes in any value and in
      * the list initalization, we move ownership to the member value
      */
-    Literal(any value) : value(std::move(value)) {
+    Literal(std::any value) : value(std::move(value)) {
     }
 
     /*
@@ -134,12 +129,12 @@ struct Literal : Expr {
      * and pass in a dereferenced pointer to the node object
      * it should return a Literal&
      */
-    any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor& visitor) override {
         return visitor.visitLiteralExpr(*this);
     }
 
     // Member value
-    any value;
+    std::any value;
 };
 
 // Unary node, inheritting from Expr
@@ -150,7 +145,7 @@ struct Unary : Expr {
      * In our list initialization, we move ownership of the token and right expression
      * to the members
      */
-    Unary(Token op, unique_ptr<Expr> right) : op(std::move(op)), right(std::move(right)) {
+    Unary(Token op, std::unique_ptr<Expr> right) : op(std::move(op)), right(std::move(right)) {
     }
 
     /*
@@ -158,14 +153,31 @@ struct Unary : Expr {
      * and pass in a dereferenced pointer to the node object
      * it should return a Unary&
      */
-    any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor& visitor) override {
         return visitor.visitUnaryExpr(*this);
     }
 
     // Operator token
     Token op;
     // Right expression
-    unique_ptr<Expr> right;
+    std::unique_ptr<Expr> right;
+};
+
+// Variable node
+struct Variable : Expr {
+    /*
+     * Constructor for the variable now, we pass in an Identifier token
+     */
+    Variable(Token identifier) : identifier(std::move(identifier)) {
+    }
+
+    // Override for the Expr accept method
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visitVariableExpr(*this);
+    }
+
+    // Token for the identifier
+    Token identifier;
 };
 
 } // namespace lox

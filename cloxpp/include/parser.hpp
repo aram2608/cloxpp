@@ -2,6 +2,7 @@
 
 #include "error.hpp"
 #include "expr.hpp"
+#include "stmt.hpp"
 #include "tokens.hpp"
 
 #include <iostream>
@@ -11,41 +12,43 @@
 #include <vector>
 
 namespace lox {
-using std::initializer_list;
-using std::unique_ptr;
-using std::vector;
 
 class Parser {
-    vector<Token> tokens;
-    int           current = 0;
+    std::vector<Token> tokens;
+    int                current = 0;
     struct ParseError : public std::runtime_error {
         // We inherit all the constructors from std::runtime_error
         using std::runtime_error::runtime_error;
     };
 
   public:
-    Parser(vector<Token> tokens);
-    std::unique_ptr<Expr> parse();
-    LoxError              errors;
+    Parser(std::vector<Token> tokens);
+    std::vector<std ::unique_ptr<Stmt>> parse();
+    LoxError                            errors;
 
   private:
-    unique_ptr<Expr> expression();
-    unique_ptr<Expr> comma();
-    unique_ptr<Expr> conditional();
-    unique_ptr<Expr> equality();
-    unique_ptr<Expr> comparison();
-    unique_ptr<Expr> term();
-    unique_ptr<Expr> factor();
-    unique_ptr<Expr> unary();
-    unique_ptr<Expr> primary();
-    bool             match(initializer_list<TokenType> types);
-    Token            consume(TokenType type, std::string message);
-    bool             check(TokenType type);
-    Token            advance();
-    Token            peek();
-    Token            previous();
-    bool             is_end();
-    ParseError       error(Token token, std::string_view message);
-    void             synchronize();
+    std::unique_ptr<Stmt> declaration();
+    std::unique_ptr<Stmt> var_declaration();
+    std::unique_ptr<Stmt> statement();
+    std::unique_ptr<Stmt> print_statement();
+    std::unique_ptr<Stmt> expression_statement();
+    std::unique_ptr<Expr> expression();
+    std::unique_ptr<Expr> comma();
+    std::unique_ptr<Expr> conditional();
+    std::unique_ptr<Expr> equality();
+    std::unique_ptr<Expr> comparison();
+    std::unique_ptr<Expr> term();
+    std::unique_ptr<Expr> factor();
+    std::unique_ptr<Expr> unary();
+    std::unique_ptr<Expr> primary();
+    bool                  match(std::initializer_list<TokenType> types);
+    Token                 consume(TokenType type, std::string message);
+    bool                  check(TokenType type);
+    Token                 advance();
+    Token                 peek();
+    Token                 previous();
+    bool                  is_end();
+    ParseError            error(Token token, std::string_view message);
+    void                  synchronize();
 };
 } // namespace lox

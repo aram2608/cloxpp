@@ -1,6 +1,8 @@
 #include "scanner.hpp"
 
 using namespace lox;
+using std::string;
+using std::vector;
 
 /*
  * Constructor for our Scanner class
