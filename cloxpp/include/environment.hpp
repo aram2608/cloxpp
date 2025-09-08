@@ -11,8 +11,8 @@
 
 namespace CppLox {
 
-class Environment {
-    // unique_ptr to the Environment
+class Environment : public std::enable_shared_from_this<Environment> {
+    // shared_ptr to the Environment
     std::shared_ptr<Environment> enclosing;
     // Ordered map of keys and values
     std::map<std::string, std::any> values;

@@ -1,4 +1,5 @@
 #include "interpreter.hpp"
+#include <iostream>
 
 using namespace CppLox;
 using std::any;
@@ -30,8 +31,7 @@ void Interpreter::execute(Stmt& stmt) {
 }
 
 // Function to iterate and execute over each statement in the block statement
-void Interpreter::execute_block(const vector<unique_ptr<Stmt>>& stmts,
-                                shared_ptr<Environment>         env) {
+void Interpreter::execute_block(vector<unique_ptr<Stmt>> stmts, shared_ptr<Environment> env) {
     // We first need to store the first environment
     shared_ptr<Environment> previous = this->environment;
 
@@ -44,7 +44,7 @@ void Interpreter::execute_block(const vector<unique_ptr<Stmt>>& stmts,
         for (const unique_ptr<Stmt>& stmt : stmts) {
             execute(*stmt);
         }
-    // We try and catch all exceptios
+        // We try and catch all exceptios
     } catch (...) {
         // We transfer ownership to this environment
         this->environment = std::move(previous);
@@ -57,13 +57,20 @@ void Interpreter::execute_block(const vector<unique_ptr<Stmt>>& stmts,
 
 // Function to handle blockstm logic
 any Interpreter::visitBlockStmt(Block& stmt) {
-    execute_block(stmt.stmts, std::make_shared<Environment>(environment));
+    // We move ownership since we cannot copy unique_ptrs
+    execute_block(std::move(stmt.stmts), std::make_shared<Environment>(environment));
     return {};
 }
 
 // Function to handle expression stmt logic
 any Interpreter::visitExpressionStmt(Expression& stmt) {
     // We dereference the pointer and evaulate the underlying expression
+    // If in repl mode evaluate the expression and print to screen
+    if (repl) {
+        any value = evaluate(*stmt.expr);
+        std::cout << make_string(value) << std::endl;
+    }
+    // otherwise evaluate then destroy the value
     evaluate(*stmt.expr);
     // we then return an empty std::any{}
     return {};

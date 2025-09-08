@@ -20,8 +20,13 @@ class LoxError {
         had_error = true;
     }
 
-    // A function to display errors, we use string view since we dont need to access
-    // the string itself and therefore do not need a copy
+    /*
+     * A function to display errors, we use a string so that each error can own
+     * its own string copies, we need to do this to ensure that
+     * the object we inherit the string from can get destroyed and we still have access
+     * to the message
+     * We do the same for the tokens
+     */
     void error(int line, std::string message) {
         report(line, "", message);
     }

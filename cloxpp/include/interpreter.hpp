@@ -17,16 +17,16 @@ class Interpreter : ExprVisitor, StmtVisitor {
   public:
     Interpreter();
 
-    void     interpret(std::vector<std::unique_ptr<Stmt>> stmts);
-    void     execute(Stmt& stmt);
-    void     execute_block(const std::vector<std::unique_ptr<Stmt>>& stmts,
-                           std::shared_ptr<Environment>              env);
+    void interpret(std::vector<std::unique_ptr<Stmt>> stmts);
+    void execute(Stmt& stmt);
+    void execute_block(std::vector<std::unique_ptr<Stmt>> stmts, std::shared_ptr<Environment> env);
     std::any evaluate(Expr& expr);
 
     LoxError errors;
+    bool repl {false};
 
   private:
-    std::shared_ptr<Environment> environment{new Environment};
+    std::shared_ptr<Environment> environment = std::make_shared<Environment>();
     std::any                     visitBlockStmt(Block& stmt) override;
     std::any                     visitExpressionStmt(Expression& stmt) override;
     std::any                     visitPrintStmt(Print& stmt) override;

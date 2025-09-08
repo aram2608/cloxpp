@@ -60,6 +60,7 @@ void Lox::run_prompt() {
      * We exit the loop as soon as exit() is used.
      * Otherwise we evalutate the input
      */
+    interpreter.repl = true;
     while (true) {
         string code;
         /*
