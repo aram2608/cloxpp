@@ -11,19 +11,23 @@
 namespace CppLox {
 
 struct Block;
-struct Expression;
+struct ExpressionStmt;
 struct IfStmt;
+struct WhileStmt;
+// struct ForStmt;
 struct Print;
 struct Var;
 
 // Statement visitor interface
 struct StmtVisitor {
-    virtual ~StmtVisitor()                                 = default;
-    virtual std::any visitBlockStmt(Block& stmt)           = 0;
-    virtual std::any visitExpressionStmt(Expression& stmt) = 0;
-    virtual std::any visitPrintStmt(Print& stmt)           = 0;
-    virtual std::any visitVarStmt(Var& stmt)               = 0;
-    virtual std::any visitIfStmt(IfStmt& if_stmt)          = 0;
+    virtual ~StmtVisitor()                                     = default;
+    virtual std::any visitBlockStmt(Block& stmt)               = 0;
+    virtual std::any visitExpressionStmt(ExpressionStmt& stmt) = 0;
+    virtual std::any visitPrintStmt(Print& stmt)               = 0;
+    virtual std::any visitVarStmt(Var& stmt)                   = 0;
+    virtual std::any visitIfStmt(IfStmt& if_stmt)              = 0;
+    virtual std::any visitWhileStmt(WhileStmt& if_stmt)        = 0;
+    // virtual std::any visitForStmt(ForStmt& for_stmt)       = 0;
 };
 
 // Statement interface
@@ -56,11 +60,11 @@ struct Block : Stmt {
     std::vector<std::unique_ptr<Stmt>> stmts;
 };
 
-struct Expression : Stmt {
+struct ExpressionStmt : Stmt {
     /*
      * Constructor for expression statements, we pass in an expression and move ownership
      */
-    Expression(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {
+    ExpressionStmt(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {
     }
 
     // Override Stmt accept method
@@ -91,6 +95,25 @@ struct IfStmt : Stmt {
     std::unique_ptr<Stmt> then_branch;
     // pointer to else clause
     std::unique_ptr<Stmt> else_branch;
+};
+
+struct WhileStmt : Stmt {
+    /*
+     * WhileStmt constructor
+     */
+    WhileStmt(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body)
+        : condition(std::move(condition)), body(std::move(body)) {
+    }
+
+    // Override Stmt accept method
+    std::any accept(StmtVisitor& visitor) override {
+        return visitor.visitWhileStmt(*this);
+    }
+
+    // Unique_ptr to while expression
+    std::unique_ptr<Expr> condition;
+    // unique_ptr to statements needed to run
+    std::unique_ptr<Stmt> body;
 };
 
 struct Print : Stmt {

@@ -28,9 +28,10 @@ class Interpreter : ExprVisitor, StmtVisitor {
   private:
     std::shared_ptr<Environment> environment = std::make_shared<Environment>();
     std::any                     visitBlockStmt(Block& stmt) override;
-    std::any                     visitExpressionStmt(Expression& stmt) override;
+    std::any                     visitExpressionStmt(ExpressionStmt& stmt) override;
     std::any                     visitPrintStmt(Print& stmt) override;
     std::any                     visitIfStmt(IfStmt& stmt) override;
+    std::any                     visitWhileStmt(WhileStmt& stmt) override;
     std::any                     visitVarStmt(Var& stmt) override;
     std::any                     visitLogicalExpr(Logical& expr) override;
     std::any                     visitAssignExpr(Assign& expr) override;

@@ -66,6 +66,14 @@ unique_ptr<Stmt> Parser::statement() {
         return print_statement();
     }
 
+    if (match({TokenType::WHILE})) {
+        return while_statement();
+    }
+
+    if (match({TokenType::FOR})) {
+        return for_statement();
+    }
+
     if (match({TokenType::LEFT_BRACE})) {
         // We need to move ownership
         return std::make_unique<Block>(std::move(block()));
@@ -107,6 +115,92 @@ unique_ptr<Stmt> Parser::if_statement() {
         std::move(condition), std::move(then_branch), std::move(else_branch));
 }
 
+// Function to create a while statement
+unique_ptr<Stmt> Parser::while_statement() {
+    // we consume the first closing parenthesis
+    // and we save the expression
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.");
+    unique_ptr<Expr> condition = expression();
+    // we consume the last parenethesis, this is important as it signals
+    // the end of the expression
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after condition.");
+    // we can now save the underlying statement
+    unique_ptr<Stmt> body = statement();
+
+    return std::make_unique<WhileStmt>(std::move(condition), std::move(body));
+}
+
+// Logic for handling for statements
+unique_ptr<Stmt> Parser::for_statement() {
+    // We consume the first parenethesis
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
+
+    // We declare our initialier stmt
+    unique_ptr<Stmt> initializer;
+    // If we skip past it, we can just defer to a nullptr
+    if (match({TokenType::SEMICOLON})) {
+        initializer = nullptr;
+        // if we match a var, we can add a variable declaration
+    } else if (match({TokenType::VAR})) {
+        initializer = var_declaration();
+        // otherwise, we just pass the expression
+    } else {
+        initializer = expression_statement();
+    }
+
+    // We can now take our condition, we start with a nullptr
+    unique_ptr<Expr> condition = nullptr;
+    // if we do not match a semicolon, we can save the expression
+    if (!check(TokenType::SEMICOLON)) {
+        condition = expression();
+    }
+
+    // otherwise we continue parsing and consume the semicolon
+    consume(TokenType::SEMICOLON, "Expect ';' after loop condition.");
+
+    // now we can check for an increment
+    unique_ptr<Expr> increment = nullptr;
+    if (!check(TokenType::RIGHT_PAREN)) {
+        increment = expression();
+    }
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
+    // we can now take the statement body
+    unique_ptr<Stmt> body = statement();
+
+    // We can now check if our increment is null
+    // and replace our statement with a block instead
+    if (increment != nullptr) {
+        // we create our vector of pointers to statements
+        // and create our expression statement
+        vector<unique_ptr<Stmt>>   body_stmt;
+        unique_ptr<ExpressionStmt> expr = std::make_unique<ExpressionStmt>(std::move(increment));
+
+        // now we can move ownership to the the vector
+        body_stmt.push_back(std::move(body));
+        body_stmt.push_back(std::move(expr));
+        body = std::make_unique<Block>(std::move(body_stmt));
+    }
+
+    // If the condition is nullptr we cram a true in to
+    // make an infinite while loop
+    if (condition == nullptr) {
+        condition = std::make_unique<Literal>(true);
+    }
+    // we create said while loop
+    body = std::make_unique<WhileStmt>(std::move(condition), std::move(body));
+
+    // if we come across an initalizer, we run it once
+    // and then pass in a final block statement
+    if (initializer != nullptr) {
+        vector<unique_ptr<Stmt>> body_stmt;
+        body_stmt.push_back(std::move(initializer));
+        body_stmt.push_back(std::move(body));
+        body = std::make_unique<Block>(std::move(body_stmt));
+    }
+
+    return body;
+}
+
 // Function to handel Lox's built in print statement
 unique_ptr<Stmt> Parser::print_statement() {
     // We create our base expression
@@ -125,7 +219,7 @@ unique_ptr<Stmt> Parser::expression_statement() {
     // Consume the end of the statement and toss an error otherwise
     consume(TokenType::SEMICOLON, "Expect ';' after expression.");
     // We wrap our expression in the Expression statement and return it
-    return std::make_unique<Expression>(std::move(expr));
+    return std::make_unique<ExpressionStmt>(std::move(expr));
 }
 
 // Function to handle block scopes

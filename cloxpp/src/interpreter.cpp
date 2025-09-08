@@ -64,15 +64,13 @@ any Interpreter::visitBlockStmt(Block& stmt) {
 }
 
 // Function to handle expression stmt logic
-any Interpreter::visitExpressionStmt(Expression& stmt) {
+any Interpreter::visitExpressionStmt(ExpressionStmt& stmt) {
     // We dereference the pointer and evaulate the underlying expression
-    // If in repl mode evaluate the expression and print to screen
+    any value = evaluate(*stmt.expr);
+    // If in repl mode print to screen
     if (repl) {
-        any value = evaluate(*stmt.expr);
         std::cout << make_string(value) << std::endl;
     }
-    // otherwise evaluate then destroy the value
-    evaluate(*stmt.expr);
     // we then return an empty std::any{}
     return {};
 }
@@ -93,6 +91,16 @@ any Interpreter::visitIfStmt(IfStmt& stmt) {
         execute(*stmt.then_branch);
     } else if (stmt.else_branch != nullptr) {
         execute(*stmt.else_branch);
+    }
+    return {};
+}
+
+// Logic to handle while loops
+any Interpreter::visitWhileStmt(WhileStmt& stmt) {
+    // while the underlying expression is true
+    while (is_truthy(evaluate(*stmt.condition))) {
+        // we evaluate the statements in the body
+        execute(*stmt.body);
     }
     return {};
 }
@@ -121,9 +129,11 @@ any CppLox::Interpreter::visitLogicalExpr(Logical& expr) {
     // we then test to see if the value is truthy or not
     // we can then short circuit
     if (expr.op.type == TokenType::OR) {
-      if (is_truthy(left)) return left;
+        if (is_truthy(left))
+            return left;
     } else {
-      if (!is_truthy(left)) return left;
+        if (!is_truthy(left))
+            return left;
     }
 
     // otherwise we return the right value
