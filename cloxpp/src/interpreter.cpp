@@ -44,11 +44,14 @@ void Interpreter::execute_block(const vector<unique_ptr<Stmt>>& stmts,
         for (const unique_ptr<Stmt>& stmt : stmts) {
             execute(*stmt);
         }
+    // We try and catch all exceptios
     } catch (...) {
+        // We transfer ownership to this environment
         this->environment = std::move(previous);
         throw;
     }
 
+    // We once again transfer ownership back to the main scope
     this->environment = std::move(previous);
 }
 
