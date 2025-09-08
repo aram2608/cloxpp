@@ -54,7 +54,7 @@ void Interpreter::execute_block(const vector<unique_ptr<Stmt>>& stmts,
 
 // Function to handle blockstm logic
 any Interpreter::visitBlockStmt(Block& stmt) {
-    execute_block(stmt.stmts, environment);
+    execute_block(stmt.stmts, std::make_shared<Environment>(environment));
     return {};
 }
 

@@ -26,7 +26,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     LoxError errors;
 
   private:
-    std::shared_ptr<Environment> environment = std::make_shared<Environment>();
+    std::shared_ptr<Environment> environment{new Environment};
     std::any                     visitBlockStmt(Block& stmt) override;
     std::any                     visitExpressionStmt(Expression& stmt) override;
     std::any                     visitPrintStmt(Print& stmt) override;
