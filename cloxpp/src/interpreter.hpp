@@ -23,14 +23,16 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any evaluate(Expr& expr);
 
     LoxError errors;
-    bool repl {false};
+    bool     repl{false};
 
   private:
     std::shared_ptr<Environment> environment = std::make_shared<Environment>();
     std::any                     visitBlockStmt(Block& stmt) override;
     std::any                     visitExpressionStmt(Expression& stmt) override;
     std::any                     visitPrintStmt(Print& stmt) override;
+    std::any                     visitIfStmt(IfStmt& stmt) override;
     std::any                     visitVarStmt(Var& stmt) override;
+    std::any                     visitLogicalExpr(Logical& expr) override;
     std::any                     visitAssignExpr(Assign& expr) override;
     std::any                     visitBinaryExpr(Binary& expr) override;
     std::any                     visitUnaryExpr(Unary& expr) override;

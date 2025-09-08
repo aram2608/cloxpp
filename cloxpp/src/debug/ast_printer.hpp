@@ -66,6 +66,10 @@ class AstPrinter : public ExprVisitor {
         return std::string{parenthesize(expr.identifier.to_string())};
     }
 
+    std::any visitLogicalExpr(Logical& expr) override {
+        return std::string{parenthesize(expr.op.lexeme)};
+    }
+
   private:
     /*
      * A helper method to add parenthesis to the nodes in our pretty printer

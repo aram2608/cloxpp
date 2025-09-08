@@ -1,4 +1,5 @@
 #include "interpreter.hpp"
+
 #include <iostream>
 
 using namespace CppLox;
@@ -86,6 +87,16 @@ any Interpreter::visitPrintStmt(Print& stmt) {
     return {};
 }
 
+// Function to handle if else statements
+any Interpreter::visitIfStmt(IfStmt& stmt) {
+    if (is_truthy(evaluate(*stmt.condition))) {
+        execute(*stmt.then_branch);
+    } else if (stmt.else_branch != nullptr) {
+        execute(*stmt.else_branch);
+    }
+    return {};
+}
+
 // Function to handle var stmt logic
 any Interpreter::visitVarStmt(Var& stmt) {
     // We need to initialize a return value with null
@@ -100,6 +111,23 @@ any Interpreter::visitVarStmt(Var& stmt) {
     environment->define(stmt.identifier.lexeme, std::move(value));
     // We then return an empty std::any
     return {};
+}
+
+// Function to handle logical and, or operations
+any CppLox::Interpreter::visitLogicalExpr(Logical& expr) {
+    // we first evaluate and store the left expressions value
+    any left = evaluate(*expr.left);
+
+    // we then test to see if the value is truthy or not
+    // we can then short circuit
+    if (expr.op.type == TokenType::OR) {
+      if (is_truthy(left)) return left;
+    } else {
+      if (!is_truthy(left)) return left;
+    }
+
+    // otherwise we return the right value
+    return evaluate(*expr.right);
 }
 
 // Helper method to send the expression back to visitor

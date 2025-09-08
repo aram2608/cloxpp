@@ -10,6 +10,7 @@
 namespace CppLox {
 
 // Forward declarations
+struct Logical;
 struct Assign;
 struct Binary;
 struct Unary;
@@ -26,6 +27,7 @@ struct ExprVisitor {
      * return type is std::any since it is type safe and allows for storage
      * of unknown types similarly to void *
      */
+    virtual std::any visitLogicalExpr(Logical& expr)   = 0;
     virtual std::any visitAssignExpr(Assign& expr)     = 0;
     virtual std::any visitBinaryExpr(Binary& expr)     = 0;
     virtual std::any visitUnaryExpr(Unary& expr)       = 0;
@@ -62,11 +64,35 @@ struct Expr {
     virtual std::any accept(ExprVisitor& visitor) = 0;
 };
 
+struct Logical : Expr {
+    /*
+     * Logical node constructor
+     * We pass in the left expression and "and" or "or" token and then the right
+     * expression we wish to compare
+     */
+    Logical(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
+        : left(std::move(left)), op(op), right(std::move(right)) {
+    }
+
+    // Override the accept method from expr
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visitLogicalExpr(*this);
+    }
+
+    // pointer to leftmost expression
+    std::unique_ptr<Expr> left;
+    // logical operator tokens and, or
+    Token op;
+    // pointer to rightmost expression
+    std::unique_ptr<Expr> right;
+};
+
 // Assignment node,
 struct Assign : Expr {
     /*
      * Assignment node constructor
-     *
+     *  We pass in an identifer token and the value of an expression as its
+     * bound variable
      */
     Assign(Token identifier, std::unique_ptr<Expr> value)
         : identifier(std::move(identifier)), value(std::move(value)) {

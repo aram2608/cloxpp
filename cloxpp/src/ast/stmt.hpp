@@ -12,6 +12,7 @@ namespace CppLox {
 
 struct Block;
 struct Expression;
+struct IfStmt;
 struct Print;
 struct Var;
 
@@ -22,6 +23,7 @@ struct StmtVisitor {
     virtual std::any visitExpressionStmt(Expression& stmt) = 0;
     virtual std::any visitPrintStmt(Print& stmt)           = 0;
     virtual std::any visitVarStmt(Var& stmt)               = 0;
+    virtual std::any visitIfStmt(IfStmt& if_stmt)          = 0;
 };
 
 // Statement interface
@@ -69,6 +71,28 @@ struct Expression : Stmt {
     std::unique_ptr<Expr> expr;
 };
 
+struct IfStmt : Stmt {
+
+    IfStmt(std::unique_ptr<Expr> condition,
+           std::unique_ptr<Stmt> then_branch,
+           std::unique_ptr<Stmt> else_branch)
+        : condition(std::move(condition)), then_branch(std::move(then_branch)),
+          else_branch(std::move(else_branch)) {
+    }
+
+    // Override Stmt accept method
+    std::any accept(StmtVisitor& visitor) override {
+        return visitor.visitIfStmt(*this);
+    }
+
+    // Pointer to if expression
+    std::unique_ptr<Expr> condition;
+    // pointer to then clause
+    std::unique_ptr<Stmt> then_branch;
+    // pointer to else clause
+    std::unique_ptr<Stmt> else_branch;
+};
+
 struct Print : Stmt {
     /*
      * Constructor for Print statement, we pass in an expression and move ownership
@@ -89,7 +113,7 @@ struct Var : Stmt {
      * and initializing expression
      */
     Var(Token identifier, std::unique_ptr<Expr> initializer)
-        : identifier{std::move(identifier)}, initializer(std::move(initializer)) {
+        : identifier(std::move(identifier)), initializer(std::move(initializer)) {
     }
 
     // Override Stmt accept method

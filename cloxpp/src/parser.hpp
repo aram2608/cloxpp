@@ -29,11 +29,14 @@ class Parser {
     std::unique_ptr<Stmt>              declaration();
     std::unique_ptr<Stmt>              var_declaration();
     std::unique_ptr<Stmt>              statement();
+    std::unique_ptr<Stmt>              if_statement();
     std::unique_ptr<Stmt>              print_statement();
     std::unique_ptr<Stmt>              expression_statement();
     std::vector<std::unique_ptr<Stmt>> block();
     std::unique_ptr<Expr>              expression();
     std::unique_ptr<Expr>              assignment();
+    std::unique_ptr<Expr>              _or();
+    std::unique_ptr<Expr>              _and();
     std::unique_ptr<Expr>              comma();
     std::unique_ptr<Expr>              conditional();
     std::unique_ptr<Expr>              equality();

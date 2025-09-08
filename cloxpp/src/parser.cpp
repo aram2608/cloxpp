@@ -60,6 +60,8 @@ unique_ptr<Stmt> Parser::var_declaration() {
 // Lox programs are a series of statements so
 // all scripts start here defined by our grammar rules
 unique_ptr<Stmt> Parser::statement() {
+    if (match({TokenType::IF}))
+        return if_statement();
     if (match({TokenType::PRINT})) {
         return print_statement();
     }
@@ -71,6 +73,38 @@ unique_ptr<Stmt> Parser::statement() {
 
     // If we dont reach the predefined stmt types return a base expression stmt
     return expression_statement();
+}
+
+// Function to match if statement
+unique_ptr<Stmt> Parser::if_statement() {
+    // We need to consume the left parenthesis, if statements must use them
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'if'.");
+    // we then save the expression inside the parenthesis
+    unique_ptr<Expr> condition = expression();
+    // We consume the right parenthesis for the same reason
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after if condition.");
+
+    // we can then catch any statements for the then clause and default to
+    // a nullptr for the else clause
+    unique_ptr<Stmt> then_branch = statement();
+    unique_ptr<Stmt> else_branch = nullptr;
+    /*
+     * If we match an else keyword we can add the procdeding statement
+     * we avoid the else-problem by immediately attaching the else clause to the related
+     * if statement
+     *
+     * if (maybe()) <- this owns else clause #2
+     *   if (sometimes()) <- this owns else clause #1
+     *   else (dont()) // #1
+     * else(yes()) // #2
+     */
+    if (match({TokenType::ELSE})) {
+        else_branch = statement();
+    }
+
+    // We return a unique_ptr to the statement, we must move ownership
+    return std::make_unique<IfStmt>(
+        std::move(condition), std::move(then_branch), std::move(else_branch));
 }
 
 // Function to handel Lox's built in print statement
@@ -131,7 +165,7 @@ unique_ptr<Expr> Parser::expression() {
  */
 unique_ptr<Expr> Parser::assignment() {
     // We first need to initialize our expression
-    std::unique_ptr<Expr> expr = equality();
+    std::unique_ptr<Expr> expr = _or();
 
     // We need to match and =
     if (match({TokenType::EQUAL})) {
@@ -155,6 +189,41 @@ unique_ptr<Expr> Parser::assignment() {
         error(equals, "Invalid assignment target.");
     }
     // We return the expression
+    return expr;
+}
+
+// Function to handle logical operations
+unique_ptr<Expr> Parser::_or() {
+    // We first assign an expression to an and expression
+    unique_ptr<Expr> expr = _and();
+
+    // If we match the or keyword, we add a token and the right most expression
+    // through the _and() method
+    while (match({TokenType::OR})) {
+        Token            op    = previous();
+        unique_ptr<Expr> right = _and();
+        // we create a new pointer to a Logical node and move ownership
+        expr = std::make_unique<Logical>(std::move(expr), std::move(op), std::move(right));
+    }
+
+    // We then can return the final expression
+    return expr;
+}
+
+unique_ptr<Expr> Parser::_and() {
+    // We first assign an expression to an and expression
+    unique_ptr<Expr> expr = equality();
+
+    // If we match the and keyword, we add a token and the right most expression
+    // through the equality() method
+    while (match({TokenType::AND})) {
+        Token            op    = previous();
+        unique_ptr<Expr> right = equality();
+        // we create a new pointer to a Logical node and move ownership
+        expr = std::make_unique<Logical>(std::move(expr), std::move(op), std::move(right));
+    }
+
+    // We then can return the final expression
     return expr;
 }
 
