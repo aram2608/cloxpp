@@ -16,7 +16,10 @@ add_executable(${PROJECT_NAME}
     cloxpp/src/interpreter.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/include)
+target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/src/ast)
+target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/src/utils)
+target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/src/runtime)
+target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/src/debug)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE magic_enum::magic_enum)
 
