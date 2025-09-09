@@ -105,6 +105,20 @@ any Interpreter::visitWhileStmt(WhileStmt& stmt) {
     return {};
 }
 
+any Interpreter::visitForStmt(ForStmt& stmt) {
+    while (is_truthy(evaluate(*stmt.condition))) {
+        try {
+            execute(*stmt.body);
+        } catch (...) {
+            break;
+        }
+        if (stmt.increment != nullptr)
+            evaluate(*stmt.increment);
+    }
+    return nullptr;
+    return {};
+}
+
 // Function to handle var stmt logic
 any Interpreter::visitVarStmt(Var& stmt) {
     // We need to initialize a return value with null

@@ -32,6 +32,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any                     visitPrintStmt(Print& stmt) override;
     std::any                     visitIfStmt(IfStmt& stmt) override;
     std::any                     visitWhileStmt(WhileStmt& stmt) override;
+    std::any                     visitForStmt(ForStmt& stmt) override;
     std::any                     visitVarStmt(Var& stmt) override;
     std::any                     visitLogicalExpr(Logical& expr) override;
     std::any                     visitAssignExpr(Assign& expr) override;
