@@ -14,7 +14,7 @@ Interpreter::Interpreter() {
 
 // Main logic for interpreting a program
 // We pass in a vector of unique_ptrs to Stmts
-void Interpreter::interpret(vector<unique_ptr<Stmt>> stmts) {
+void Interpreter::interpret(const vector<unique_ptr<Stmt>>& stmts) {
     try {
         // We then iterate through them and execute one by one
         for (const unique_ptr<Stmt>& stmt : stmts) {
@@ -32,7 +32,8 @@ void Interpreter::execute(Stmt& stmt) {
 }
 
 // Function to iterate and execute over each statement in the block statement
-void Interpreter::execute_block(vector<unique_ptr<Stmt>> stmts, shared_ptr<Environment> env) {
+void Interpreter::execute_block(const vector<unique_ptr<Stmt>>& stmts,
+                                shared_ptr<Environment>         env) {
     // We first need to store the first environment
     shared_ptr<Environment> previous = this->environment;
 
@@ -66,12 +67,7 @@ any Interpreter::visitBlockStmt(Block& stmt) {
 // Function to handle expression stmt logic
 any Interpreter::visitExpressionStmt(ExpressionStmt& stmt) {
     // We dereference the pointer and evaulate the underlying expression
-    any value = evaluate(*stmt.expr);
-    // If in repl mode print to screen
-    if (repl) {
-        std::cout << make_string(value) << std::endl;
-    }
-    // we then return an empty std::any{}
+    evaluate(*stmt.expr);
     return {};
 }
 
@@ -102,20 +98,6 @@ any Interpreter::visitWhileStmt(WhileStmt& stmt) {
         // we evaluate the statements in the body
         execute(*stmt.body);
     }
-    return {};
-}
-
-any Interpreter::visitForStmt(ForStmt& stmt) {
-    while (is_truthy(evaluate(*stmt.condition))) {
-        try {
-            execute(*stmt.body);
-        } catch (...) {
-            break;
-        }
-        if (stmt.increment != nullptr)
-            evaluate(*stmt.increment);
-    }
-    return nullptr;
     return {};
 }
 
@@ -162,7 +144,7 @@ any Interpreter::evaluate(Expr& expr) {
 
 // Function to visit Assignment nodes
 any Interpreter::visitAssignExpr(Assign& expr) {
-    // We evalute the expression and save its value
+    // // We evalute the expression and save its value
     any value = evaluate(*expr.value);
     // We need to assign the variable and identifier
     environment->assign(expr.identifier, value);
@@ -274,8 +256,11 @@ any Interpreter::visitVariableExpr(Variable& var) {
 bool Interpreter::is_truthy(const any& object) {
     // We use the type() method to test if we have a nullptr or
     // a boolean
-    if (object.type() == typeid(nullptr))
+    if (object.type() == typeid(nullptr)) {
         return false;
+    }
+
+    // Check for booleans
     if (object.type() == typeid(bool)) {
         return std::any_cast<bool>(object);
     }

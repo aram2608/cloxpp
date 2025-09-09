@@ -130,108 +130,75 @@ unique_ptr<Stmt> Parser::while_statement() {
     return std::make_unique<WhileStmt>(std::move(condition), std::move(body));
 }
 
-// // Logic for handling for statements
-// unique_ptr<Stmt> Parser::for_statement() {
-//     // We consume the first parenethesis
-//     consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
-
-//     // We declare our initialier stmt
-//     unique_ptr<Stmt> initializer;
-//     // If we skip past it, we can just defer to a nullptr
-//     if (match({TokenType::SEMICOLON})) {
-//         initializer = nullptr;
-//         // if we match a var, we can add a variable declaration
-//     } else if (match({TokenType::VAR})) {
-//         initializer = var_declaration();
-//         // otherwise, we just pass the expression
-//     } else {
-//         initializer = expression_statement();
-//     }
-
-//     // We can now take our condition, we start with a nullptr
-//     unique_ptr<Expr> condition = nullptr;
-//     // if we do not match a semicolon, we can save the expression
-//     if (!check(TokenType::SEMICOLON)) {
-//         condition = expression();
-//     }
-
-//     // otherwise we continue parsing and consume the semicolon
-//     consume(TokenType::SEMICOLON, "Expect ';' after loop condition.");
-
-//     // now we can check for an increment
-//     unique_ptr<Expr> increment = nullptr;
-//     if (!check(TokenType::RIGHT_PAREN)) {
-//         increment = expression();
-//     }
-//     consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
-//     // we can now take the statement body
-//     unique_ptr<Stmt> body = statement();
-
-//     // We can now check if our increment is null
-//     // and replace our statement with a block instead
-//     if (increment != nullptr) {
-//         // we create our vector of pointers to statements
-//         // and create our expression statement
-//         vector<unique_ptr<Stmt>>   body_stmt;
-//         unique_ptr<ExpressionStmt> expr = std::make_unique<ExpressionStmt>(std::move(increment));
-
-//         // now we can move ownership to the the vector
-//         body_stmt.push_back(std::move(body));
-//         body_stmt.push_back(std::move(expr));
-//         body = std::make_unique<Block>(std::move(body_stmt));
-//     }
-
-//     // If the condition is nullptr we cram a true in to
-//     // make an infinite while loop
-//     if (condition == nullptr) {
-//         condition = std::make_unique<Literal>(true);
-//     }
-//     // we create said while loop
-//     body = std::make_unique<WhileStmt>(std::move(condition), std::move(body));
-
-//     // if we come across an initalizer, we run it once
-//     // and then pass in a final block statement
-//     if (initializer != nullptr) {
-//         vector<unique_ptr<Stmt>> body_stmt;
-//         body_stmt.push_back(std::move(initializer));
-//         body_stmt.push_back(std::move(body));
-//         body = std::make_unique<Block>(std::move(body_stmt));
-//     }
-
-//     return body;
-// }
-
+// Logic for handling for statements
 unique_ptr<Stmt> Parser::for_statement() {
-    consume(TokenType::LEFT_PAREN, "expected '(' after 'for'");
+    // We consume the first parenethesis
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
 
-    unique_ptr<Stmt> init;
+    // We declare our initialier stmt
+    unique_ptr<Stmt> initializer;
+    // If we skip past it, we can just defer to a nullptr
     if (match({TokenType::SEMICOLON})) {
-        init = nullptr;
+        initializer = nullptr;
+        // if we match a var, we can add a variable declaration
     } else if (match({TokenType::VAR})) {
-        init = var_declaration();
+        initializer = var_declaration();
+        // otherwise, we just pass the expression
     } else {
-        init = expression_statement();
+        initializer = expression_statement();
     }
 
-    unique_ptr<Expr> cond = std::make_unique<Literal>(true);
-    if (!check(TokenType::SEMICOLON))
-        cond = expression();
-    consume(TokenType::SEMICOLON, "expected ';' after for loop condition");
-
-    unique_ptr<Expr> incr = nullptr;
-    if (!check(TokenType::RIGHT_PAREN))
-        incr = expression();
-    consume(TokenType::RIGHT_PAREN, "expected ')' after for loop increment");
-
-    unique_ptr<Stmt> body     = statement();
-    unique_ptr<Stmt> for_stmt = std::make_unique<ForStmt>(cond, body, incr);
-
-    if (init != nullptr) {
-        vector<unique_ptr<Stmt>> stmts = {std::move(init), std::move(for_stmt)};
-        for_stmt                                 = std::make_unique<Block>(std::move(stmts));
+    // We can now take our condition, we start with a nullptr
+    unique_ptr<Expr> condition = nullptr;
+    // if we do not match a semicolon, we can save the expression
+    if (!check(TokenType::SEMICOLON)) {
+        condition = expression();
     }
 
-    return for_stmt;
+    // otherwise we continue parsing and consume the semicolon
+    consume(TokenType::SEMICOLON, "Expect ';' after loop condition.");
+
+    // now we can check for an increment
+    unique_ptr<Expr> increment = nullptr;
+    if (!check(TokenType::RIGHT_PAREN)) {
+        increment = expression();
+    }
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
+    // we can now take the statement body
+    unique_ptr<Stmt> body = statement();
+
+    // We can now check if our increment is null
+    // and replace our statement with a block instead
+    if (increment != nullptr) {
+        // we create our vector of pointers to statements
+        // and create our expression statement
+        vector<unique_ptr<Stmt>>   body_stmt;
+        unique_ptr<ExpressionStmt> expr = std::make_unique<ExpressionStmt>(std::move(increment));
+
+        // now we can move ownership to the the vector
+        body_stmt.push_back(std::move(body));
+        body_stmt.push_back(std::move(expr));
+        body = std::make_unique<Block>(std::move(body_stmt));
+    }
+
+    // If the condition is nullptr we cram a true in to
+    // make an infinite while loop
+    if (condition == nullptr) {
+        condition = std::make_unique<Literal>(true);
+    }
+    // we create said while loop
+    body = std::make_unique<WhileStmt>(std::move(condition), std::move(body));
+
+    // if we come across an initalizer, we run it once
+    // and then pass in a final block statement
+    if (initializer != nullptr) {
+        vector<unique_ptr<Stmt>> body_stmt;
+        body_stmt.push_back(std::move(initializer));
+        body_stmt.push_back(std::move(body));
+        body = std::make_unique<Block>(std::move(body_stmt));
+    }
+
+    return body;
 }
 
 // Function to handel Lox's built in print statement
@@ -286,7 +253,7 @@ unique_ptr<Expr> Parser::expression() {
  * var a = "before";
  * a = "value";
  *
- * In this expression if we evaluate a we would return "before" which is not what we want
+ * In this expression if we evaluate 'a' we would return "before" which is not what we want
  * This is the difference between an rvalue and an lvalue, an lvalue is a storage location for a
  * value while an rvalue is simply a transient value we have evaluated
  */

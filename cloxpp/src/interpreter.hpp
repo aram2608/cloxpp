@@ -17,9 +17,9 @@ class Interpreter : ExprVisitor, StmtVisitor {
   public:
     Interpreter();
 
-    void interpret(std::vector<std::unique_ptr<Stmt>> stmts);
+    void interpret(const std::vector<std::unique_ptr<Stmt>>& stmts);
     void execute(Stmt& stmt);
-    void execute_block(std::vector<std::unique_ptr<Stmt>> stmts, std::shared_ptr<Environment> env);
+    void execute_block(const std::vector<std::unique_ptr<Stmt>>& stmts, std::shared_ptr<Environment> env);
     std::any evaluate(Expr& expr);
 
     LoxError errors;
@@ -32,7 +32,6 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any                     visitPrintStmt(Print& stmt) override;
     std::any                     visitIfStmt(IfStmt& stmt) override;
     std::any                     visitWhileStmt(WhileStmt& stmt) override;
-    std::any                     visitForStmt(ForStmt& stmt) override;
     std::any                     visitVarStmt(Var& stmt) override;
     std::any                     visitLogicalExpr(Logical& expr) override;
     std::any                     visitAssignExpr(Assign& expr) override;

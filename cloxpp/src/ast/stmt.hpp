@@ -14,7 +14,6 @@ struct Block;
 struct ExpressionStmt;
 struct IfStmt;
 struct WhileStmt;
-struct ForStmt;
 struct Print;
 struct Var;
 
@@ -27,7 +26,6 @@ struct StmtVisitor {
     virtual std::any visitVarStmt(Var& stmt)                   = 0;
     virtual std::any visitIfStmt(IfStmt& if_stmt)              = 0;
     virtual std::any visitWhileStmt(WhileStmt& if_stmt)        = 0;
-    virtual std::any visitForStmt(ForStmt& for_stmt)           = 0;
 };
 
 // Statement interface
@@ -75,24 +73,13 @@ struct ExpressionStmt : Stmt {
     std::unique_ptr<Expr> expr;
 };
 
-struct ForStmt : Stmt {
-    std::unique_ptr<Expr> condition;
-    std::unique_ptr<Stmt> body;
-    std::unique_ptr<Expr> increment;
-
-    ForStmt(std::unique_ptr<Expr> condition,
-            std::unique_ptr<Stmt> body,
-            std::unique_ptr<Expr> increment)
-        : condition(std::move(condition)), body(std::move(body)),
-          increment(std::move(increment)) {};
-
-    std::any accept(StmtVisitor& visitor) override {
-        return visitor.visitForStmt(*this);
-    }
-};
-
 struct IfStmt : Stmt {
-
+    /*
+     * If statement constructor, we pass in a pointer to the condtion
+     * we also pass a pointer the then clause statement
+     * and finally we pass in an else clause statement
+     * we need to move ownership
+     */
     IfStmt(std::unique_ptr<Expr> condition,
            std::unique_ptr<Stmt> then_branch,
            std::unique_ptr<Stmt> else_branch)
@@ -115,7 +102,8 @@ struct IfStmt : Stmt {
 
 struct WhileStmt : Stmt {
     /*
-     * WhileStmt constructor
+     * WhileStmt constructor, we pass in a pointer to the condition expression
+     * and for the body statement
      */
     WhileStmt(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body)
         : condition(std::move(condition)), body(std::move(body)) {
