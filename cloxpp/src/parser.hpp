@@ -33,6 +33,7 @@ class Parser {
     std::unique_ptr<Stmt>              while_statement();
     std::unique_ptr<Stmt>              for_statement();
     std::unique_ptr<Stmt>              print_statement();
+    std::unique_ptr<Function>          function(std::string kind);
     std::unique_ptr<Stmt>              expression_statement();
     std::vector<std::unique_ptr<Stmt>> block();
     std::unique_ptr<Expr>              expression();
@@ -46,6 +47,8 @@ class Parser {
     std::unique_ptr<Expr>              term();
     std::unique_ptr<Expr>              factor();
     std::unique_ptr<Expr>              unary();
+    std::unique_ptr<Expr>              finish_call(std::unique_ptr<Expr> callee);
+    std::unique_ptr<Expr>              call();
     std::unique_ptr<Expr>              primary();
     bool                               match(std::initializer_list<TokenType> types);
     Token                              consume(TokenType type, std::string message);

@@ -1,7 +1,9 @@
 #pragma once
+#include "callable.hpp"
 #include "environment.hpp"
 #include "error.hpp"
 #include "expr.hpp"
+#include "lox_functions.hpp"
 #include "run_time_error.hpp"
 #include "stmt.hpp"
 #include "tokens.hpp"
@@ -12,8 +14,15 @@
 #include <vector>
 
 namespace CppLox {
+
 // We inherit the ExprVisitor class so now we need to override each visit method
 class Interpreter : ExprVisitor, StmtVisitor {
+  public:
+    std::shared_ptr<Environment> globals = std::make_shared<Environment>();
+
+  private:
+    std::shared_ptr<Environment> environment = globals;
+
   public:
     Interpreter();
 
@@ -27,20 +36,21 @@ class Interpreter : ExprVisitor, StmtVisitor {
     bool     repl{false};
 
   private:
-    std::shared_ptr<Environment> environment = std::make_shared<Environment>();
-    std::any                     visitBlockStmt(Block& stmt) override;
-    std::any                     visitExpressionStmt(ExpressionStmt& stmt) override;
-    std::any                     visitPrintStmt(Print& stmt) override;
-    std::any                     visitIfStmt(IfStmt& stmt) override;
-    std::any                     visitWhileStmt(WhileStmt& stmt) override;
-    std::any                     visitVarStmt(Var& stmt) override;
-    std::any                     visitLogicalExpr(Logical& expr) override;
-    std::any                     visitAssignExpr(Assign& expr) override;
-    std::any                     visitBinaryExpr(Binary& expr) override;
-    std::any                     visitUnaryExpr(Unary& expr) override;
-    std::any                     visitGroupingExpr(Grouping& expr) override;
-    std::any                     visitLiteralExpr(Literal& expr) override;
-    std::any                     visitVariableExpr(Variable& var) override;
+    std::any visitBlockStmt(Block& stmt) override;
+    std::any visitExpressionStmt(ExpressionStmt& stmt) override;
+    std::any visitFunctionStmt(std::shared_ptr<Function> stmt) override;
+    std::any visitPrintStmt(Print& stmt) override;
+    std::any visitIfStmt(IfStmt& stmt) override;
+    std::any visitWhileStmt(WhileStmt& stmt) override;
+    std::any visitVarStmt(Var& stmt) override;
+    std::any visitLogicalExpr(Logical& expr) override;
+    std::any visitAssignExpr(Assign& expr) override;
+    std::any visitBinaryExpr(Binary& expr) override;
+    std::any visitUnaryExpr(Unary& expr) override;
+    std::any visitCallExpr(Call& expr) override;
+    std::any visitGroupingExpr(Grouping& expr) override;
+    std::any visitLiteralExpr(Literal& expr) override;
+    std::any visitVariableExpr(Variable& var) override;
 
     bool        is_truthy(const std::any& object);
     bool        is_equal(const std::any& me, const std::any& you);

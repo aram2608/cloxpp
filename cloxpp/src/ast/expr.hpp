@@ -10,6 +10,7 @@
 namespace CppLox {
 
 // Forward declarations
+struct Call;
 struct Logical;
 struct Assign;
 struct Binary;
@@ -27,6 +28,7 @@ struct ExprVisitor {
      * return type is std::any since it is type safe and allows for storage
      * of unknown types similarly to void *
      */
+    virtual std::any visitCallExpr(Call& expr)         = 0;
     virtual std::any visitLogicalExpr(Logical& expr)   = 0;
     virtual std::any visitAssignExpr(Assign& expr)     = 0;
     virtual std::any visitBinaryExpr(Binary& expr)     = 0;
@@ -62,6 +64,20 @@ struct Expr {
 
     // accept() method for visiting nodes, we pass in a reference to ExprVisitor&
     virtual std::any accept(ExprVisitor& visitor) = 0;
+};
+
+struct Call : Expr {
+    Call(std::unique_ptr<Expr> callee, Token paren, std::vector<std::unique_ptr<Expr>> args)
+        : callee(std::move(callee)), paren(paren), args(std::move(args)) {
+    }
+
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visitCallExpr(*this);
+    }
+
+    std::unique_ptr<Expr>              callee;
+    Token                              paren;
+    std::vector<std::unique_ptr<Expr>> args;
 };
 
 struct Logical : Expr {

@@ -25,8 +25,13 @@ vector<unique_ptr<Stmt>> Parser::parse() {
 unique_ptr<Stmt> Parser::declaration() {
     try {
         // We match a var keyword and return var_declaration
-        if (match({TokenType::VAR}))
+        if (match({TokenType::VAR})) {
             return var_declaration();
+        }
+
+        if (match({TokenType::FUN})) {
+            return function("function");
+        }
 
         // By default we return a statement
         return statement();
@@ -212,6 +217,34 @@ unique_ptr<Stmt> Parser::print_statement() {
     return std::make_unique<Print>(std::move(value));
 }
 
+unique_ptr<Function> Parser::function(std::string kind) {
+    // we consume the first token and throw an error if we do not come across a name
+    Token name = consume(TokenType::IDENTIFIER, "Expect " + kind + " name.");
+    // we now consume the first parenthesis and throw an error if not present
+    consume(TokenType::LEFT_PAREN, "Expect '(' after " + kind + " name.");
+    // we initialize a vector of tokens
+    vector<Token> parameters;
+    // we check for the right parenthesis
+    if (!check(TokenType::RIGHT_PAREN)) {
+        // and we add parameters as long as we match a comme token
+        // if we encounter more than 255 arguments we throw an error
+        do {
+            if (parameters.size() >= 255) {
+                error(peek(), "Can't have more than 255 parameters.");
+            }
+            parameters.push_back(consume(TokenType::IDENTIFIER, "Expect parameter name."));
+        } while (match({TokenType::COMMA}));
+    }
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.");
+
+    // we consume the first brace and kick an error, block assumes the first brace token
+    // has already been matched
+    consume(TokenType::LEFT_BRACE, "Expect '{' before " + kind + " body.");
+    vector<unique_ptr<Stmt>> body = block();
+
+    return std::make_unique<Function>(std::move(name), std::move(parameters), std::move(body));
+}
+
 // Function to handle expression statement
 unique_ptr<Stmt> Parser::expression_statement() {
     // Creates our base expressions
@@ -393,7 +426,51 @@ unique_ptr<Expr> Parser::unary() {
         unique_ptr<Expr> right = unary();
         return std::make_unique<Unary>(op, std::move(right));
     }
-    return primary();
+    return call();
+}
+
+unique_ptr<Expr> Parser::finish_call(unique_ptr<Expr> callee) {
+    // By default we set a match number of args
+    const size_t MAX_ARGS = 255;
+
+    // we create our vector of unique ptrs to our arguments
+    vector<unique_ptr<Expr>> args;
+    // we check if we have met a right parenthesis
+    if (!check(TokenType::RIGHT_PAREN)) {
+        // if we havent we continuously push_back arguments after matching a
+        // comma
+        do {
+            if (args.size() >= MAX_ARGS) {
+                error(peek(), "Can't have more than 255 arguments.");
+            }
+            args.push_back(std::move(expression()));
+        } while (match({TokenType::COMMA}));
+    }
+
+    // we consume the closing parenthesis
+    Token paren = consume(TokenType::RIGHT_PAREN, "Expect ')' after arguments.");
+
+    // we return our call node
+    return std::make_unique<Call>(std::move(callee), paren, std::move(args));
+}
+
+unique_ptr<Expr> Parser::call() {
+    // we
+    unique_ptr<Expr> expr = primary();
+
+    // we continuously match left parenethesis and
+    // call the finish_call method
+    while (true) {
+        if (match({TokenType::LEFT_PAREN})) {
+            expr = finish_call(std::move(expr));
+            // we break as soon as we dont match any more opening
+            // parenthesis
+        } else {
+            break;
+        }
+    }
+    // we then return our expression
+    return expr;
 }
 
 // Function to handle the atomic units of Lox

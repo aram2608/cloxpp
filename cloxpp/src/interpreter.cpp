@@ -9,7 +9,16 @@ using std::string;
 using std::unique_ptr;
 using std::vector;
 
+// Constructor fo Interpreter
+// We construct/define all our global runtime parameters/native functions
+// here
 Interpreter::Interpreter() {
+    /*
+     * we define a variable named clock that stores a pointer to out Native Clock method
+     * we use a shared_ptr since they are much more forgiving than unique_ptrs when it comes to
+     * ownership
+     */
+    globals->define("clock", std::shared_ptr<NativeClock>{});
 }
 
 /*
@@ -78,6 +87,12 @@ any Interpreter::visitBlockStmt(Block& stmt) {
 any Interpreter::visitExpressionStmt(ExpressionStmt& stmt) {
     // We dereference the pointer and evaulate the underlying expression
     evaluate(*stmt.expr);
+    return {};
+}
+
+any Interpreter::visitFunctionStmt(std::shared_ptr<Function> stmt) {
+    auto function = stmt;
+    environment->define(stmt->name.lexeme, function);
     return {};
 }
 
@@ -239,6 +254,36 @@ any Interpreter::visitUnaryExpr(Unary& expr) {
     }
     // Unreachable so we return an empty std::any{}
     return {};
+}
+
+// Function to handle function calls
+any Interpreter::visitCallExpr(Call& expr) {
+    // we evaluate our calle and save it
+    any callee = evaluate(*expr.callee);
+
+    // we initialize a vector of any to store our args
+    vector<any> args;
+    // we iterate over the vector of Expr args
+    // we make sure its const ref so that we dont deplete the vector too quickly
+    for (const unique_ptr<Expr>& arg : expr.args) {
+        args.push_back(evaluate(*arg));
+    }
+
+    unique_ptr<LoxCallable> function;
+
+    // We add a check to ensure our callable is actually a callable type
+    if (callee.type() != typeid(unique_ptr<LoxCallable>)) {
+        throw RuntimeError(expr.paren, "Can only call functions and classes.");
+    }
+    function = std::any_cast<std::unique_ptr<LoxFunction>>(std::move(callee));
+
+    if (args.size() != function->arity()) {
+        throw RuntimeError{expr.paren,
+                           "Expected " + std::to_string(function->arity()) + " arguments but got " +
+                               std::to_string(args.size()) + "."};
+    }
+
+    return function->call(*this, std::move(args));
 }
 
 // To evaluate we recursively evaluate

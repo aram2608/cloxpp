@@ -5,12 +5,13 @@
 
 #include <any>
 #include <memory>
-#include <utility> // std::move
+#include <utility>
 #include <vector>
 
 namespace CppLox {
 
 struct Block;
+struct Function;
 struct ExpressionStmt;
 struct IfStmt;
 struct WhileStmt;
@@ -21,11 +22,12 @@ struct Var;
 struct StmtVisitor {
     virtual ~StmtVisitor()                                     = default;
     virtual std::any visitBlockStmt(Block& stmt)               = 0;
+    virtual std::any visitFunctionStmt(std::shared_ptr<Function> stmt)     = 0;
     virtual std::any visitExpressionStmt(ExpressionStmt& stmt) = 0;
     virtual std::any visitPrintStmt(Print& stmt)               = 0;
     virtual std::any visitVarStmt(Var& stmt)                   = 0;
     virtual std::any visitIfStmt(IfStmt& if_stmt)              = 0;
-    virtual std::any visitWhileStmt(WhileStmt& if_stmt)        = 0;
+    virtual std::any visitWhileStmt(WhileStmt& while_stmt)     = 0;
 };
 
 // Statement interface
@@ -56,6 +58,26 @@ struct Block : Stmt {
 
     // A vector of pointers to the statements inside the block
     std::vector<std::unique_ptr<Stmt>> stmts;
+};
+
+struct Function : Stmt, std::enable_shared_from_this<Function> {
+    /*
+     * FunctionDeclaration constructor (Function) for readability. We pass in the name of the
+     * function as a token, a vector of its parameters as Tokens, and a vector of statements for the
+     * body of the function
+     */
+    Function(Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body)
+        : name(name), params(params), body(std::move(body)) {
+    }
+
+    // Override Stmt accept method
+    std::any accept(StmtVisitor& visitor) override {
+        return visitor.visitFunctionStmt(shared_from_this());
+    }
+
+    Token                              name;
+    std::vector<Token>                 params;
+    std::vector<std::unique_ptr<Stmt>> body;
 };
 
 struct ExpressionStmt : Stmt {
