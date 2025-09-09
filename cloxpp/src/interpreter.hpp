@@ -17,9 +17,10 @@ class Interpreter : ExprVisitor, StmtVisitor {
   public:
     Interpreter();
 
-    void interpret(const std::vector<std::unique_ptr<Stmt>>& stmts);
-    void execute(Stmt& stmt);
-    void execute_block(const std::vector<std::unique_ptr<Stmt>>& stmts, std::shared_ptr<Environment> env);
+    void     interpret(const std::vector<std::unique_ptr<Stmt>>& stmts);
+    void     execute(Stmt& stmt);
+    void     execute_block(const std::vector<std::unique_ptr<Stmt>>& stmts,
+                           std::shared_ptr<Environment>              env);
     std::any evaluate(Expr& expr);
 
     LoxError errors;

@@ -12,8 +12,13 @@ using std::vector;
 Interpreter::Interpreter() {
 }
 
-// Main logic for interpreting a program
-// We pass in a vector of unique_ptrs to Stmts
+/*
+ * Main logic for interpreting a program
+ * We pass in a vector of unique_ptrs to Stmts
+ * We need to pass in a const ref since when we iterate without a const ref
+ * we can implicitly use the move method, since copying unique_ptrs is not allowed
+ * This can lead to the vector getting depleted more quickly and we miss statements
+ */
 void Interpreter::interpret(const vector<unique_ptr<Stmt>>& stmts) {
     try {
         // We then iterate through them and execute one by one
@@ -31,7 +36,12 @@ void Interpreter::execute(Stmt& stmt) {
     stmt.accept(*this);
 }
 
-// Function to iterate and execute over each statement in the block statement
+/*
+ * Function to iterate and execute over each statement in the block statement
+ * we apply the same logic as the interpret method here and pass
+ * a const ref of pointers so we do not deplete the vector before
+ * iteration is finished
+ */
 void Interpreter::execute_block(const vector<unique_ptr<Stmt>>& stmts,
                                 shared_ptr<Environment>         env) {
     // We first need to store the first environment
