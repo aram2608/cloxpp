@@ -6,7 +6,6 @@ using namespace CppLox;
 using std::any;
 using std::shared_ptr;
 using std::string;
-using std::unique_ptr;
 using std::vector;
 
 // Constructor fo Interpreter
@@ -14,26 +13,23 @@ using std::vector;
 // here
 Interpreter::Interpreter() {
     /*
-     * we define a variable named clock that stores a pointer to out Native Clock method
-     * we use a shared_ptr since they are much more forgiving than unique_ptrs when it comes to
-     * ownership
+     * we define a variable named clock that stores a pointer to out Native
+     * Clock method we use a shared_ptr since they are much more forgiving than
+     * unique_ptrs when it comes to ownership
      */
     globals->define("clock", std::shared_ptr<NativeClock>{});
 }
 
 /*
  * Main logic for interpreting a program
- * We pass in a vector of unique_ptrs to Stmts
- * We need to pass in a const ref since when we iterate without a const ref
- * we can implicitly use the move method, since copying unique_ptrs is not allowed
- * This can lead to the vector getting depleted more quickly and we miss statements
+ * We pass in a vector of shared_ptrs
  */
-void Interpreter::interpret(const vector<unique_ptr<Stmt>>& stmts) {
+void Interpreter::interpret(const vector<shared_ptr<Stmt>>& stmts) {
     try {
         // We then iterate through them and execute one by one
-        for (const unique_ptr<Stmt>& stmt : stmts) {
+        for (const shared_ptr<Stmt>& stmt : stmts) {
             // We need to dereference our pointer
-            execute(*stmt);
+            execute(stmt);
         }
     } catch (RuntimeError error) {
         errors.runtime_error(error);
@@ -41,8 +37,14 @@ void Interpreter::interpret(const vector<unique_ptr<Stmt>>& stmts) {
 }
 
 // Helper function to execute statemtent
-void Interpreter::execute(Stmt& stmt) {
-    stmt.accept(*this);
+void Interpreter::execute(std::shared_ptr<Stmt> stmt) {
+    stmt->accept(*this);
+}
+
+// Helper method to send the expression back to visitor
+// implementation
+any Interpreter::evaluate(std::shared_ptr<Expr> expr) {
+    return expr->accept(*this);
 }
 
 /*
@@ -51,55 +53,58 @@ void Interpreter::execute(Stmt& stmt) {
  * a const ref of pointers so we do not deplete the vector before
  * iteration is finished
  */
-void Interpreter::execute_block(const vector<unique_ptr<Stmt>>& stmts,
+void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
                                 shared_ptr<Environment>         env) {
     // We first need to store the first environment
     shared_ptr<Environment> previous = this->environment;
 
     // We transfer ownership of the passed in environment to the current
     // environment
-    this->environment = std::move(env);
+    this->environment = env;
 
     // We then try to iterate over the stmts in the vector
     try {
-        for (const unique_ptr<Stmt>& stmt : stmts) {
-            execute(*stmt);
+        for (const shared_ptr<Stmt>& stmt : stmts) {
+            execute(stmt);
         }
         // We try and catch all exceptios
     } catch (...) {
-        // We transfer ownership to this environment
-        this->environment = std::move(previous);
+        // We transfer ownership to th environment
+        this->environment = previous;
         throw;
     }
 
-    // We once again transfer ownership back to the main scope
-    this->environment = std::move(previous);
+    // We transfer ownership back to the main scope
+    this->environment = previous;
 }
 
 // Function to handle blockstm logic
-any Interpreter::visitBlockStmt(Block& stmt) {
-    // We move ownership since we cannot copy unique_ptrs
-    execute_block(std::move(stmt.stmts), std::make_shared<Environment>(environment));
+any Interpreter::visitBlockStmt(std::shared_ptr<Block> stmt) {
+    // We move ownership since we cannot copy shared_ptrs
+    execute_block(std::move(stmt->stmts), std::make_shared<Environment>(environment));
     return {};
 }
 
 // Function to handle expression stmt logic
-any Interpreter::visitExpressionStmt(ExpressionStmt& stmt) {
-    // We dereference the pointer and evaulate the underlying expression
-    evaluate(*stmt.expr);
+any Interpreter::visitExpressionStmt(std::shared_ptr<ExpressionStmt> stmt) {
+    // We point to our expression and evalute
+    evaluate(stmt->expr);
     return {};
 }
 
+// Function to visit our Function node
 any Interpreter::visitFunctionStmt(std::shared_ptr<Function> stmt) {
-    auto function = stmt;
+    // we create our function
+    shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(stmt);
+    // we then define the function in the environemt
     environment->define(stmt->name.lexeme, function);
     return {};
 }
 
 // Function to handle print stmt logic
-any Interpreter::visitPrintStmt(Print& stmt) {
+any Interpreter::visitPrintStmt(std::shared_ptr<Print> stmt) {
     // We evaluate the expression and store temporarily
-    any value = evaluate(*stmt.expr);
+    any value = evaluate(stmt->expr);
     // We then display the value, the variable is destroyed after leaving scope
     std::cout << make_string(value) << std::endl;
     // We then return an empty std::any{}
@@ -107,49 +112,49 @@ any Interpreter::visitPrintStmt(Print& stmt) {
 }
 
 // Function to handle if else statements
-any Interpreter::visitIfStmt(IfStmt& stmt) {
-    if (is_truthy(evaluate(*stmt.condition))) {
-        execute(*stmt.then_branch);
-    } else if (stmt.else_branch != nullptr) {
-        execute(*stmt.else_branch);
+any Interpreter::visitIfStmt(std::shared_ptr<IfStmt> stmt) {
+    if (is_truthy(evaluate(stmt->condition))) {
+        execute(stmt->then_branch);
+    } else if (stmt->else_branch != nullptr) {
+        execute(stmt->else_branch);
     }
     return {};
 }
 
 // Logic to handle while loops
-any Interpreter::visitWhileStmt(WhileStmt& stmt) {
+any Interpreter::visitWhileStmt(std::shared_ptr<WhileStmt> stmt) {
     // while the underlying expression is true
-    while (is_truthy(evaluate(*stmt.condition))) {
+    while (is_truthy(evaluate(stmt->condition))) {
         // we evaluate the statements in the body
-        execute(*stmt.body);
+        execute(stmt->body);
     }
     return {};
 }
 
 // Function to handle var stmt logic
-any Interpreter::visitVarStmt(Var& stmt) {
+any Interpreter::visitVarStmt(std::shared_ptr<Var> stmt) {
     // We need to initialize a return value with null
     any value = nullptr;
     // We check if our value is null
-    if (stmt.initializer != nullptr) {
+    if (stmt->initializer != nullptr) {
         // If a vlue
-        value = evaluate(*stmt.initializer);
+        value = evaluate(stmt->initializer);
     }
 
     // We add our variable to the environment with its value if it has one
-    environment->define(stmt.identifier.lexeme, std::move(value));
+    environment->define(stmt->identifier.lexeme, value);
     // We then return an empty std::any
     return {};
 }
 
 // Function to handle logical and, or operations
-any CppLox::Interpreter::visitLogicalExpr(Logical& expr) {
+any Interpreter::visitLogicalExpr(std::shared_ptr<Logical> expr) {
     // we first evaluate and store the left expressions value
-    any left = evaluate(*expr.left);
+    any left = evaluate(expr->left);
 
     // we then test to see if the value is truthy or not
     // we can then short circuit
-    if (expr.op.type == TokenType::OR) {
+    if (expr->op.type == TokenType::OR) {
         if (is_truthy(left))
             return left;
     } else {
@@ -158,50 +163,44 @@ any CppLox::Interpreter::visitLogicalExpr(Logical& expr) {
     }
 
     // otherwise we return the right value
-    return evaluate(*expr.right);
-}
-
-// Helper method to send the expression back to visitor
-// implementation
-any Interpreter::evaluate(Expr& expr) {
-    return expr.accept(*this);
+    return evaluate(expr->right);
 }
 
 // Function to visit Assignment nodes
-any Interpreter::visitAssignExpr(Assign& expr) {
+any Interpreter::visitAssignExpr(std::shared_ptr<Assign> expr) {
     // // We evalute the expression and save its value
-    any value = evaluate(*expr.value);
+    any value = evaluate(expr->value);
     // We need to assign the variable and identifier
-    environment->assign(expr.identifier, value);
+    environment->assign(expr->identifier, value);
     // We return the value
     return value;
 }
 
 // Function to visit binary expression nodes
-any Interpreter::visitBinaryExpr(Binary& expr) {
+any Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr) {
     // We evaluate left and right expressions
-    // we need to dereference the unique_ptr
-    any left  = evaluate(*expr.left);
-    any right = evaluate(*expr.right);
+    // we need to dereference the shared_ptr
+    any left  = evaluate(expr->left);
+    any right = evaluate(expr->right);
 
     // We catch each Binary op type
-    switch (expr.op.type) {
+    switch (expr->op.type) {
     case TokenType::BANG_EQUAL:
         return !is_equal(left, right);
     case TokenType::EQUAL_EQUAL:
         return is_equal(left, right);
         // Comparison operation
     case TokenType::GREATER:
-        check_num_operands(expr.op, left, right);
+        check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) > std::any_cast<double>(right);
     case TokenType::GREATER_EQUAL:
-        check_num_operands(expr.op, left, right);
+        check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) >= std::any_cast<double>(right);
     case TokenType::LESS:
-        check_num_operands(expr.op, left, right);
+        check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) < std::any_cast<double>(right);
     case TokenType::LESS_EQUAL:
-        check_num_operands(expr.op, left, right);
+        check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) <= std::any_cast<double>(right);
     // + is an overloaded operator that can handle both string concat
     // and division
@@ -217,21 +216,21 @@ any Interpreter::visitBinaryExpr(Binary& expr) {
         }
 
         // Catch operations where strings or nums are not used
-        throw RuntimeError(expr.op, "Operands must be two numbers or two strings.");
+        throw RuntimeError(expr->op, "Operands must be two numbers or two strings.");
     case TokenType::MINUS:
         // cast to doubles and subtract
-        check_num_operands(expr.op, left, right);
+        check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) - std::any_cast<double>(right);
     case TokenType::SLASH:
         // cast to doubles and divide
-        check_num_operands(expr.op, left, right);
+        check_num_operands(expr->op, left, right);
         if (std::any_cast<double>(right) == double(0)) {
-            throw RuntimeError(expr.op, "Division by 0.");
+            throw RuntimeError(expr->op, "Division by 0->");
         }
         return std::any_cast<double>(left) / std::any_cast<double>(right);
     case TokenType::STAR:
         // cast to doubles and multiply
-        check_num_operands(expr.op, left, right);
+        check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) * std::any_cast<double>(right);
     }
 
@@ -240,14 +239,14 @@ any Interpreter::visitBinaryExpr(Binary& expr) {
 }
 
 //
-any Interpreter::visitUnaryExpr(Unary& expr) {
-    any right = evaluate(*expr.right);
+any Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr) {
+    any right = evaluate(expr->right);
 
-    switch (expr.op.type) {
+    switch (expr->op.type) {
     case TokenType::BANG:
         return !is_truthy(right);
     case TokenType::MINUS:
-        check_num_operand(expr.op, right);
+        check_num_operand(expr->op, right);
         // We cast the value from the right expression to a double
         // then apply the unary op and return
         return -std::any_cast<double>(right);
@@ -257,28 +256,29 @@ any Interpreter::visitUnaryExpr(Unary& expr) {
 }
 
 // Function to handle function calls
-any Interpreter::visitCallExpr(Call& expr) {
+any Interpreter::visitCallExpr(std::shared_ptr<Call> expr) {
     // we evaluate our calle and save it
-    any callee = evaluate(*expr.callee);
+    any callee = evaluate(expr->callee);
 
     // we initialize a vector of any to store our args
     vector<any> args;
     // we iterate over the vector of Expr args
     // we make sure its const ref so that we dont deplete the vector too quickly
-    for (const unique_ptr<Expr>& arg : expr.args) {
-        args.push_back(evaluate(*arg));
+    for (const shared_ptr<Expr>& arg : expr->args) {
+        args.push_back(evaluate(arg));
     }
 
-    unique_ptr<LoxCallable> function;
+    // We forward declare our lox callable object
+    shared_ptr<LoxCallable> function;
 
-    // We add a check to ensure our callable is actually a callable type
-    if (callee.type() != typeid(unique_ptr<LoxCallable>)) {
-        throw RuntimeError(expr.paren, "Can only call functions and classes.");
+    // We add a check to ensure our callable is actually a Function type
+    if (callee.type() != typeid(shared_ptr<LoxFunction>)) {
+        throw RuntimeError(expr->paren, "Can only call functions and classes.");
     }
-    function = std::any_cast<std::unique_ptr<LoxFunction>>(std::move(callee));
+    function = std::any_cast<std::shared_ptr<LoxFunction>>(std::move(callee));
 
     if (args.size() != function->arity()) {
-        throw RuntimeError{expr.paren,
+        throw RuntimeError{expr->paren,
                            "Expected " + std::to_string(function->arity()) + " arguments but got " +
                                std::to_string(args.size()) + "."};
     }
@@ -288,22 +288,22 @@ any Interpreter::visitCallExpr(Call& expr) {
 
 // To evaluate we recursively evaluate
 // since Groupings contain other expressions
-any Interpreter::visitGroupingExpr(Grouping& expr) {
+any Interpreter::visitGroupingExpr(shared_ptr<Grouping> expr) {
     // Since we are using smart pointers we need to dereference
-    return evaluate(*expr.expr);
+    return evaluate(expr->expr);
 }
 
 // Function to return a node's literal value
-any Interpreter::visitLiteralExpr(Literal& expr) {
+any Interpreter::visitLiteralExpr(shared_ptr<Literal> expr) {
     // We stuffed the value after scanning into the token so we can
     // simply retrieve it
-    return expr.value;
+    return expr->value;
 }
 
 // Function to handle variable expressions
-any Interpreter::visitVariableExpr(Variable& var) {
+any Interpreter::visitVariableExpr(shared_ptr<Variable> expr) {
     // We return a variable if its defined
-    return environment->get(var.identifier);
+    return environment->get(expr->identifier);
 }
 
 // Function to test logical operations

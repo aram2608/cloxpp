@@ -26,31 +26,31 @@ class Interpreter : ExprVisitor, StmtVisitor {
   public:
     Interpreter();
 
-    void     interpret(const std::vector<std::unique_ptr<Stmt>>& stmts);
-    void     execute(Stmt& stmt);
-    void     execute_block(const std::vector<std::unique_ptr<Stmt>>& stmts,
+    void     interpret(const std::vector<std::shared_ptr<Stmt>>& stmts);
+    void     execute(std::shared_ptr<Stmt> stmt);
+    void     execute_block(const std::vector<std::shared_ptr<Stmt>>& stmts,
                            std::shared_ptr<Environment>              env);
-    std::any evaluate(Expr& expr);
+    std::any evaluate(std::shared_ptr<Expr> expr);
 
     LoxError errors;
     bool     repl{false};
 
   private:
-    std::any visitBlockStmt(Block& stmt) override;
-    std::any visitExpressionStmt(ExpressionStmt& stmt) override;
+    std::any visitBlockStmt(std::shared_ptr<Block> stmt) override;
     std::any visitFunctionStmt(std::shared_ptr<Function> stmt) override;
-    std::any visitPrintStmt(Print& stmt) override;
-    std::any visitIfStmt(IfStmt& stmt) override;
-    std::any visitWhileStmt(WhileStmt& stmt) override;
-    std::any visitVarStmt(Var& stmt) override;
-    std::any visitLogicalExpr(Logical& expr) override;
-    std::any visitAssignExpr(Assign& expr) override;
-    std::any visitBinaryExpr(Binary& expr) override;
-    std::any visitUnaryExpr(Unary& expr) override;
-    std::any visitCallExpr(Call& expr) override;
-    std::any visitGroupingExpr(Grouping& expr) override;
-    std::any visitLiteralExpr(Literal& expr) override;
-    std::any visitVariableExpr(Variable& var) override;
+    std::any visitExpressionStmt(std::shared_ptr<ExpressionStmt> stmt) override;
+    std::any visitPrintStmt(std::shared_ptr<Print> stmt) override;
+    std::any visitVarStmt(std::shared_ptr<Var> stmt) override;
+    std::any visitIfStmt(std::shared_ptr<IfStmt> if_stmt) override;
+    std::any visitWhileStmt(std::shared_ptr<WhileStmt> while_stmt) override;
+    std::any visitCallExpr(std::shared_ptr<Call> expr) override;
+    std::any visitLogicalExpr(std::shared_ptr<Logical> expr) override;
+    std::any visitAssignExpr(std::shared_ptr<Assign> expr) override;
+    std::any visitBinaryExpr(std::shared_ptr<Binary> expr) override;
+    std::any visitUnaryExpr(std::shared_ptr<Unary> expr) override;
+    std::any visitGroupingExpr(std::shared_ptr<Grouping> expr) override;
+    std::any visitLiteralExpr(std::shared_ptr<Literal> expr) override;
+    std::any visitVariableExpr(std::shared_ptr<Variable> expr) override;
 
     bool        is_truthy(const std::any& object);
     bool        is_equal(const std::any& me, const std::any& you);

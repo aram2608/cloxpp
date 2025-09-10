@@ -20,53 +20,50 @@ struct Var;
 
 // Statement visitor interface
 struct StmtVisitor {
-    virtual ~StmtVisitor()                                     = default;
-    virtual std::any visitBlockStmt(Block& stmt)               = 0;
-    virtual std::any visitFunctionStmt(std::shared_ptr<Function> stmt)     = 0;
-    virtual std::any visitExpressionStmt(ExpressionStmt& stmt) = 0;
-    virtual std::any visitPrintStmt(Print& stmt)               = 0;
-    virtual std::any visitVarStmt(Var& stmt)                   = 0;
-    virtual std::any visitIfStmt(IfStmt& if_stmt)              = 0;
-    virtual std::any visitWhileStmt(WhileStmt& while_stmt)     = 0;
+    virtual ~StmtVisitor()                                                     = default;
+    virtual std::any visitBlockStmt(std::shared_ptr<Block> stmt)               = 0;
+    virtual std::any visitFunctionStmt(std::shared_ptr<Function> stmt)         = 0;
+    virtual std::any visitExpressionStmt(std::shared_ptr<ExpressionStmt> stmt) = 0;
+    virtual std::any visitPrintStmt(std::shared_ptr<Print> stmt)               = 0;
+    virtual std::any visitVarStmt(std::shared_ptr<Var> stmt)                   = 0;
+    virtual std::any visitIfStmt(std::shared_ptr<IfStmt> if_stmt)              = 0;
+    virtual std::any visitWhileStmt(std::shared_ptr<WhileStmt> while_stmt)     = 0;
 };
 
 // Statement interface
 struct Stmt {
     virtual ~Stmt() = default;
     Stmt()          = default;
-    // Delete copy operator
-    Stmt(const Stmt&) = delete;
-    // We also delete the copy assignment operator for the same reason
-    Stmt& operator=(const Stmt&) = delete;
 
-    // accept() method for visiting nodes, we pass in a reference to ExprVisitor&
+    // accept() method for visiting nodes, we pass in a reference to
+    // ExprVisitor&
     virtual std::any accept(StmtVisitor& visitor) = 0;
 };
 
-struct Block : Stmt {
+struct Block : Stmt, std::enable_shared_from_this<Block> {
     /*
-     * Constructor for Block class, we pass in a vector of statements and move ownership
-     * of statements
+     * Constructor for Block class, we pass in a vector of statements and move
+     * ownership of statements
      */
-    Block(std::vector<std::unique_ptr<Stmt>> stmts) : stmts(std::move(stmts)) {
+    Block(std::vector<std::shared_ptr<Stmt>> stmts) : stmts(std::move(stmts)) {
     }
 
     // Override Stmt accept method
     std::any accept(StmtVisitor& visitor) override {
-        return visitor.visitBlockStmt(*this);
+        return visitor.visitBlockStmt(shared_from_this());
     }
 
     // A vector of pointers to the statements inside the block
-    std::vector<std::unique_ptr<Stmt>> stmts;
+    std::vector<std::shared_ptr<Stmt>> stmts;
 };
 
 struct Function : Stmt, std::enable_shared_from_this<Function> {
     /*
-     * FunctionDeclaration constructor (Function) for readability. We pass in the name of the
-     * function as a token, a vector of its parameters as Tokens, and a vector of statements for the
-     * body of the function
+     * FunctionDeclaration constructor (Function) for readability. We pass in
+     * the name of the function as a token, a vector of its parameters as
+     * Tokens, and a vector of statements for the body of the function
      */
-    Function(Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body)
+    Function(Token name, std::vector<Token> params, std::vector<std::shared_ptr<Stmt>> body)
         : name(name), params(params), body(std::move(body)) {
     }
 
@@ -77,101 +74,103 @@ struct Function : Stmt, std::enable_shared_from_this<Function> {
 
     Token                              name;
     std::vector<Token>                 params;
-    std::vector<std::unique_ptr<Stmt>> body;
+    std::vector<std::shared_ptr<Stmt>> body;
 };
 
-struct ExpressionStmt : Stmt {
+struct ExpressionStmt : Stmt, std::enable_shared_from_this<ExpressionStmt> {
     /*
-     * Constructor for expression statements, we pass in an expression and move ownership
+     * Constructor for expression statements, we pass in an expression and move
+     * ownership
      */
-    ExpressionStmt(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {
+    ExpressionStmt(std::shared_ptr<Expr> expr) : expr(std::move(expr)) {
     }
 
     // Override Stmt accept method
     std::any accept(StmtVisitor& visitor) override {
-        return visitor.visitExpressionStmt(*this);
+        return visitor.visitExpressionStmt(shared_from_this());
     }
 
-    std::unique_ptr<Expr> expr;
+    std::shared_ptr<Expr> expr;
 };
 
-struct IfStmt : Stmt {
+struct IfStmt : Stmt, std::enable_shared_from_this<IfStmt> {
     /*
      * If statement constructor, we pass in a pointer to the condtion
      * we also pass a pointer the then clause statement
      * and finally we pass in an else clause statement
      * we need to move ownership
      */
-    IfStmt(std::unique_ptr<Expr> condition,
-           std::unique_ptr<Stmt> then_branch,
-           std::unique_ptr<Stmt> else_branch)
+    IfStmt(std::shared_ptr<Expr> condition,
+           std::shared_ptr<Stmt> then_branch,
+           std::shared_ptr<Stmt> else_branch)
         : condition(std::move(condition)), then_branch(std::move(then_branch)),
           else_branch(std::move(else_branch)) {
     }
 
     // Override Stmt accept method
     std::any accept(StmtVisitor& visitor) override {
-        return visitor.visitIfStmt(*this);
+        return visitor.visitIfStmt(shared_from_this());
     }
 
     // Pointer to if expression
-    std::unique_ptr<Expr> condition;
+    std::shared_ptr<Expr> condition;
     // pointer to then clause
-    std::unique_ptr<Stmt> then_branch;
+    std::shared_ptr<Stmt> then_branch;
     // pointer to else clause
-    std::unique_ptr<Stmt> else_branch;
+    std::shared_ptr<Stmt> else_branch;
 };
 
-struct WhileStmt : Stmt {
+struct WhileStmt : Stmt, std::enable_shared_from_this<WhileStmt> {
     /*
      * WhileStmt constructor, we pass in a pointer to the condition expression
      * and for the body statement
      */
-    WhileStmt(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body)
+    WhileStmt(std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> body)
         : condition(std::move(condition)), body(std::move(body)) {
     }
 
     // Override Stmt accept method
     std::any accept(StmtVisitor& visitor) override {
-        return visitor.visitWhileStmt(*this);
+        return visitor.visitWhileStmt(shared_from_this());
     }
 
-    // Unique_ptr to while expression
-    std::unique_ptr<Expr> condition;
-    // unique_ptr to statements needed to run
-    std::unique_ptr<Stmt> body;
+    // shared_ptr to while expression
+    std::shared_ptr<Expr> condition;
+    // shared_ptr to statements needed to run
+    std::shared_ptr<Stmt> body;
 };
 
-struct Print : Stmt {
+struct Print : Stmt, std::enable_shared_from_this<Print> {
     /*
-     * Constructor for Print statement, we pass in an expression and move ownership
+     * Constructor for Print statement, we pass in an expression and move
+     * ownership
      */
-    Print(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {
+    Print(std::shared_ptr<Expr> expr) : expr(std::move(expr)) {
     }
 
     std::any accept(StmtVisitor& visitor) override {
-        return visitor.visitPrintStmt(*this);
+        return visitor.visitPrintStmt(shared_from_this());
     }
 
-    std::unique_ptr<Expr> expr;
+    std::shared_ptr<Expr> expr;
 };
 
-struct Var : Stmt {
+struct Var : Stmt, std::enable_shared_from_this<Var> {
     /*
      * Constructor for Var statement, we pass in an identifier token
      * and initializing expression
      */
-    Var(Token identifier, std::unique_ptr<Expr> initializer)
+    Var(Token identifier, std::shared_ptr<Expr> initializer)
         : identifier(std::move(identifier)), initializer(std::move(initializer)) {
     }
 
     // Override Stmt accept method
     std::any accept(StmtVisitor& visitor) override {
-        return visitor.visitVarStmt(*this);
+        return visitor.visitVarStmt(shared_from_this());
     }
 
     // Identifier token
     Token                 identifier;
-    std::unique_ptr<Expr> initializer;
+    std::shared_ptr<Expr> initializer;
 };
 } // namespace CppLox

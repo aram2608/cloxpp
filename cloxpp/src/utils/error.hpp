@@ -23,9 +23,8 @@ class LoxError {
     /*
      * A function to display errors, we use a string so that each error can own
      * its own string copies, we need to do this to ensure that
-     * the object we inherit the string from can get destroyed and we still have access
-     * to the message
-     * We do the same for the tokens
+     * the object we inherit the string from can get destroyed and we still have
+     * access to the message We do the same for the tokens
      */
     void error(int line, std::string message) {
         report(line, "", message);

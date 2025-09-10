@@ -2,7 +2,7 @@
 
 using namespace CppLox;
 using std::initializer_list;
-using std::unique_ptr;
+using std::shared_ptr;
 using std::vector;
 
 // Constructor for Parser class
@@ -12,9 +12,9 @@ Parser::Parser(vector<Token> tokens) {
 }
 
 // Function to parse code
-vector<unique_ptr<Stmt>> Parser::parse() {
+vector<shared_ptr<Stmt>> Parser::parse() {
     // We create a new vector to store pointers to our statements
-    vector<unique_ptr<Stmt>> stmts;
+    vector<shared_ptr<Stmt>> stmts;
     while (!is_end()) {
         stmts.push_back(declaration());
     }
@@ -22,13 +22,14 @@ vector<unique_ptr<Stmt>> Parser::parse() {
 }
 
 // Function for handling declarations
-unique_ptr<Stmt> Parser::declaration() {
+shared_ptr<Stmt> Parser::declaration() {
     try {
         // We match a var keyword and return var_declaration
         if (match({TokenType::VAR})) {
             return var_declaration();
         }
 
+        // We match a function declaration
         if (match({TokenType::FUN})) {
             return function("function");
         }
@@ -45,12 +46,12 @@ unique_ptr<Stmt> Parser::declaration() {
 }
 
 // Function to handle var_declar
-unique_ptr<Stmt> Parser::var_declaration() {
+shared_ptr<Stmt> Parser::var_declaration() {
     // Match an identifier token and consume it
     Token identifier = consume(TokenType::IDENTIFIER, "Expected identifier.");
 
     // We initialize a value with nullptr
-    unique_ptr<Expr> initializer = nullptr;
+    shared_ptr<Expr> initializer = nullptr;
     // If we match an equal token bind initializer to the output of expression
     if (match({TokenType::EQUAL})) {
         initializer = expression();
@@ -58,13 +59,13 @@ unique_ptr<Stmt> Parser::var_declaration() {
 
     // We match a semicolon and throw an error if the statement is not closed
     consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
-    return std::make_unique<Var>(std::move(identifier), std::move(initializer));
+    return std::make_shared<Var>(std::move(identifier), std::move(initializer));
 }
 
 // Function to handle parsing of statements
 // Lox programs are a series of statements so
 // all scripts start here defined by our grammar rules
-unique_ptr<Stmt> Parser::statement() {
+shared_ptr<Stmt> Parser::statement() {
     if (match({TokenType::IF}))
         return if_statement();
     if (match({TokenType::PRINT})) {
@@ -81,7 +82,7 @@ unique_ptr<Stmt> Parser::statement() {
 
     if (match({TokenType::LEFT_BRACE})) {
         // We need to move ownership
-        return std::make_unique<Block>(std::move(block()));
+        return std::make_shared<Block>(std::move(block()));
     }
 
     // If we dont reach the predefined stmt types return a base expression stmt
@@ -89,22 +90,22 @@ unique_ptr<Stmt> Parser::statement() {
 }
 
 // Function to match if statement
-unique_ptr<Stmt> Parser::if_statement() {
+shared_ptr<Stmt> Parser::if_statement() {
     // We need to consume the left parenthesis, if statements must use them
     consume(TokenType::LEFT_PAREN, "Expect '(' after 'if'.");
     // we then save the expression inside the parenthesis
-    unique_ptr<Expr> condition = expression();
+    shared_ptr<Expr> condition = expression();
     // We consume the right parenthesis for the same reason
     consume(TokenType::RIGHT_PAREN, "Expect ')' after if condition.");
 
     // we can then catch any statements for the then clause and default to
     // a nullptr for the else clause
-    unique_ptr<Stmt> then_branch = statement();
-    unique_ptr<Stmt> else_branch = nullptr;
+    shared_ptr<Stmt> then_branch = statement();
+    shared_ptr<Stmt> else_branch = nullptr;
     /*
      * If we match an else keyword we can add the procdeding statement
-     * we avoid the else-problem by immediately attaching the else clause to the related
-     * if statement
+     * we avoid the else-problem by immediately attaching the else clause to the
+     * related if statement
      *
      * if (maybe()) <- this owns else clause #2
      *   if (sometimes()) <- this owns else clause #1
@@ -115,33 +116,33 @@ unique_ptr<Stmt> Parser::if_statement() {
         else_branch = statement();
     }
 
-    // We return a unique_ptr to the statement, we must move ownership
-    return std::make_unique<IfStmt>(
+    // We return a shared_ptr to the statement, we must move ownership
+    return std::make_shared<IfStmt>(
         std::move(condition), std::move(then_branch), std::move(else_branch));
 }
 
 // Function to create a while statement
-unique_ptr<Stmt> Parser::while_statement() {
+shared_ptr<Stmt> Parser::while_statement() {
     // we consume the first closing parenthesis
     // and we save the expression
     consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.");
-    unique_ptr<Expr> condition = expression();
+    shared_ptr<Expr> condition = expression();
     // we consume the last parenethesis, this is important as it signals
     // the end of the expression
     consume(TokenType::RIGHT_PAREN, "Expect ')' after condition.");
     // we can now save the underlying statement
-    unique_ptr<Stmt> body = statement();
+    shared_ptr<Stmt> body = statement();
 
-    return std::make_unique<WhileStmt>(std::move(condition), std::move(body));
+    return std::make_shared<WhileStmt>(std::move(condition), std::move(body));
 }
 
 // Logic for handling for statements
-unique_ptr<Stmt> Parser::for_statement() {
+shared_ptr<Stmt> Parser::for_statement() {
     // We consume the first parenethesis
     consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
 
     // We declare our initialier stmt
-    unique_ptr<Stmt> initializer;
+    shared_ptr<Stmt> initializer;
     // If we skip past it, we can just defer to a nullptr
     if (match({TokenType::SEMICOLON})) {
         initializer = nullptr;
@@ -154,7 +155,7 @@ unique_ptr<Stmt> Parser::for_statement() {
     }
 
     // We can now take our condition, we start with a nullptr
-    unique_ptr<Expr> condition = nullptr;
+    shared_ptr<Expr> condition = nullptr;
     // if we do not match a semicolon, we can save the expression
     if (!check(TokenType::SEMICOLON)) {
         condition = expression();
@@ -164,61 +165,62 @@ unique_ptr<Stmt> Parser::for_statement() {
     consume(TokenType::SEMICOLON, "Expect ';' after loop condition.");
 
     // now we can check for an increment
-    unique_ptr<Expr> increment = nullptr;
+    shared_ptr<Expr> increment = nullptr;
     if (!check(TokenType::RIGHT_PAREN)) {
         increment = expression();
     }
     consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
     // we can now take the statement body
-    unique_ptr<Stmt> body = statement();
+    shared_ptr<Stmt> body = statement();
 
     // We can now check if our increment is null
     // and replace our statement with a block instead
     if (increment != nullptr) {
         // we create our vector of pointers to statements
         // and create our expression statement
-        vector<unique_ptr<Stmt>>   body_stmt;
-        unique_ptr<ExpressionStmt> expr = std::make_unique<ExpressionStmt>(std::move(increment));
+        vector<shared_ptr<Stmt>>   body_stmt;
+        shared_ptr<ExpressionStmt> expr = std::make_shared<ExpressionStmt>(std::move(increment));
 
         // now we can move ownership to the the vector
         body_stmt.push_back(std::move(body));
         body_stmt.push_back(std::move(expr));
-        body = std::make_unique<Block>(std::move(body_stmt));
+        body = std::make_shared<Block>(std::move(body_stmt));
     }
 
     // If the condition is nullptr we cram a true in to
     // make an infinite while loop
     if (condition == nullptr) {
-        condition = std::make_unique<Literal>(true);
+        condition = std::make_shared<Literal>(true);
     }
     // we create said while loop
-    body = std::make_unique<WhileStmt>(std::move(condition), std::move(body));
+    body = std::make_shared<WhileStmt>(std::move(condition), std::move(body));
 
     // if we come across an initalizer, we run it once
     // and then pass in a final block statement
     if (initializer != nullptr) {
-        vector<unique_ptr<Stmt>> body_stmt;
+        vector<shared_ptr<Stmt>> body_stmt;
         body_stmt.push_back(std::move(initializer));
         body_stmt.push_back(std::move(body));
-        body = std::make_unique<Block>(std::move(body_stmt));
+        body = std::make_shared<Block>(std::move(body_stmt));
     }
 
     return body;
 }
 
 // Function to handel Lox's built in print statement
-unique_ptr<Stmt> Parser::print_statement() {
+shared_ptr<Stmt> Parser::print_statement() {
     // We create our base expression
-    unique_ptr<Expr> value = expression();
+    shared_ptr<Expr> value = expression();
     // We then consume the semicolon and toss an error if the statement was not
     // finished
     consume(TokenType::SEMICOLON, "Expect ';' after value.");
     // We wrap our expression in a statement and return it
-    return std::make_unique<Print>(std::move(value));
+    return std::make_shared<Print>(std::move(value));
 }
 
-unique_ptr<Function> Parser::function(std::string kind) {
-    // we consume the first token and throw an error if we do not come across a name
+shared_ptr<Function> Parser::function(std::string kind) {
+    // we consume the first token and throw an error if we do not come across a
+    // name
     Token name = consume(TokenType::IDENTIFIER, "Expect " + kind + " name.");
     // we now consume the first parenthesis and throw an error if not present
     consume(TokenType::LEFT_PAREN, "Expect '(' after " + kind + " name.");
@@ -237,28 +239,28 @@ unique_ptr<Function> Parser::function(std::string kind) {
     }
     consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.");
 
-    // we consume the first brace and kick an error, block assumes the first brace token
-    // has already been matched
+    // we consume the first brace and kick an error, block assumes the first
+    // brace token has already been matched
     consume(TokenType::LEFT_BRACE, "Expect '{' before " + kind + " body.");
-    vector<unique_ptr<Stmt>> body = block();
+    vector<shared_ptr<Stmt>> body = block();
 
-    return std::make_unique<Function>(std::move(name), std::move(parameters), std::move(body));
+    return std::make_shared<Function>(std::move(name), std::move(parameters), std::move(body));
 }
 
 // Function to handle expression statement
-unique_ptr<Stmt> Parser::expression_statement() {
+shared_ptr<Stmt> Parser::expression_statement() {
     // Creates our base expressions
-    unique_ptr<Expr> expr = expression();
+    shared_ptr<Expr> expr = expression();
     // Consume the end of the statement and toss an error otherwise
     consume(TokenType::SEMICOLON, "Expect ';' after expression.");
     // We wrap our expression in the Expression statement and return it
-    return std::make_unique<ExpressionStmt>(std::move(expr));
+    return std::make_shared<ExpressionStmt>(std::move(expr));
 }
 
 // Function to handle block scopes
-vector<unique_ptr<Stmt>> Parser::block() {
+vector<shared_ptr<Stmt>> Parser::block() {
     // we create a list of statements
-    vector<unique_ptr<Stmt>> stmts;
+    vector<shared_ptr<Stmt>> stmts;
 
     // While we have not reached a right base add declarations
     while (!check(TokenType::RIGHT_BRACE) && !is_end()) {
@@ -273,7 +275,7 @@ vector<unique_ptr<Stmt>> Parser::block() {
 }
 
 // Function to handle the parsing of expressions
-unique_ptr<Expr> Parser::expression() {
+shared_ptr<Expr> Parser::expression() {
     return assignment();
 }
 
@@ -286,20 +288,21 @@ unique_ptr<Expr> Parser::expression() {
  * var a = "before";
  * a = "value";
  *
- * In this expression if we evaluate 'a' we would return "before" which is not what we want
- * This is the difference between an rvalue and an lvalue, an lvalue is a storage location for a
- * value while an rvalue is simply a transient value we have evaluated
+ * In this expression if we evaluate 'a' we would return "before" which is not
+ * what we want This is the difference between an rvalue and an lvalue, an
+ * lvalue is a storage location for a value while an rvalue is simply a
+ * transient value we have evaluated
  */
-unique_ptr<Expr> Parser::assignment() {
+shared_ptr<Expr> Parser::assignment() {
     // We first need to initialize our expression
-    std::unique_ptr<Expr> expr = _or();
+    std::shared_ptr<Expr> expr = _or();
 
     // We need to match and =
     if (match({TokenType::EQUAL})) {
         // If we match an = sign we need to save the token
         Token equals = previous();
         // We call assignment to recursivle parse the right hand side
-        std::unique_ptr<Expr> value = assignment();
+        std::shared_ptr<Expr> value = assignment();
 
         /*
          * We try and cast the expression, if it works we extract the token
@@ -310,7 +313,7 @@ unique_ptr<Expr> Parser::assignment() {
          */
         if (Variable* var = dynamic_cast<Variable*>(expr.get())) {
             Token identifier = var->identifier;
-            return std::make_unique<Assign>(std::move(identifier), std::move(value));
+            return std::make_shared<Assign>(std::move(identifier), std::move(value));
         }
 
         error(equals, "Invalid assignment target.");
@@ -320,34 +323,34 @@ unique_ptr<Expr> Parser::assignment() {
 }
 
 // Function to handle logical operations
-unique_ptr<Expr> Parser::_or() {
+shared_ptr<Expr> Parser::_or() {
     // We first assign an expression to an and expression
-    unique_ptr<Expr> expr = _and();
+    shared_ptr<Expr> expr = _and();
 
     // If we match the or keyword, we add a token and the right most expression
     // through the _and() method
     while (match({TokenType::OR})) {
         Token            op    = previous();
-        unique_ptr<Expr> right = _and();
+        shared_ptr<Expr> right = _and();
         // we create a new pointer to a Logical node and move ownership
-        expr = std::make_unique<Logical>(std::move(expr), std::move(op), std::move(right));
+        expr = std::make_shared<Logical>(std::move(expr), std::move(op), std::move(right));
     }
 
     // We then can return the final expression
     return expr;
 }
 
-unique_ptr<Expr> Parser::_and() {
+shared_ptr<Expr> Parser::_and() {
     // We first assign an expression to an and expression
-    unique_ptr<Expr> expr = equality();
+    shared_ptr<Expr> expr = equality();
 
     // If we match the and keyword, we add a token and the right most expression
     // through the equality() method
     while (match({TokenType::AND})) {
         Token            op    = previous();
-        unique_ptr<Expr> right = equality();
+        shared_ptr<Expr> right = equality();
         // we create a new pointer to a Logical node and move ownership
-        expr = std::make_unique<Logical>(std::move(expr), std::move(op), std::move(right));
+        expr = std::make_shared<Logical>(std::move(expr), std::move(op), std::move(right));
     }
 
     // We then can return the final expression
@@ -355,62 +358,62 @@ unique_ptr<Expr> Parser::_and() {
 }
 
 // Function to handle second grammar rule,
-unique_ptr<Expr> Parser::equality() {
+shared_ptr<Expr> Parser::equality() {
     // We first need to match a comparison
-    unique_ptr<Expr> expr = comparison();
+    shared_ptr<Expr> expr = comparison();
 
     // then enter a while loop for the (...) rule
     // We search for a != or a == then break, we do this with the match method
     while (match({TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL})) {
         // We consume tokens and expressions until we break the loop
         Token            op    = previous();
-        unique_ptr<Expr> right = comparison();
-        // We have to move since unique_ptrs are read only
-        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+        shared_ptr<Expr> right = comparison();
+        // We have to move since shared_ptrs are read only
+        expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
     }
     // We return the final expression
     return expr;
 }
 
 // Function to handle comparison operatios
-unique_ptr<Expr> Parser::comparison() {
-    unique_ptr<Expr> expr = term();
+shared_ptr<Expr> Parser::comparison() {
+    shared_ptr<Expr> expr = term();
     // We look through each comparison type and break when
     // we no longer come across a comparison operator
     while (match(
         {TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL})) {
         Token            op    = previous();
-        unique_ptr<Expr> right = term();
+        shared_ptr<Expr> right = term();
         // We need to move ownership to the new expression
-        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+        expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
     }
     // We return the final expression
     return expr;
 }
 
-unique_ptr<Expr> Parser::term() {
-    unique_ptr<Expr> expr = factor();
+shared_ptr<Expr> Parser::term() {
+    shared_ptr<Expr> expr = factor();
 
     while (match({TokenType::MINUS, TokenType::PLUS})) {
         Token            op    = previous();
-        unique_ptr<Expr> right = factor();
+        shared_ptr<Expr> right = factor();
         // We need to move ownership to the new expression
-        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+        expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
     }
 
     return expr;
 }
 
 // Function to visit factor node
-unique_ptr<Expr> Parser::factor() {
+shared_ptr<Expr> Parser::factor() {
     // We initialize our first expression
-    unique_ptr<Expr> expr = unary();
+    shared_ptr<Expr> expr = unary();
     // Loop until we dont come across multi or division anymore
     while (match({TokenType::STAR, TokenType::SLASH})) {
         Token            op    = previous();
-        unique_ptr<Expr> right = unary();
+        shared_ptr<Expr> right = unary();
         // We need to move ownership to the new expression
-        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+        expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
     }
 
     // Return og expr otherwise
@@ -418,23 +421,23 @@ unique_ptr<Expr> Parser::factor() {
 }
 
 // Function to visit the unary operation node
-unique_ptr<Expr> Parser::unary() {
+shared_ptr<Expr> Parser::unary() {
     // We can match either the - or ! operators
     if (match({TokenType::BANG, TokenType::MINUS})) {
         // We store the token types and make a new unary node
         Token            op    = previous();
-        unique_ptr<Expr> right = unary();
-        return std::make_unique<Unary>(op, std::move(right));
+        shared_ptr<Expr> right = unary();
+        return std::make_shared<Unary>(op, std::move(right));
     }
     return call();
 }
 
-unique_ptr<Expr> Parser::finish_call(unique_ptr<Expr> callee) {
+shared_ptr<Expr> Parser::finish_call(shared_ptr<Expr> callee) {
     // By default we set a match number of args
     const size_t MAX_ARGS = 255;
 
     // we create our vector of unique ptrs to our arguments
-    vector<unique_ptr<Expr>> args;
+    vector<shared_ptr<Expr>> args;
     // we check if we have met a right parenthesis
     if (!check(TokenType::RIGHT_PAREN)) {
         // if we havent we continuously push_back arguments after matching a
@@ -451,12 +454,12 @@ unique_ptr<Expr> Parser::finish_call(unique_ptr<Expr> callee) {
     Token paren = consume(TokenType::RIGHT_PAREN, "Expect ')' after arguments.");
 
     // we return our call node
-    return std::make_unique<Call>(std::move(callee), paren, std::move(args));
+    return std::make_shared<Call>(std::move(callee), paren, std::move(args));
 }
 
-unique_ptr<Expr> Parser::call() {
-    // we
-    unique_ptr<Expr> expr = primary();
+shared_ptr<Expr> Parser::call() {
+    // we initialize our expr from primary
+    shared_ptr<Expr> expr = primary();
 
     // we continuously match left parenethesis and
     // call the finish_call method
@@ -474,31 +477,31 @@ unique_ptr<Expr> Parser::call() {
 }
 
 // Function to handle the atomic units of Lox
-unique_ptr<Expr> Parser::primary() {
+shared_ptr<Expr> Parser::primary() {
     // Booleans
     if (match({TokenType::FALSE}))
-        return std::make_unique<Literal>(false);
+        return std::make_shared<Literal>(false);
     if (match({TokenType::TRUE}))
-        return std::make_unique<Literal>(true);
+        return std::make_shared<Literal>(true);
     // Null value
     if (match({TokenType::NIL}))
-        return std::make_unique<Literal>(nullptr);
+        return std::make_shared<Literal>(nullptr);
 
     // Strings and nums
     if (match({TokenType::NUMBER, TokenType::STRING})) {
-        return std::make_unique<Literal>(previous().literal);
+        return std::make_shared<Literal>(previous().literal);
     }
 
     // Identifiers
     if (match({TokenType::IDENTIFIER})) {
-        return std::make_unique<Variable>(previous());
+        return std::make_shared<Variable>(previous());
     }
 
     // Parenthesis
     if (match({TokenType::LEFT_PAREN})) {
-        unique_ptr<Expr> expr = expression();
+        shared_ptr<Expr> expr = expression();
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
-        return std::make_unique<Grouping>(std::move(expr));
+        return std::make_shared<Grouping>(std::move(expr));
     }
     // Catch bad tokens
     throw error(peek(), "Expect expression.");

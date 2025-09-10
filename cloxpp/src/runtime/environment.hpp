@@ -30,8 +30,8 @@ class Environment : public std::enable_shared_from_this<Environment> {
     // Function to define and store variables in the map
     void define(std::string identifier, std::any value) {
         // the value is oftentimes a pointer so we move ownership
-        // this method overrides id everytime however, since the [] operator does not
-        // care if the object already exists or not
+        // this method overrides id everytime however, since the [] operator
+        // does not care if the object already exists or not
         values[identifier] = std::move(value);
     }
 

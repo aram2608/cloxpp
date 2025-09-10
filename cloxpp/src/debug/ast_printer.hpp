@@ -21,22 +21,22 @@ class AstPrinter : public ExprVisitor {
 
     // Function to stringify binary expr
     std::any visitBinaryExpr(Binary& expr) override {
-        // When used with a unique_ptr or shared_ptr, get() returns a raw pointer
-        // to the managed object
+        // When used with a unique_ptr or shared_ptr, get() returns a raw
+        // pointer to the managed object
         return std::string{parenthesize(expr.op.lexeme, {expr.left.get(), expr.right.get()})};
     }
 
     // Function to stringify Unary expr
     std::any visitUnaryExpr(Unary& expr) override {
-        // When used with a unique_ptr or shared_ptr, get() returns a raw pointer
-        // to the managed object
+        // When used with a unique_ptr or shared_ptr, get() returns a raw
+        // pointer to the managed object
         return std::string{parenthesize(expr.op.lexeme, {expr.right.get()})};
     }
 
     // Function to stringify Grouping Expr
     std::any visitGroupingExpr(Grouping& expr) override {
-        // When used with a unique_ptr or shared_ptr, get() returns a raw pointer
-        // to the managed object
+        // When used with a unique_ptr or shared_ptr, get() returns a raw
+        // pointer to the managed object
         return std::string{parenthesize("group", {expr.expr.get()})};
     }
 

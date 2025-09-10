@@ -100,7 +100,8 @@ void Scanner::scan() {
     case '>':
         add_token(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
         break;
-    // Slashes need to be handled in a special way since comments will be C style
+    // Slashes need to be handled in a special way since comments will be C
+    // style
     case '/':
         if (match('/')) {
             comment();
@@ -191,7 +192,8 @@ char Scanner::peek_next() {
 
 // Function to handle string token types
 void Scanner::add_string() {
-    // We need to peek forward until we meet the end of file or the closing quote
+    // We need to peek forward until we meet the end of file or the closing
+    // quote
     while (peek() != '"' && !is_end()) {
         // If we reach a new line we increment the line number
         if (peek() == '\n') {
@@ -287,15 +289,16 @@ void Scanner::add_identifier() {
 
     /*
      * We search our reserved keywords map to find the saved string
-     * map.find() takes a key as an arg and searches for an element with a matching key
-     * If found, .find() returns an iterator pointing to the element (a std::pair of key and value)
-     * If not found, .find() returns an iterator to std::map::end().
+     * map.find() takes a key as an arg and searches for an element with a
+     * matching key If found, .find() returns an iterator pointing to the
+     * element (a std::pair of key and value) If not found, .find() returns an
+     * iterator to std::map::end().
      */
     auto match = keywords.find(text);
     /*
-     * The map.end() method returns an interator that points past the end of the map
-     * Meaning if our match is equal to it, then it is not found in the map at all
-     * We can consider that as an identifier
+     * The map.end() method returns an interator that points past the end of the
+     * map Meaning if our match is equal to it, then it is not found in the map
+     * at all We can consider that as an identifier
      */
     if (match == keywords.end()) {
         type = TokenType::IDENTIFIER;

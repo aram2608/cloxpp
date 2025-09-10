@@ -8,8 +8,8 @@ using std::cout;
 using std::endl;
 using std::ifstream;
 using std::istreambuf_iterator;
+using std::shared_ptr;
 using std::string;
-using std::unique_ptr;
 using std::vector;
 
 // Empty constructor for now
@@ -24,7 +24,7 @@ void Lox::run(string code) {
     // Create tokens from source code
     vector<Token> tokens           = scanner.scan_tokens();
     parser                         = Parser(tokens);
-    vector<unique_ptr<Stmt>> stmts = parser.parse();
+    vector<shared_ptr<Stmt>> stmts = parser.parse();
 
     // Catch scanner and parser errors
     if (had_error())
@@ -112,7 +112,8 @@ string Lox::slurp_file(const string& filename) {
     // We first create an ifstream object called file()
     ifstream file(filename);
 
-    // Test to ensure file can open, otherwise assume bad file and return an empty string
+    // Test to ensure file can open, otherwise assume bad file and return an
+    // empty string
     if (!file.is_open()) {
         cout << "Error: Could not open file " << filename << endl;
 

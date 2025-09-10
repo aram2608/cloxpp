@@ -14,10 +14,12 @@ int main(int argc, char* argv[]) {
     /*
         * We need to catch the number of command line arguments
         * More than 1 should exit with a failure status
-        * In C++ argc is argument count and argv is argument vector, a vector containing
+        * In C++ argc is argument count and argv is argument vector, a vector
+       containing
         * pointers to the arguments themselves
 
-        * argc is an integer and stores the number of arguments used including the name
+        * argc is an integer and stores the number of arguments used including
+       the name
         * of the program itself. As such the default value of argc is always 1.
     */
     if (argc > 2) {
