@@ -40,7 +40,11 @@ any LoxFunction::call(Interpreter& interpreter, vector<any> arguments) {
         environment->define(declaration->params[i].lexeme, arguments[i]);
     }
 
-    // we move ownership of the body and environment
+    // we need to catch a Return exception if there is one
+    try {
     interpreter.execute_block(std::move(declaration->body), std::move(environment));
+    } catch (Interpreter::Return value) {
+        return value.value;
+    }
     return nullptr;
 }

@@ -66,6 +66,7 @@ shared_ptr<Stmt> Parser::var_declaration() {
 // Lox programs are a series of statements so
 // all scripts start here defined by our grammar rules
 shared_ptr<Stmt> Parser::statement() {
+    // We have a match case for each keyword
     if (match({TokenType::IF}))
         return if_statement();
     if (match({TokenType::PRINT})) {
@@ -74,6 +75,10 @@ shared_ptr<Stmt> Parser::statement() {
 
     if (match({TokenType::WHILE})) {
         return while_statement();
+    }
+
+    if (match({TokenType::RETURN})) {
+        return return_statement();
     }
 
     if (match({TokenType::FOR})) {
@@ -216,6 +221,23 @@ shared_ptr<Stmt> Parser::print_statement() {
     consume(TokenType::SEMICOLON, "Expect ';' after value.");
     // We wrap our expression in a statement and return it
     return std::make_shared<Print>(std::move(value));
+}
+
+// Function to handle return statement logic
+shared_ptr<Stmt> Parser::return_statement() {
+    // we save the keyword
+    Token keyword = previous();
+    // we initialize our value as a nullptr
+    shared_ptr<Expr> value = nullptr;
+    // if we do not match a semicolon as the proceeding token
+    // we return an expression
+    if (!check(TokenType::SEMICOLON)) {
+        value = expression();
+    }
+
+    // we check for a semicolon and throw an error otherwise
+    consume(TokenType::SEMICOLON, "Expect ';' after return value.");
+    return std::make_shared<ReturnStmt>(std::move(keyword), std::move(value));
 }
 
 shared_ptr<Function> Parser::function(std::string kind) {

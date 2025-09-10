@@ -17,11 +17,13 @@ struct IfStmt;
 struct WhileStmt;
 struct Print;
 struct Var;
+struct ReturnStmt;
 
 // Statement visitor interface
 struct StmtVisitor {
     virtual ~StmtVisitor()                                                     = default;
     virtual std::any visitBlockStmt(std::shared_ptr<Block> stmt)               = 0;
+    virtual std::any visitReturnStmt(std::shared_ptr<ReturnStmt> stmt)         = 0;
     virtual std::any visitFunctionStmt(std::shared_ptr<Function> stmt)         = 0;
     virtual std::any visitExpressionStmt(std::shared_ptr<ExpressionStmt> stmt) = 0;
     virtual std::any visitPrintStmt(std::shared_ptr<Print> stmt)               = 0;
@@ -38,6 +40,25 @@ struct Stmt {
     // accept() method for visiting nodes, we pass in a reference to
     // ExprVisitor&
     virtual std::any accept(StmtVisitor& visitor) = 0;
+};
+
+// Return statement node
+struct ReturnStmt : Stmt, std::enable_shared_from_this<ReturnStmt> {
+    // Constructor for the return statement, we pass in a pointer the optional
+    // return value
+    ReturnStmt(Token keyword, std::shared_ptr<Expr> expr)
+        : keyword(keyword), expr(std::move(expr)) {
+    }
+
+    // We override the accept method
+    std::any accept(StmtVisitor& visitor) {
+        return visitor.visitReturnStmt(shared_from_this());
+    }
+
+    // a shared_ptr the the optional expression
+    std::shared_ptr<Expr> expr;
+    // return keyword, useful for error reporting
+    Token keyword;
 };
 
 struct Block : Stmt, std::enable_shared_from_this<Block> {

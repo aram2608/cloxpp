@@ -1,6 +1,0 @@
-(VAR , var , nil)
-(IDENTIFIER , language , language)
-(EQUAL , = , nil)
-(STRING , "lox" , lox)
-(SEMICOLON , ; , nil)
-(eof ,  , nil)

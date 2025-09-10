@@ -33,6 +33,7 @@ class Parser {
     std::shared_ptr<Stmt>              while_statement();
     std::shared_ptr<Stmt>              for_statement();
     std::shared_ptr<Stmt>              print_statement();
+    std::shared_ptr<Stmt>              return_statement();
     std::shared_ptr<Function>          function(std::string kind);
     std::shared_ptr<Stmt>              expression_statement();
     std::vector<std::shared_ptr<Stmt>> block();

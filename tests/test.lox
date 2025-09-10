@@ -1,0 +1,75 @@
+// ===== arithmetic & precedence =====
+print "== arithmetic ==";
+print 5 + 3 * 2;          // 11
+print (5 + 3) * 2;        // 16
+print 10 - 4 / 2;         // 8
+print -(-5);              // 5
+
+// ===== variables & reassignment =====
+print "== variables ==";
+var a = 10;
+print a;                  // 10
+a = a + 5;
+print a;                  // 15
+var b = a * 2;
+print b;                  // 30
+
+// ===== if / else =====
+print "== if/else ==";
+var n = 3;
+if (n < 5) {
+  print "small";
+} else {
+  print "big";
+}
+
+// ===== while =====
+print "== while ==";
+var w = 3;
+while (w > 0) {
+  print w;                // 3, 2, 1
+  w = w - 1;
+}
+
+// ===== for =====
+print "== for ==";
+for (var i = 0; i < 3; i = i + 1) {
+  print i;                // 0, 1, 2
+}
+print "done";
+
+// ===== functions (no returns) =====
+print "== functions ==";
+fun greet(name) {
+  print "Hello, " + name;
+}
+greet("World");           // Hello, World
+
+fun add(a, b) {
+  print a + b;
+}
+add(2, 3);                // 5
+
+fun double(x) {
+  print x * 2;
+}
+fun run() {
+  double(5);
+}
+run();                    // 10
+
+// ===== simple chaining =====
+print "== chaining ==";
+fun sayHi(first, last) {
+  print "Hi, " + first + " " + last + "!";
+}
+sayHi("Dear", "Reader");  // Hi, Dear Reader!
+
+fun tri(a, b, c) {
+  print a + b + c;
+}
+tri(1, 2, 3);             // 6
+
+// ===== arity error probe (optional; comment out if you don't want an error) =====
+// print "== arity probe ==";
+greet();                // Expect a nice runtime arity error

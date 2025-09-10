@@ -17,6 +17,14 @@ namespace CppLox {
 
 // We inherit the ExprVisitor class so now we need to override each visit method
 class Interpreter : ExprVisitor, StmtVisitor {
+  // We make LoxFunction a friend class so we can throw it the return value
+  friend class LoxFunction;
+    struct Return {
+        Return(std::any value) : value(value) {
+        }
+        std::any value;
+    };
+
   public:
     std::shared_ptr<Environment> globals = std::make_shared<Environment>();
 
@@ -36,6 +44,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     bool     repl{false};
 
   private:
+    std::any visitReturnStmt(std::shared_ptr<ReturnStmt> stmt) override;
     std::any visitBlockStmt(std::shared_ptr<Block> stmt) override;
     std::any visitFunctionStmt(std::shared_ptr<Function> stmt) override;
     std::any visitExpressionStmt(std::shared_ptr<ExpressionStmt> stmt) override;

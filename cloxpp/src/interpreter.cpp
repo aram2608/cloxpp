@@ -13,9 +13,9 @@ using std::vector;
 // here
 Interpreter::Interpreter() {
     /*
-     * we define a variable named clock that stores a pointer to out Native
-     * Clock method we use a shared_ptr since they are much more forgiving than
-     * unique_ptrs when it comes to ownership
+     * we define a variable named clock that stores a pointer to out Native Clock method
+     * we use a shared_ptr since they are much more forgiving than unique_ptrs when it comes to
+     * ownership
      */
     globals->define("clock", std::shared_ptr<NativeClock>{});
 }
@@ -76,6 +76,21 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
 
     // We transfer ownership back to the main scope
     this->environment = previous;
+}
+
+// Function to handle interpretation of return statements
+// Returns are tricky since we need to skip past sections of the call stack
+// as soon as we meet the return statement
+any Interpreter::visitReturnStmt(std::shared_ptr<ReturnStmt> stmt) {
+    // we initialize a nullptr to start
+    any value = nullptr;
+    // if the expression is not nullptr we can evaluate the expression
+    // and store the value
+    if (stmt->expr != nullptr) {
+        value = evaluate(stmt->expr);
+    }
+    // we throw our return value
+    throw Return(std::move(value));
 }
 
 // Function to handle blockstm logic
@@ -275,14 +290,18 @@ any Interpreter::visitCallExpr(std::shared_ptr<Call> expr) {
     if (callee.type() != typeid(shared_ptr<LoxFunction>)) {
         throw RuntimeError(expr->paren, "Can only call functions and classes.");
     }
+    // If we pass our test we can cast our Function into a callable object
     function = std::any_cast<std::shared_ptr<LoxFunction>>(std::move(callee));
 
+    // We need to test our functions arity to ensure the correct number of args are
+    // passed
     if (args.size() != function->arity()) {
         throw RuntimeError{expr->paren,
                            "Expected " + std::to_string(function->arity()) + " arguments but got " +
                                std::to_string(args.size()) + "."};
     }
 
+    // we can then return a call to the function with the arguments
     return function->call(*this, std::move(args));
 }
 
