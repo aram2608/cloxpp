@@ -163,9 +163,9 @@ any Resolver::visitVariableExpr(shared_ptr<Variable> expr) {
         // Next we look back into the scopes and store the first one
         std::map<std::string, bool> scope = scopes.back();
         // We then use find to search for our lexeme
-        auto elem = scope.find(expr->name.lexeme);
-        // We test if the iterator is inside the scope or if the name is set to false
-        if (elem != scope.end() && elem->second == false)
+        auto it = scope.find(expr->name.lexeme);
+        // We test if the iterator is inside the scope and if the name is set to false
+        if (it != scope.end() && it->second == false)
             // If so we throw an error
             error.error(expr->name, "Can't read local variable in its own initializer.");
     }
@@ -180,11 +180,8 @@ void Resolver::begin_scope() {
 }
 
 // Function to delete the last element in a vector
-// we first check to make sure its not empty
 void Resolver::end_scope() {
-    if (!scopes.empty()) {
-        scopes.pop_back();
-    }
+    scopes.pop_back();
 }
 
 // Helper method to resolve statements
@@ -199,7 +196,16 @@ void Resolver::resolve(shared_ptr<Expr> expr) {
 
 // Function used to resolve local variables
 void Resolver::resolve_local(shared_ptr<Expr> expr, Token name) {
+    // We start at the inner most scope and work outwards to find the name
     for (int i = scopes.size() - 1; i >= 0; --i) {
+        /*
+         * If we match it, we ask the interpreter to resolve it and pass in
+         * the number corresponding the scope
+         * if its in the current scope we get 0
+         * if its the enclosing scope - 1
+         * if its the scope outside of the immediate enclosing scope - 2
+         * etc...
+         */
         if (scopes[i].find(name.lexeme) != scopes[i].end()) {
             interpreter.resolve(expr, scopes.size() - 1 - i);
             return;
@@ -239,8 +245,8 @@ void Resolver::declare(Token name) {
     std::map<std::string, bool> scope = scopes.back();
 
     // We check to see if a variable has already been declared in the local scope
-    auto elem = scope.find(name.lexeme);
-    if (elem != scope.end()) {
+    auto it = scope.find(name.lexeme);
+    if (it != scope.end()) {
         // If so we can kick an error
         error.error(name, "Already a variable with this name in this scope.");
     }

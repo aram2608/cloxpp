@@ -34,9 +34,10 @@ while (w > 0) {
 // ===== for =====
 print "== for ==";
 for (var i = 0; i < 3; i = i + 1) {
-  print i;                // 0, 1, 2
+  print i;                
 }
 print "done";
+// 0, 1, 2
 
 // ===== functions (no returns) =====
 print "== functions ==";

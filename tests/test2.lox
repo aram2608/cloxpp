@@ -53,11 +53,13 @@ var w = 2;
 while (w > 0) {
   var j = 0;
   while (j < 2) {
-    print w * 10 + j;    // 20,21 then 10,11
+    print w * 10 + j;
     j = j + 1;
   }
   w = w - 1;
 }
+
+// 20,21 then 10,11
 
 // ===== functions calling functions =====
 print "== functions ==";

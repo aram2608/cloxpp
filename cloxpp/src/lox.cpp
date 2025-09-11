@@ -1,7 +1,5 @@
 #include "lox.hpp"
 
-#include <utility>
-
 using namespace CppLox;
 using std::cin;
 using std::cout;
@@ -14,7 +12,7 @@ using std::vector;
 
 // Empty constructor for now
 // We initialize an empty parser to start off
-Lox::Lox() : parser(std::vector<Token>{}), resolver(interpreter) {
+Lox::Lox() : parser(std::vector<Token>{}) {
 }
 
 // The main logic for our Lox program, handles scanning, parsing, etc.
@@ -27,7 +25,10 @@ void Lox::run(string code) {
     vector<shared_ptr<Stmt>> stmts = parser.parse();
 
     // Catch scanner and parser errors
-    if (had_error()) {
+    if (scanner.errors.had_error) {
+        return;
+    }
+    if (parser.errors.had_error) {
         return;
     }
 
@@ -41,8 +42,7 @@ void Lox::run(string code) {
     }
 
     // We interpret the AST
-    // We need to move ownership to the interpreter
-    interpreter.interpret(std::move(stmts));
+    interpreter.interpret(stmts);
 }
 
 // Function to wrap the run function around file contents
@@ -102,23 +102,11 @@ void Lox::run_prompt() {
     }
 }
 
-// Helper method to wrap parser and scanner errors
-bool Lox::had_error() {
-    if (scanner.errors.had_error) {
-        return true;
-    }
-    if (parser.errors.had_error) {
-        return true;
-    }
-    return false;
-}
-
 // Helper method to reset errors after evaluation
 void Lox::reset_errors() {
     scanner.errors.had_error            = false;
     parser.errors.had_error             = false;
     interpreter.errors.had_RuntimeError = false;
-    resolver.error.had_error            = false;
 }
 
 // Function to slurp a files contents

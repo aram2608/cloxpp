@@ -1,6 +1,8 @@
 #include "interpreter.hpp"
 
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 using namespace CppLox;
 using std::any;
@@ -135,8 +137,10 @@ any Interpreter::visitPrintStmt(shared_ptr<Print> stmt) {
 
 // Function to handle if else statements
 any Interpreter::visitIfStmt(shared_ptr<IfStmt> stmt) {
+    // We evaluate if the condition is truthy then execute the clause
     if (is_truthy(evaluate(stmt->condition))) {
         execute(stmt->then_branch);
+        // Otherwise we evaluate the else clause if it exists
     } else if (stmt->else_branch != nullptr) {
         execute(stmt->else_branch);
     }
@@ -149,6 +153,9 @@ any Interpreter::visitWhileStmt(shared_ptr<WhileStmt> stmt) {
     while (is_truthy(evaluate(stmt->condition))) {
         // we evaluate the statements in the body
         execute(stmt->body);
+        // debugging snippet for infitine while loops
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::cout << "2 seconds have passed." << std::endl;
     }
     return {};
 }
@@ -339,6 +346,20 @@ any Interpreter::visitVariableExpr(shared_ptr<Variable> expr) {
     // scopes
     return variable_lookup(expr->name, expr);
 }
+
+// debugging snippet
+// std::any Interpreter::visitVariableExpr(std::shared_ptr<Variable> expr) {
+//     int dist = -1;
+//     if (auto it = locals.find(expr); it != locals.end())
+//         dist = it->second;
+
+//     std::cerr << "[get] " << expr->name.lexeme << " dist=" << dist << " env@" << environment
+//               << "\n";
+
+//     if (dist != -1)
+//         return environment->get_at(dist, expr->name.lexeme);
+//     return globals->get(expr->name);
+// }
 
 // Function to test logical operations
 // Pass in const ref since this is read only

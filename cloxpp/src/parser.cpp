@@ -181,15 +181,8 @@ shared_ptr<Stmt> Parser::for_statement() {
     // We can now check if our increment is null
     // and replace our statement with a block instead
     if (increment != nullptr) {
-        // we create our vector of pointers to statements
-        // and create our expression statement
-        vector<shared_ptr<Stmt>>   body_stmt;
-        shared_ptr<ExpressionStmt> expr = std::make_shared<ExpressionStmt>(std::move(increment));
-
-        // now we can move ownership to the the vector
-        body_stmt.push_back(std::move(body));
-        body_stmt.push_back(std::move(expr));
-        body = std::make_shared<Block>(std::move(body_stmt));
+        body = std::make_shared<Block>(std::vector<std::shared_ptr<Stmt>>{
+            std::move(body), std::make_shared<ExpressionStmt>(std::move(increment))});
     }
 
     // If the condition is nullptr we cram a true in to
@@ -203,10 +196,8 @@ shared_ptr<Stmt> Parser::for_statement() {
     // if we come across an initalizer, we run it once
     // and then pass in a final block statement
     if (initializer != nullptr) {
-        vector<shared_ptr<Stmt>> body_stmt;
-        body_stmt.push_back(std::move(initializer));
-        body_stmt.push_back(std::move(body));
-        body = std::make_shared<Block>(std::move(body_stmt));
+        body = std::make_shared<Block>(
+            std::vector<std::shared_ptr<Stmt>>{std::move(initializer), std::move(body)});
     }
 
     return body;
