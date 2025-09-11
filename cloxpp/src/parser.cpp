@@ -48,7 +48,7 @@ shared_ptr<Stmt> Parser::declaration() {
 // Function to handle var_declar
 shared_ptr<Stmt> Parser::var_declaration() {
     // Match an identifier token and consume it
-    Token identifier = consume(TokenType::IDENTIFIER, "Expected identifier.");
+    Token name = consume(TokenType::IDENTIFIER, "Expected identifier.");
 
     // We initialize a value with nullptr
     shared_ptr<Expr> initializer = nullptr;
@@ -59,7 +59,7 @@ shared_ptr<Stmt> Parser::var_declaration() {
 
     // We match a semicolon and throw an error if the statement is not closed
     consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
-    return std::make_shared<Var>(std::move(identifier), std::move(initializer));
+    return std::make_shared<Var>(std::move(name), std::move(initializer));
 }
 
 // Function to handle parsing of statements
@@ -334,8 +334,8 @@ shared_ptr<Expr> Parser::assignment() {
          * expression
          */
         if (Variable* var = dynamic_cast<Variable*>(expr.get())) {
-            Token identifier = var->identifier;
-            return std::make_shared<Assign>(std::move(identifier), std::move(value));
+            Token name = var->name;
+            return std::make_shared<Assign>(std::move(name), std::move(value));
         }
 
         error(equals, "Invalid assignment target.");

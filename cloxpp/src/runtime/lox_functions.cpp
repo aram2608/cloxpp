@@ -5,10 +5,11 @@ using std::any;
 using std::string;
 using std::vector;
 
-// Constructor for lox function class, we pass in a declaration and move
-// ownership
-LoxFunction::LoxFunction(std::shared_ptr<Function> declaration)
-    : declaration(std::move(declaration)) {
+// Constructor for lox function class, we pass in a declaration and environment
+// and move ownership
+LoxFunction::LoxFunction(std::shared_ptr<Function>    declaration,
+                         std::shared_ptr<Environment> closure)
+    : declaration(std::move(declaration)), closure(std::move(closure)) {
 }
 
 // A helper method to return the string representation of a function
@@ -24,15 +25,13 @@ int LoxFunction::arity() {
 // we override the LoxCallable call method
 any LoxFunction::call(Interpreter& interpreter, vector<any> arguments) {
     /*
-    // functions need to have their own enviroment, this is to ensure they have
-    their own scope
-    // we first need to copy the interpreters global environment into the
-    function
-    // we do not move the environment since we are going to reuse the old
-    environment as soon as
-    // we leave the function body
-    */
-    std::shared_ptr environment = std::make_shared<Environment>(interpreter.globals);
+     * functions need to have their own enviroment, this is to ensure they have
+     * their own scope
+     * we first need to copy the environment from the closure
+     * we do not move the environment since we are going to reuse the old
+     * environment as soon as we leave the function body
+     */
+    std::shared_ptr environment = std::make_shared<Environment>(closure);
 
     // we can then create an iterator that iterates over the paremeters and
     // defines them in the environment
@@ -42,7 +41,7 @@ any LoxFunction::call(Interpreter& interpreter, vector<any> arguments) {
 
     // we need to catch a Return exception if there is one
     try {
-    interpreter.execute_block(std::move(declaration->body), std::move(environment));
+        interpreter.execute_block(std::move(declaration->body), std::move(environment));
     } catch (Interpreter::Return value) {
         return value.value;
     }

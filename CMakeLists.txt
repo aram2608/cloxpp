@@ -15,12 +15,14 @@ add_executable(${PROJECT_NAME}
     cloxpp/src/parser.cpp
     cloxpp/src/interpreter.cpp
     cloxpp/src/runtime/lox_functions.cpp
+    cloxpp/src/runtime/resolver.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/src/ast)
-target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/src/utils)
-target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/src/runtime)
-target_include_directories(${PROJECT_NAME} PRIVATE cloxpp/src/debug)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cloxpp/src/)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cloxpp/src/ast/)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cloxpp/src/debug/)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cloxpp/src/utils/)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cloxpp/src/runtime/)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE magic_enum::magic_enum)
 

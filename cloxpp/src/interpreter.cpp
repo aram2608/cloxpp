@@ -17,7 +17,7 @@ Interpreter::Interpreter() {
      * we use a shared_ptr since they are much more forgiving than unique_ptrs when it comes to
      * ownership
      */
-    globals->define("clock", std::shared_ptr<NativeClock>{});
+    globals->define("clock", shared_ptr<NativeClock>{});
 }
 
 /*
@@ -36,14 +36,20 @@ void Interpreter::interpret(const vector<shared_ptr<Stmt>>& stmts) {
     }
 }
 
+// Function to resolve expressions
+void Interpreter::resolve(shared_ptr<Expr> expr, int depth) {
+    // We store the expression with its associated depth
+    locals[expr] = depth;
+}
+
 // Helper function to execute statemtent
-void Interpreter::execute(std::shared_ptr<Stmt> stmt) {
+void Interpreter::execute(shared_ptr<Stmt> stmt) {
     stmt->accept(*this);
 }
 
 // Helper method to send the expression back to visitor
 // implementation
-any Interpreter::evaluate(std::shared_ptr<Expr> expr) {
+any Interpreter::evaluate(shared_ptr<Expr> expr) {
     return expr->accept(*this);
 }
 
@@ -81,7 +87,7 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
 // Function to handle interpretation of return statements
 // Returns are tricky since we need to skip past sections of the call stack
 // as soon as we meet the return statement
-any Interpreter::visitReturnStmt(std::shared_ptr<ReturnStmt> stmt) {
+any Interpreter::visitReturnStmt(shared_ptr<ReturnStmt> stmt) {
     // we initialize a nullptr to start
     any value = nullptr;
     // if the expression is not nullptr we can evaluate the expression
@@ -94,30 +100,31 @@ any Interpreter::visitReturnStmt(std::shared_ptr<ReturnStmt> stmt) {
 }
 
 // Function to handle blockstm logic
-any Interpreter::visitBlockStmt(std::shared_ptr<Block> stmt) {
+any Interpreter::visitBlockStmt(shared_ptr<Block> stmt) {
     // We move ownership since we cannot copy shared_ptrs
     execute_block(std::move(stmt->stmts), std::make_shared<Environment>(environment));
     return {};
 }
 
 // Function to handle expression stmt logic
-any Interpreter::visitExpressionStmt(std::shared_ptr<ExpressionStmt> stmt) {
+any Interpreter::visitExpressionStmt(shared_ptr<ExpressionStmt> stmt) {
     // We point to our expression and evalute
     evaluate(stmt->expr);
     return {};
 }
 
 // Function to visit our Function node
-any Interpreter::visitFunctionStmt(std::shared_ptr<Function> stmt) {
-    // we create our function
-    shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(stmt);
+any Interpreter::visitFunctionStmt(shared_ptr<Function> stmt) {
+    // we create our function by passing in the statements and current environment
+    // as the function is declared
+    shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(stmt, environment);
     // we then define the function in the environemt
     environment->define(stmt->name.lexeme, function);
     return {};
 }
 
 // Function to handle print stmt logic
-any Interpreter::visitPrintStmt(std::shared_ptr<Print> stmt) {
+any Interpreter::visitPrintStmt(shared_ptr<Print> stmt) {
     // We evaluate the expression and store temporarily
     any value = evaluate(stmt->expr);
     // We then display the value, the variable is destroyed after leaving scope
@@ -127,7 +134,7 @@ any Interpreter::visitPrintStmt(std::shared_ptr<Print> stmt) {
 }
 
 // Function to handle if else statements
-any Interpreter::visitIfStmt(std::shared_ptr<IfStmt> stmt) {
+any Interpreter::visitIfStmt(shared_ptr<IfStmt> stmt) {
     if (is_truthy(evaluate(stmt->condition))) {
         execute(stmt->then_branch);
     } else if (stmt->else_branch != nullptr) {
@@ -137,7 +144,7 @@ any Interpreter::visitIfStmt(std::shared_ptr<IfStmt> stmt) {
 }
 
 // Logic to handle while loops
-any Interpreter::visitWhileStmt(std::shared_ptr<WhileStmt> stmt) {
+any Interpreter::visitWhileStmt(shared_ptr<WhileStmt> stmt) {
     // while the underlying expression is true
     while (is_truthy(evaluate(stmt->condition))) {
         // we evaluate the statements in the body
@@ -147,7 +154,7 @@ any Interpreter::visitWhileStmt(std::shared_ptr<WhileStmt> stmt) {
 }
 
 // Function to handle var stmt logic
-any Interpreter::visitVarStmt(std::shared_ptr<Var> stmt) {
+any Interpreter::visitVarStmt(shared_ptr<Var> stmt) {
     // We need to initialize a return value with null
     any value = nullptr;
     // We check if our value is null
@@ -157,13 +164,13 @@ any Interpreter::visitVarStmt(std::shared_ptr<Var> stmt) {
     }
 
     // We add our variable to the environment with its value if it has one
-    environment->define(stmt->identifier.lexeme, value);
+    environment->define(stmt->name.lexeme, value);
     // We then return an empty std::any
     return {};
 }
 
 // Function to handle logical and, or operations
-any Interpreter::visitLogicalExpr(std::shared_ptr<Logical> expr) {
+any Interpreter::visitLogicalExpr(shared_ptr<Logical> expr) {
     // we first evaluate and store the left expressions value
     any left = evaluate(expr->left);
 
@@ -182,17 +189,24 @@ any Interpreter::visitLogicalExpr(std::shared_ptr<Logical> expr) {
 }
 
 // Function to visit Assignment nodes
-any Interpreter::visitAssignExpr(std::shared_ptr<Assign> expr) {
+any Interpreter::visitAssignExpr(shared_ptr<Assign> expr) {
     // // We evalute the expression and save its value
     any value = evaluate(expr->value);
-    // We need to assign the variable and identifier
-    environment->assign(expr->identifier, value);
-    // We return the value
+    // We first need to search the locals map for our expression
+    auto it = locals.find(expr);
+    // If we find it we need to use our helper method to assign it to the
+    // appropriate environment
+    if (it != locals.end()) {
+        environment->assign_at(it->second, expr->name, value);
+    } else {
+        globals->assign(expr->name, value);
+    }
+    // We then return our value
     return value;
 }
 
 // Function to visit binary expression nodes
-any Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr) {
+any Interpreter::visitBinaryExpr(shared_ptr<Binary> expr) {
     // We evaluate left and right expressions
     // we need to dereference the shared_ptr
     any left  = evaluate(expr->left);
@@ -240,7 +254,7 @@ any Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr) {
         // cast to doubles and divide
         check_num_operands(expr->op, left, right);
         if (std::any_cast<double>(right) == double(0)) {
-            throw RuntimeError(expr->op, "Division by 0->");
+            throw RuntimeError(expr->op, "Division by 0 not allowed.");
         }
         return std::any_cast<double>(left) / std::any_cast<double>(right);
     case TokenType::STAR:
@@ -254,7 +268,7 @@ any Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr) {
 }
 
 //
-any Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr) {
+any Interpreter::visitUnaryExpr(shared_ptr<Unary> expr) {
     any right = evaluate(expr->right);
 
     switch (expr->op.type) {
@@ -271,7 +285,7 @@ any Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr) {
 }
 
 // Function to handle function calls
-any Interpreter::visitCallExpr(std::shared_ptr<Call> expr) {
+any Interpreter::visitCallExpr(shared_ptr<Call> expr) {
     // we evaluate our calle and save it
     any callee = evaluate(expr->callee);
 
@@ -291,7 +305,7 @@ any Interpreter::visitCallExpr(std::shared_ptr<Call> expr) {
         throw RuntimeError(expr->paren, "Can only call functions and classes.");
     }
     // If we pass our test we can cast our Function into a callable object
-    function = std::any_cast<std::shared_ptr<LoxFunction>>(std::move(callee));
+    function = std::any_cast<shared_ptr<LoxFunction>>(std::move(callee));
 
     // We need to test our functions arity to ensure the correct number of args are
     // passed
@@ -321,8 +335,9 @@ any Interpreter::visitLiteralExpr(shared_ptr<Literal> expr) {
 
 // Function to handle variable expressions
 any Interpreter::visitVariableExpr(shared_ptr<Variable> expr) {
-    // We return a variable if its defined
-    return environment->get(expr->identifier);
+    // We return a variable if its defined by looking it up in all the
+    // scopes
+    return variable_lookup(expr->name, expr);
 }
 
 // Function to test logical operations
@@ -403,4 +418,18 @@ string Interpreter::make_string(const any& object) {
     }
 
     return "Error in make_string: object type not recognized.";
+}
+
+// Function to look up variables
+any Interpreter::variable_lookup(Token name, shared_ptr<Expr> expr) {
+    // We search the map using find and return an iterator of positions
+    auto it = locals.find(expr);
+    // We test to see if the distance is found in the map
+    if (it != locals.end()) {
+        // If it is we return it from the environment
+        return environment->get_at(it->second, name.lexeme);
+    } else {
+        // If not we retrieve it from the global scope
+        return globals->get(name);
+    }
 }

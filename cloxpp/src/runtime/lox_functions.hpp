@@ -11,19 +11,20 @@
 namespace CppLox {
 
 class Environment;
-class Function;
+struct Function;
 
 // We create a new Lox function class that is similar to our Native Functions
 // we override the same methods to make
 class LoxFunction : public LoxCallable {
   public:
-    LoxFunction(std::shared_ptr<Function> declaration);
+    LoxFunction(std::shared_ptr<Function> declaration, std::shared_ptr<Environment> closure);
     std::string to_string() override;
     int         arity() override;
     std::any    call(Interpreter& interpreter, std::vector<std::any> arguments) override;
 
   private:
-    std::shared_ptr<Function> declaration;
+    std::shared_ptr<Function>    declaration;
+    std::shared_ptr<Environment> closure;
 };
 
 } // namespace CppLox

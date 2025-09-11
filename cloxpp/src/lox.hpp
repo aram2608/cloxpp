@@ -2,6 +2,7 @@
 
 #include "interpreter.hpp"
 #include "parser.hpp"
+#include "resolver.hpp"
 #include "scanner.hpp"
 
 #include <cstdlib>
@@ -24,6 +25,7 @@ class Lox {
     Scanner     scanner;
     Parser      parser;
     Interpreter interpreter{};
+    Resolver    resolver;
     void        run(std::string code);
     std::string slurp_file(const std::string& filename);
 };

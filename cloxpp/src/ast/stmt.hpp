@@ -178,11 +178,11 @@ struct Print : Stmt, std::enable_shared_from_this<Print> {
 
 struct Var : Stmt, std::enable_shared_from_this<Var> {
     /*
-     * Constructor for Var statement, we pass in an identifier token
+     * Constructor for Var statement, we pass in an name token
      * and initializing expression
      */
-    Var(Token identifier, std::shared_ptr<Expr> initializer)
-        : identifier(std::move(identifier)), initializer(std::move(initializer)) {
+    Var(Token name, std::shared_ptr<Expr> initializer)
+        : name(std::move(name)), initializer(std::move(initializer)) {
     }
 
     // Override Stmt accept method
@@ -190,8 +190,8 @@ struct Var : Stmt, std::enable_shared_from_this<Var> {
         return visitor.visitVarStmt(shared_from_this());
     }
 
-    // Identifier token
-    Token                 identifier;
+    // name token
+    Token                 name;
     std::shared_ptr<Expr> initializer;
 };
 } // namespace CppLox

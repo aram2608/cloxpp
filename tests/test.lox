@@ -72,4 +72,4 @@ tri(1, 2, 3);             // 6
 
 // ===== arity error probe (optional; comment out if you don't want an error) =====
 // print "== arity probe ==";
-greet();                // Expect a nice runtime arity error
+//greet();                // Expect a nice runtime arity error

@@ -14,7 +14,7 @@ using std::vector;
 
 // Empty constructor for now
 // We initialize an empty parser to start off
-Lox::Lox() : parser(std::vector<Token>{}) {
+Lox::Lox() : parser(std::vector<Token>{}), resolver(interpreter) {
 }
 
 // The main logic for our Lox program, handles scanning, parsing, etc.
@@ -27,8 +27,19 @@ void Lox::run(string code) {
     vector<shared_ptr<Stmt>> stmts = parser.parse();
 
     // Catch scanner and parser errors
-    if (had_error())
+    if (had_error()) {
         return;
+    }
+
+    // If there are no syntax errors we can run our resolver
+    Resolver resolver = Resolver(interpreter);
+    resolver.resolve(stmts);
+
+    // We catch any resolution errors
+    if (resolver.error.had_error) {
+        return;
+    }
+
     // We interpret the AST
     // We need to move ownership to the interpreter
     interpreter.interpret(std::move(stmts));
@@ -93,10 +104,12 @@ void Lox::run_prompt() {
 
 // Helper method to wrap parser and scanner errors
 bool Lox::had_error() {
-    if (scanner.errors.had_error)
+    if (scanner.errors.had_error) {
         return true;
-    if (parser.errors.had_error)
+    }
+    if (parser.errors.had_error) {
         return true;
+    }
     return false;
 }
 
@@ -105,6 +118,7 @@ void Lox::reset_errors() {
     scanner.errors.had_error            = false;
     parser.errors.had_error             = false;
     interpreter.errors.had_RuntimeError = false;
+    resolver.error.had_error            = false;
 }
 
 // Function to slurp a files contents

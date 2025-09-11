@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tokens.hpp"
+#include "utils/tokens.hpp"
 
 #include <any>
 #include <memory>
@@ -101,8 +101,8 @@ struct Assign : Expr, std::enable_shared_from_this<Assign> {
      *  We pass in an identifer token and the value of an expression as its
      * bound variable
      */
-    Assign(Token identifier, std::shared_ptr<Expr> value)
-        : identifier(std::move(identifier)), value(std::move(value)) {
+    Assign(Token name, std::shared_ptr<Expr> value)
+        : name(std::move(name)), value(std::move(value)) {
     }
 
     // Override the accept method from expr
@@ -111,7 +111,7 @@ struct Assign : Expr, std::enable_shared_from_this<Assign> {
     }
 
     // Token name
-    Token identifier;
+    Token name;
     // Pointer to value
     std::shared_ptr<Expr> value;
 };
@@ -224,9 +224,9 @@ struct Unary : Expr, std::enable_shared_from_this<Unary> {
 // Variable node
 struct Variable : Expr, std::enable_shared_from_this<Variable> {
     /*
-     * Constructor for the variable now, we pass in an Identifier token
+     * Constructor for the variable now, we pass in an name token
      */
-    Variable(Token identifier) : identifier(std::move(identifier)) {
+    Variable(Token name) : name(std::move(name)) {
     }
 
     // Override for the Expr accept method
@@ -234,8 +234,8 @@ struct Variable : Expr, std::enable_shared_from_this<Variable> {
         return visitor.visitVariableExpr(shared_from_this());
     }
 
-    // Token for the identifier
-    Token identifier;
+    // Token for the name
+    Token name;
 };
 
 } // namespace CppLox

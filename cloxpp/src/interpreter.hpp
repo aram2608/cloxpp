@@ -17,8 +17,8 @@ namespace CppLox {
 
 // We inherit the ExprVisitor class so now we need to override each visit method
 class Interpreter : ExprVisitor, StmtVisitor {
-  // We make LoxFunction a friend class so we can throw it the return value
-  friend class LoxFunction;
+    // We make LoxFunction a friend class so we can throw it the return value
+    friend class LoxFunction;
     struct Return {
         Return(std::any value) : value(value) {
         }
@@ -26,7 +26,8 @@ class Interpreter : ExprVisitor, StmtVisitor {
     };
 
   public:
-    std::shared_ptr<Environment> globals = std::make_shared<Environment>();
+    std::shared_ptr<Environment>         globals = std::make_shared<Environment>();
+    std::map<std::shared_ptr<Expr>, int> locals;
 
   private:
     std::shared_ptr<Environment> environment = globals;
@@ -35,6 +36,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     Interpreter();
 
     void     interpret(const std::vector<std::shared_ptr<Stmt>>& stmts);
+    void     resolve(std::shared_ptr<Expr> expr, int depth);
     void     execute(std::shared_ptr<Stmt> stmt);
     void     execute_block(const std::vector<std::shared_ptr<Stmt>>& stmts,
                            std::shared_ptr<Environment>              env);
@@ -66,6 +68,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     void        check_num_operand(const Token& op, const std::any& operand);
     void        check_num_operands(const Token& op, const std::any& op_a, const std::any& op_b);
     std::string make_string(const std::any& object);
+    std::any    variable_lookup(Token name, std::shared_ptr<Expr> expr);
 };
 
 } // namespace CppLox

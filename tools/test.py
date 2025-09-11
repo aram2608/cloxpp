@@ -16,7 +16,6 @@ def extract_files(path: Path) -> list:
 
 
 def orchestrator(files: list, path: Path, dry: bool) -> None:
-    file_count = 1
     # We loop through each file
     for f in files:
         # We save the command we would like to run as a list
@@ -30,32 +29,41 @@ def orchestrator(files: list, path: Path, dry: bool) -> None:
 
         # Write log output
         if not dry:
-            write_log(file_count=file_count, output=path, stdout=result.stdout)
-            write_stderr(file_count=file_count, output=path, stderr=result.stderr)
+            # check if not empty
+            if result.stdout:
+                write_log(input_file=f, output=path, stdout=result.stdout)
+            # check if not empty
+            if result.stderr:
+                write_stderr(input_file=f, output=path, stderr=result.stderr)
         else:
             print(result.stderr)
             sleep(0.5)
         # We increment file count to create a new output file
-        file_count += 1
 
 
 # Helper function to write output
-def write_log(file_count: int, output: Path, stdout: str) -> None:
+def write_log(input_file: Path, output: Path, stdout: str) -> None:
+    # We create a Path object for the input file
+    input_file = Path(input_file)
+
     # We first need to create a new file using the file count and _expected.tokens extension
-    new_file = str(file_count) + "_expected.tokens"
+    new_file = input_file.stem + ".expected"
+
     # We append the new_file to output PosixPath using the / operator
-    log = output / new_file
+    log = Path(output) / new_file
+
     # We can now open the new file in write mode and dump the stdout contents
     with open(log, "w") as f:
         f.write(stdout)
 
 
 # Helper function to write stderr
-def write_stderr(file_count: int, output: Path, stderr: str):
+def write_stderr(input_file: Path, output: Path, stderr: str):
+    input_file = Path(input_file)
     # We first need to create a new file using the file count and _expected.tokens extension
-    new_file = str(file_count) + "_stderr.tokens"
+    new_file = input_file.stem + ".stderr"
     # We append the new_file to output PosixPath using the / operator
-    log = output / new_file
+    log = Path(output) / new_file
     # We can now open the new file in write mode and dump the stdout contents
     with open(log, "w") as f:
         f.write(stderr)

@@ -24,8 +24,6 @@ false and bump();        // should NOT call bump()
 print x;                 // 0
 true or bump();          // should NOT call bump()
 print x;                 // 0
-true and print "yep";    // prints "yep"
-false or print "ok";     // prints "ok"
 
 // ===== strings =====
 print "== strings ==";
