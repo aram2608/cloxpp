@@ -155,7 +155,6 @@ any Interpreter::visitWhileStmt(shared_ptr<WhileStmt> stmt) {
         execute(stmt->body);
         // debugging snippet for infitine while loops
         std::this_thread::sleep_for(std::chrono::seconds(2));
-        std::cout << "2 seconds have passed." << std::endl;
     }
     return {};
 }
