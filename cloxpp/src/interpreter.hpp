@@ -4,7 +4,6 @@
 #include "error.hpp"
 #include "expr.hpp"
 #include "lox_functions.hpp"
-#include "run_time_error.hpp"
 #include "stmt.hpp"
 #include "tokens.hpp"
 
@@ -41,8 +40,6 @@ class Interpreter : ExprVisitor, StmtVisitor {
     void     execute_block(const std::vector<std::shared_ptr<Stmt>>& stmts,
                            std::shared_ptr<Environment>              env);
     std::any evaluate(std::shared_ptr<Expr> expr);
-
-    LoxError errors;
     bool     repl{false};
 
   private:

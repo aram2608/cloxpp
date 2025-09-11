@@ -23,7 +23,6 @@ class Parser {
   public:
     Parser(std::vector<Token> tokens);
     std::vector<std ::shared_ptr<Stmt>> parse();
-    LoxError                            errors;
 
   private:
     std::shared_ptr<Stmt>              declaration();

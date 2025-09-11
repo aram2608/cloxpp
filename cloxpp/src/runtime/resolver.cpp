@@ -81,7 +81,7 @@ any Resolver::visitPrintStmt(shared_ptr<Print> stmt) {
 any Resolver::visitReturnStmt(shared_ptr<ReturnStmt> stmt) {
     // We need to ensure that the user is not using return outside of a block
     if (current_function == FunctionType::NONE) {
-        error.error(stmt->keyword, "Can't return from top-level code.");
+        LoxError::error(stmt->keyword, "Can't return from top-level code.");
     }
 
     // We test if there is a returned expression and resolve it
@@ -167,7 +167,7 @@ any Resolver::visitVariableExpr(shared_ptr<Variable> expr) {
         // We test if the iterator is inside the scope and if the name is set to false
         if (it != scope.end() && it->second == false)
             // If so we throw an error
-            error.error(expr->name, "Can't read local variable in its own initializer.");
+            LoxError::error(expr->name, "Can't read local variable in its own initializer.");
     }
     // Otherwise we resolve the local variable
     resolve_local(expr, expr->name);
@@ -248,7 +248,7 @@ void Resolver::declare(Token name) {
     auto it = scope.find(name.lexeme);
     if (it != scope.end()) {
         // If so we can kick an error
-        error.error(name, "Already a variable with this name in this scope.");
+        LoxError::error(name, "Already a variable with this name in this scope.");
     }
 
     // we store the name with false

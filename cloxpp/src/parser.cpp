@@ -575,7 +575,7 @@ Token Parser::previous() {
 }
 
 Parser::ParseError Parser::error(Token token, std::string message) {
-    errors.error(token, message);
+    LoxError::error(token, message);
     return ParseError{""};
 }
 

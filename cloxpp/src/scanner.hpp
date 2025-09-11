@@ -29,8 +29,6 @@ class Scanner {
 
     std::vector<Token> scan_tokens();
 
-    LoxError errors;
-
   private:
     void scan();
     char advance();

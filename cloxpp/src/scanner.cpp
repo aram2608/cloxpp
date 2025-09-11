@@ -132,7 +132,7 @@ void Scanner::scan() {
         } else if (is_alpha(c)) {
             add_identifier();
         } else {
-            errors.error(line, "Unexpected character.");
+            LoxError::error(line, "Unexpected character.");
         }
         break;
     }
@@ -204,7 +204,7 @@ void Scanner::add_string() {
     }
     // If we reach the end of file with no terminating "
     if (is_end()) {
-        errors.error(line, "Unterminated string.");
+        LoxError::error(line, "Unterminated string.");
         return;
     }
 
@@ -249,7 +249,7 @@ void Scanner::multiline_comment() {
         }
     }
     // We throw an error if we don't close comments
-    errors.error(mlc_line, "Multiline comment unterminated.");
+    LoxError::error(mlc_line, "Multiline comment unterminated.");
 }
 
 // Function to handle adding number tokens

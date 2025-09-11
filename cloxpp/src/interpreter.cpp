@@ -34,7 +34,7 @@ void Interpreter::interpret(const vector<shared_ptr<Stmt>>& stmts) {
             execute(stmt);
         }
     } catch (RuntimeError error) {
-        errors.runtime_error(error);
+        LoxError::runtime_error(error);
     }
 }
 

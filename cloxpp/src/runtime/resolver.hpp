@@ -23,7 +23,6 @@ class Resolver : ExprVisitor, StmtVisitor {
 
   public:
     Resolver(Interpreter& interpreter);
-    LoxError error;
     // Function to resolve lists of statements
     void     resolve(const std::vector<std::shared_ptr<Stmt>>& stmts);
     std::any visitBlockStmt(std::shared_ptr<Block> stmt) override;

@@ -1,43 +1,27 @@
 #include "lox.hpp"
 
-using namespace CppLox;
-using std::cin;
-using std::cout;
-using std::endl;
-using std::ifstream;
-using std::istreambuf_iterator;
-using std::shared_ptr;
-using std::string;
-using std::vector;
-
-// Empty constructor for now
-// We initialize an empty parser to start off
-Lox::Lox() : parser(std::vector<Token>{}) {
-}
-
 // The main logic for our Lox program, handles scanning, parsing, etc.
-void Lox::run(string code) {
+void run(std::string code) {
+    // Create our Interpreter instance
+    CppLox::Interpreter interpreter{};
     // Create out Scanner instance
-    Scanner scanner(code);
+    CppLox::Scanner scanner = CppLox::Scanner(code);
     // Create tokens from source code
-    vector<Token> tokens           = scanner.scan_tokens();
-    parser                         = Parser(tokens);
-    vector<shared_ptr<Stmt>> stmts = parser.parse();
+    std::vector<CppLox::Token>       tokens = scanner.scan_tokens();
+    CppLox::Parser                   parser = CppLox::Parser(tokens);
+    std::vector<std::shared_ptr<CppLox::Stmt>> stmts  = parser.parse();
 
     // Catch scanner and parser errors
-    if (scanner.errors.had_error) {
-        return;
-    }
-    if (parser.errors.had_error) {
+    if (CppLox::LoxError::had_error) {
         return;
     }
 
     // If there are no syntax errors we can run our resolver
-    Resolver resolver = Resolver(interpreter);
+    CppLox::Resolver resolver = CppLox::Resolver(interpreter);
     resolver.resolve(stmts);
 
     // We catch any resolution errors
-    if (resolver.error.had_error) {
+    if (CppLox::LoxError::had_error) {
         return;
     }
 
@@ -46,34 +30,33 @@ void Lox::run(string code) {
 }
 
 // Function to wrap the run function around file contents
-void Lox::run_file(const string& filename) {
+void run_file(const std::string& filename) {
     // Slurp up file contents into a string
-    string contents = slurp_file(filename);
+    std::string contents = slurp_file(filename);
 
     // Run our main logic
     run(contents);
 
     // Catch any errors in our code
-    if (scanner.errors.had_error) {
+    if (CppLox::LoxError::had_error) {
         std::exit(EXIT_FAILURE);
     }
 
     // Catch runtime errors in file
-    if (interpreter.errors.had_RuntimeError) {
+    if (CppLox::LoxError::had_RuntimeError) {
         std::exit(EXIT_FAILURE);
     }
 }
 
 // Function for main REPL logic
-void Lox::run_prompt() {
+void run_prompt() {
     /*
      * We start by running the REPL in an infinite loop
      * We exit the loop as soon as exit() is used.
      * Otherwise we evalutate the input
      */
-    interpreter.repl = true;
     while (true) {
-        string code;
+        std::string code;
         /*
          * Read the whole line, spaces included
          * We need to use getline() or else cin splits
@@ -97,34 +80,28 @@ void Lox::run_prompt() {
             // Evaulate text contents
         } else {
             run(code);
-            reset_errors();
+            CppLox::LoxError::had_error        = false;
+            CppLox::LoxError::had_RuntimeError = false;
         }
     }
 }
 
-// Helper method to reset errors after evaluation
-void Lox::reset_errors() {
-    scanner.errors.had_error            = false;
-    parser.errors.had_error             = false;
-    interpreter.errors.had_RuntimeError = false;
-}
-
 // Function to slurp a files contents
-string Lox::slurp_file(const string& filename) {
+std::string slurp_file(const std::string& filename) {
     // We first create an ifstream object called file()
-    ifstream file(filename);
+    std::ifstream file(filename);
 
     // Test to ensure file can open, otherwise assume bad file and return an
     // empty string
     if (!file.is_open()) {
-        cout << "Error: Could not open file " << filename << endl;
+        std::cout << "Error: Could not open file " << filename << std::endl;
 
         // Return empty string on failure
         return "";
     }
 
     // Read entire file into string using iterators
-    string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+    std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
     // Close file to prevent leaks
     file.close();

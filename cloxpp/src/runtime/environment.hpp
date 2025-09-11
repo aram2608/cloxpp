@@ -1,6 +1,6 @@
 #pragma once
 
-#include "run_time_error.hpp"
+#include "error.hpp"
 #include "tokens.hpp"
 
 #include <any>
