@@ -1,9 +1,9 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-#include "utils/error.hpp"
 #include "ast/expr.hpp"
 #include "ast/stmt.hpp"
+#include "utils/error.hpp"
 #include "utils/tokens.hpp"
 
 #include <iostream>
@@ -27,6 +27,7 @@ class Parser {
 
   private:
     std::shared_ptr<Stmt>              declaration();
+    std::shared_ptr<Stmt>              class_declaration();
     std::shared_ptr<Stmt>              var_declaration();
     std::shared_ptr<Stmt>              statement();
     std::shared_ptr<Stmt>              if_statement();

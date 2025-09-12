@@ -86,6 +86,11 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
     this->environment = previous;
 }
 
+any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
+    environment->define(stmt->name.lexeme, nullptr);
+    return std::any();
+}
+
 // Function to handle interpretation of return statements
 // Returns are tricky since we need to skip past sections of the call stack
 // as soon as we meet the return statement

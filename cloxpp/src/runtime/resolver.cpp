@@ -1,5 +1,7 @@
 #include "runtime/resolver.hpp"
 
+#include "resolver.hpp"
+
 using namespace CppLox;
 using std::any;
 using std::shared_ptr;
@@ -96,6 +98,13 @@ any Resolver::visitWhileStmt(shared_ptr<WhileStmt> while_stmt) {
     // We resolve the condtion and body for each while loop
     resolve(while_stmt->condition);
     resolve(while_stmt->body);
+    return {};
+}
+
+// Function to resolve classes
+any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
+    declare(stmt->name);
+    define(stmt->name);
     return {};
 }
 

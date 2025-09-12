@@ -1,10 +1,10 @@
 #ifndef RESOLVER_HPP
 #define RESOLVER_HPP
 
-#include "core/interpreter.hpp"
-#include "utils/error.hpp"
 #include "ast/expr.hpp"
 #include "ast/stmt.hpp"
+#include "core/interpreter.hpp"
+#include "utils/error.hpp"
 
 #include <map>
 #include <memory>
@@ -34,6 +34,7 @@ class Resolver : ExprVisitor, StmtVisitor {
     std::any visitPrintStmt(std::shared_ptr<Print> stmt) override;
     std::any visitReturnStmt(std::shared_ptr<ReturnStmt> stmt) override;
     std::any visitWhileStmt(std::shared_ptr<WhileStmt> while_stmt) override;
+    std::any visitClassStmt(std::shared_ptr<Class> stmt) override;
 
     std::any visitCallExpr(std::shared_ptr<Call> expr) override;
     std::any visitLogicalExpr(std::shared_ptr<Logical> expr) override;

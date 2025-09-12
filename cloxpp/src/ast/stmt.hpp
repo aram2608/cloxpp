@@ -13,6 +13,7 @@ namespace CppLox {
 
 struct Block;
 struct Function;
+struct Class;
 struct ExpressionStmt;
 struct IfStmt;
 struct WhileStmt;
@@ -31,6 +32,7 @@ struct StmtVisitor {
     virtual std::any visitVarStmt(std::shared_ptr<Var> stmt)                   = 0;
     virtual std::any visitIfStmt(std::shared_ptr<IfStmt> if_stmt)              = 0;
     virtual std::any visitWhileStmt(std::shared_ptr<WhileStmt> while_stmt)     = 0;
+    virtual std::any visitClassStmt(std::shared_ptr<Class> stmt)               = 0;
 };
 
 // Statement interface
@@ -77,6 +79,27 @@ struct Block : Stmt, std::enable_shared_from_this<Block> {
 
     // A vector of pointers to the statements inside the block
     std::vector<std::shared_ptr<Stmt>> stmts;
+};
+
+struct Class : Stmt, std::enable_shared_from_this<Class> {
+    /*
+     * Constructor for the Class class, we pass in the identifier for the class
+     * and a vector for functions corresponding to the class methods
+     * we move ownership of the vector
+     */
+    Class(Token name, std::vector<std::shared_ptr<Function>> methods)
+        : name(name), methods(std::move(methods)) {
+    }
+
+    // We override the accept method
+    std::any accept(StmtVisitor& visitor) override {
+        return visitor.visitClassStmt(shared_from_this());
+    }
+
+    // Identifier token
+    Token name;
+    // Vector of methods
+    std::vector<std::shared_ptr<Function>> methods;
 };
 
 struct Function : Stmt, std::enable_shared_from_this<Function> {

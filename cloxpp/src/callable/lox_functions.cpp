@@ -1,4 +1,4 @@
-#include "runtime/lox_functions.hpp"
+#include "callable/lox_functions.hpp"
 
 using namespace CppLox;
 using std::any;

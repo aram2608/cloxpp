@@ -2,7 +2,7 @@
 #define LOX_FUNCTIONS_HPP
 
 #include "core/interpreter.hpp"
-#include "runtime/callable.hpp"
+#include "callable/callable.hpp"
 
 #include <any>
 #include <memory>

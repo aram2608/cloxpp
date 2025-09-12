@@ -1,5 +1,7 @@
 #include "core/parser.hpp"
 
+#include "parser.hpp"
+
 using namespace CppLox;
 using std::initializer_list;
 using std::shared_ptr;
@@ -34,6 +36,10 @@ shared_ptr<Stmt> Parser::declaration() {
             return function("function");
         }
 
+        if (match({TokenType::CLASS})) {
+            return class_declaration();
+        }
+
         // By default we return a statement
         return statement();
         // catch erros and get the parser to chill out
@@ -43,6 +49,29 @@ shared_ptr<Stmt> Parser::declaration() {
         // we need to return nullptr instead of {}
         return nullptr;
     }
+}
+
+// Function to handle class declarations
+shared_ptr<Stmt> Parser::class_declaration() {
+    // We first need to consume the token identifier and kick an error otherwise
+    Token name = consume(TokenType::IDENTIFIER, "Expect class name.");
+    // We next need to consume the opening brace starting the class body
+    consume(TokenType::LEFT_BRACE, "Expect '{' before class body.");
+
+    // We initialize our vector of methods
+    std::vector<std::shared_ptr<Function>> methods;
+
+    // We loop until we come across the closing brace for the body
+    // or the end of the file
+    while (!check(TokenType::RIGHT_BRACE) && !is_end()) {
+        // We add each method to the vector
+        methods.push_back(function("method"));
+    }
+
+    // We then consume the closing brack and throw an error otherwise
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
+    // We then return the new Class
+    return std::make_unique<Class>(std::move(methods));
 }
 
 // Function to handle var_declar

@@ -1,12 +1,13 @@
 #ifndef INTERPRETER_HPP
 #define INTERPRETER_HPP
 
-#include "runtime/callable.hpp"
+#include "ast/expr.hpp"
+#include "ast/stmt.hpp"
+#include "callable/callable.hpp"
+#include "callable/lox_functions.hpp"
+#include "callable/native_functions.hpp"
 #include "runtime/environment.hpp"
 #include "utils/error.hpp"
-#include "ast/expr.hpp"
-#include "runtime/lox_functions.hpp"
-#include "ast/stmt.hpp"
 #include "utils/tokens.hpp"
 
 #include <any>
@@ -45,6 +46,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     bool     repl{false};
 
   private:
+    std::any visitClassStmt(std::shared_ptr<Class> stmt) override;
     std::any visitReturnStmt(std::shared_ptr<ReturnStmt> stmt) override;
     std::any visitBlockStmt(std::shared_ptr<Block> stmt) override;
     std::any visitFunctionStmt(std::shared_ptr<Function> stmt) override;

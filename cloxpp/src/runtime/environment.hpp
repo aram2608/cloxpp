@@ -39,7 +39,7 @@ class Environment : public std::enable_shared_from_this<Environment> {
         /*
          * We check the internal names string lexeme and make sure its
          * in the map
-        
+
          */
         if (values.contains(name.lexeme)) {
             // We assign the lexeme to the value
