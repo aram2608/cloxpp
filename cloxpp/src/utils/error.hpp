@@ -61,7 +61,6 @@ class LoxError {
 
     // Function to report runtime errors
     static void runtime_error(const RuntimeError& error) {
-        std::cout << error.token.to_string() << std::endl;
         std::cerr << error.what() << "\n[line " << error.token.line << "]\n";
         had_RuntimeError = true;
     }

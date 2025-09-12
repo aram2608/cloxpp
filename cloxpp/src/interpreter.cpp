@@ -1,6 +1,7 @@
 #include "interpreter.hpp"
 
 #include <chrono>
+#include <cmath>
 #include <iostream>
 #include <thread>
 
@@ -66,8 +67,7 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
     // We first need to store the first environment
     shared_ptr<Environment> previous = this->environment;
 
-    // We transfer ownership of the passed in environment to the current
-    // environment
+    // We transfer ownership of the passed in environment
     this->environment = env;
 
     // We then try to iterate over the stmts in the vector
@@ -199,11 +199,9 @@ any Interpreter::visitAssignExpr(shared_ptr<Assign> expr) {
     // // We evalute the expression and save its value
     any value = evaluate(expr->value);
     // We first need to search the locals map for our expression
-    auto it = locals.find(expr);
-    // If we find it we need to use our helper method to assign it to the
-    // appropriate environment
-    if (it != locals.end()) {
-        environment->assign_at(it->second, expr->name, value);
+    if (locals.contains(expr)) {
+        int distance = locals.at(expr);
+        environment->assign_at(distance, expr->name, value);
     } else {
         globals->assign(expr->name, value);
     }
@@ -267,6 +265,9 @@ any Interpreter::visitBinaryExpr(shared_ptr<Binary> expr) {
         // cast to doubles and multiply
         check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) * std::any_cast<double>(right);
+    case TokenType::MOD:
+        check_num_operands(expr->op, left, right);
+        return std::fmod(std::any_cast<double>(left), std::any_cast<double>(right));
     }
 
     // Unreachable so we return an empty std::any{}
@@ -349,14 +350,16 @@ any Interpreter::visitVariableExpr(shared_ptr<Variable> expr) {
 // debugging snippet
 // std::any Interpreter::visitVariableExpr(std::shared_ptr<Variable> expr) {
 //     int dist = -1;
-//     if (auto it = locals.find(expr); it != locals.end())
+//     if (auto it = locals.find(expr); it != locals.end()) {
 //         dist = it->second;
+//     }
 
 //     std::cerr << "[get] " << expr->name.lexeme << " dist=" << dist << " env@" << environment
 //               << "\n";
 
-//     if (dist != -1)
+//     if (dist != -1) {
 //         return environment->get_at(dist, expr->name.lexeme);
+//     }
 //     return globals->get(expr->name);
 // }
 

@@ -52,7 +52,7 @@ class Resolver : ExprVisitor, StmtVisitor {
     // Overload to resolve expression
     void resolve(std::shared_ptr<Expr> expr);
     // Helper method to resolve local variables
-    void resolve_local(std::shared_ptr<Expr> expr, Token name);
+    void resolve_local(const std::shared_ptr<Expr>& expr, Token name);
     // Helper method to resolve functions, their paremeters, and body statements
     void resolve_function(std::shared_ptr<Function> function, FunctionType type);
 

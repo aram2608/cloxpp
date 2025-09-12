@@ -5,7 +5,7 @@ using namespace CppLox;
 // The main logic for our Lox program, handles scanning, parsing, etc.
 void Lox::run(std::string code) {
     // Create our Interpreter instance
-    CppLox::Interpreter interpreter{};
+    CppLox::Interpreter interpreter;
     // Create out Scanner instance
     CppLox::Scanner scanner = CppLox::Scanner(code);
     // Create tokens from source code

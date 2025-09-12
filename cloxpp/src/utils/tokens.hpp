@@ -22,6 +22,7 @@ enum class TokenType {
     STAR,
     COLON,
     QUESTION,
+    MOD,
 
     // One or two character tokens.
     BANG,

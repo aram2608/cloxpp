@@ -87,6 +87,9 @@ void Scanner::scan() {
     case '?':
         add_token(TokenType::QUESTION);
         break;
+    case '%':
+        add_token(TokenType::MOD);
+        break;
     // Multicharacter lexemes need the match helper method
     case '!':
         add_token(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG);

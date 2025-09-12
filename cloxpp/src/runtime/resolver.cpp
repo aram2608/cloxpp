@@ -195,19 +195,21 @@ void Resolver::resolve(shared_ptr<Expr> expr) {
 }
 
 // Function used to resolve local variables
-void Resolver::resolve_local(shared_ptr<Expr> expr, Token name) {
+void Resolver::resolve_local(const shared_ptr<Expr>& expr, Token name) {
     // We start at the inner most scope and work outwards to find the name
-    for (int i = scopes.size() - 1; i >= 0; --i) {
+    // We create a reverse iterator that starts at the last element and
+    // works it way to the first elemen
+    for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
         /*
-         * If we match it, we ask the interpreter to resolve it and pass in
+         * If we match the name, we ask the interpreter to resolve it and pass in
          * the number corresponding the scope
          * if its in the current scope we get 0
          * if its the enclosing scope - 1
          * if its the scope outside of the immediate enclosing scope - 2
          * etc...
          */
-        if (scopes[i].find(name.lexeme) != scopes[i].end()) {
-            interpreter.resolve(expr, scopes.size() - 1 - i);
+        if (it->contains(name.lexeme)) {
+            interpreter.resolve(expr, std::distance(scopes.rbegin(), it));
             return;
         }
     }

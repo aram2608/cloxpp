@@ -32,27 +32,25 @@ class Environment : public std::enable_shared_from_this<Environment> {
         // the value is oftentimes a pointer so we move ownership
         // this method overrides id everytime however, since the [] operator
         // does not care if the object already exists or not
-        values[name] = std::move(value);
+        values[name] = value;
     }
 
     void assign(Token name, std::any value) {
         /*
          * We check the internal names string lexeme and make sure its
          * in the map
-         * We use an iterator since the [] operators enable a second lookup
-         * With the iterator method we can simply look once with find
+        
          */
-        auto it = values.find(name.lexeme);
-        if (it != values.end()) {
+        if (values.contains(name.lexeme)) {
             // We assign the lexeme to the value
-            it->second = std::move(value);
+            values[name.lexeme] = value;
             return;
         }
 
         // We can walk the chain of environments and recursivley search for
         // the variable, if we dont find it we can throw an error
         if (enclosing != nullptr) {
-            enclosing->assign(name, std::move(value));
+            enclosing->assign(name, value);
             return;
         }
 
@@ -64,17 +62,15 @@ class Environment : public std::enable_shared_from_this<Environment> {
     void assign_at(int distance, Token name, std::any value) {
         // we use the ancestor helper method to walk the environment chain and add
         // to the proper environment
-        std::cout << name.lexeme << "[assign at] " << "\n";
-        ancestor(distance)->values[name.lexeme];
+        ancestor(distance)->values[name.lexeme] = value;
     }
 
     std::any get(Token name) {
         // We check the internal names string lexeme and make sure its
         // in the map
-        auto it = values.find(name.lexeme);
-        if (it != values.end()) {
-            // we return the second value from the id iterator
-            return it->second;
+        if (values.contains(name.lexeme)) {
+            // We return the value
+            return values[name.lexeme];
         }
 
         // We can ealk the chain of environments and recursivley search for

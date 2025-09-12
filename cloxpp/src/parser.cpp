@@ -422,7 +422,7 @@ shared_ptr<Expr> Parser::factor() {
     // We initialize our first expression
     shared_ptr<Expr> expr = unary();
     // Loop until we dont come across multi or division anymore
-    while (match({TokenType::STAR, TokenType::SLASH})) {
+    while (match({TokenType::STAR, TokenType::SLASH, TokenType::MOD})) {
         Token            op    = previous();
         shared_ptr<Expr> right = unary();
         // We need to move ownership to the new expression
