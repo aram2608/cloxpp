@@ -2,6 +2,7 @@
 #define NATIVE_FUNCTIONS_HPP
 
 #include "callable/callable.hpp"
+
 #include <any>
 #include <chrono>
 #include <iostream>
@@ -23,6 +24,6 @@ class NativeClock : public LoxCallable {
     std::string to_string() override;
 };
 
-}
+} // namespace CppLox
 
 #endif

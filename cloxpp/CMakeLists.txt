@@ -3,8 +3,9 @@ add_library(cloxpp_lib
     src/core/scanner.cpp
     src/core/parser.cpp
     src/core/interpreter.cpp
-    src/runtime/lox_functions.cpp
     src/runtime/resolver.cpp
+    src/callable/lox_functions.cpp
+    src/callable/native_functions.cpp
 )
 
 find_package(magic_enum CONFIG QUIET)
