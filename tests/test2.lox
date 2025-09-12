@@ -30,9 +30,6 @@ print "== strings ==";
 print "foo" + "bar";     // foobar
 print "hi " + "there";   // hi there
 
-// Mixed + should be an error in Lox; comment out if you coerce types.
-// print 1 + "x";        // expect runtime error (operands must be two numbers or two strings)
-
 // ===== scope & shadowing =====
 print "== scope & shadowing ==";
 var a = 10;

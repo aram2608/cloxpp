@@ -1,0 +1,34 @@
+== comparisons ==
+true
+true
+true
+false
+true
+true
+true
+true
+== truthiness ==
+false
+true
+true
+true
+== logic ==
+0.000000
+0.000000
+== strings ==
+foobar
+hi there
+== scope & shadowing ==
+99.000000
+10.000000
+== loops ==
+0.000000
+1.000000
+2.000000
+20.000000
+21.000000
+10.000000
+11.000000
+== functions ==
+8.000000
+9.000000
