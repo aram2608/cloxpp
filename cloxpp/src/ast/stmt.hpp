@@ -1,8 +1,8 @@
 #ifndef STMT_HPP
 #define STMT_HPP
 
-#include "expr.hpp"
-#include "tokens.hpp"
+#include "ast/expr.hpp"
+#include "utils/tokens.hpp"
 
 #include <any>
 #include <memory>

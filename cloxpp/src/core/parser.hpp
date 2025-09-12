@@ -1,10 +1,10 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-#include "error.hpp"
-#include "expr.hpp"
-#include "stmt.hpp"
-#include "tokens.hpp"
+#include "utils/error.hpp"
+#include "ast/expr.hpp"
+#include "ast/stmt.hpp"
+#include "utils/tokens.hpp"
 
 #include <iostream>
 #include <memory>

@@ -1,10 +1,10 @@
 #ifndef RESOLVER_HPP
 #define RESOLVER_HPP
 
-#include "../interpreter.hpp"
-#include "error.hpp"
-#include "expr.hpp"
-#include "stmt.hpp"
+#include "core/interpreter.hpp"
+#include "utils/error.hpp"
+#include "ast/expr.hpp"
+#include "ast/stmt.hpp"
 
 #include <map>
 #include <memory>

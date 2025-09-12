@@ -1,13 +1,13 @@
 #ifndef INTERPRETER_HPP
 #define INTERPRETER_HPP
 
-#include "callable.hpp"
-#include "environment.hpp"
-#include "error.hpp"
-#include "expr.hpp"
-#include "lox_functions.hpp"
-#include "stmt.hpp"
-#include "tokens.hpp"
+#include "runtime/callable.hpp"
+#include "runtime/environment.hpp"
+#include "utils/error.hpp"
+#include "ast/expr.hpp"
+#include "runtime/lox_functions.hpp"
+#include "ast/stmt.hpp"
+#include "utils/tokens.hpp"
 
 #include <any>
 #include <memory>

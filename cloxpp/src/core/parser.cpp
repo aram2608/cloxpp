@@ -1,4 +1,4 @@
-#include "parser.hpp"
+#include "core/parser.hpp"
 
 using namespace CppLox;
 using std::initializer_list;

@@ -1,4 +1,4 @@
-#include "lox.hpp"
+#include "core/lox.hpp"
 
 using namespace CppLox;
 

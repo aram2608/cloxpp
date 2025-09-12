@@ -1,4 +1,4 @@
-#include "scanner.hpp"
+#include "core/scanner.hpp"
 
 using namespace CppLox;
 using std::string;

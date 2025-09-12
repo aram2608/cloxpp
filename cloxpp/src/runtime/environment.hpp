@@ -1,8 +1,8 @@
 #ifndef ENVIRONMENT_HPP
 #define ENVIRONMENT_HPP
 
-#include "error.hpp"
-#include "tokens.hpp"
+#include "utils/error.hpp"
+#include "utils/tokens.hpp"
 
 #include <any>
 #include <map>

@@ -1,8 +1,8 @@
 #ifndef LOX_FUNCTIONS_HPP
 #define LOX_FUNCTIONS_HPP
 
-#include "../interpreter.hpp"
-#include "callable.hpp"
+#include "core/interpreter.hpp"
+#include "runtime/callable.hpp"
 
 #include <any>
 #include <memory>

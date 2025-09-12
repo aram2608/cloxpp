@@ -1,7 +1,7 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
-#include "tokens.hpp"
+#include "utils/tokens.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -27,7 +27,7 @@ class LoxError {
     friend class Parser;
     friend class Scanner;
     friend class Resolver;
-    friend class Lox;
+    friend struct Lox;
 
   public:
     // Default constructor so the compiler does not yell at me

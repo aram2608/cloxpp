@@ -1,11 +1,11 @@
 #ifndef LOX_HPP
 #define LOX_HPP
 
-#include "error.hpp"
-#include "interpreter.hpp"
-#include "parser.hpp"
-#include "resolver.hpp"
-#include "scanner.hpp"
+#include "utils/error.hpp"
+#include "core/interpreter.hpp"
+#include "core/parser.hpp"
+#include "runtime/resolver.hpp"
+#include "core/scanner.hpp"
 
 #include <cstdlib>
 #include <fstream>

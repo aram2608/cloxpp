@@ -1,4 +1,4 @@
-#include "resolver.hpp"
+#include "runtime/resolver.hpp"
 
 using namespace CppLox;
 using std::any;

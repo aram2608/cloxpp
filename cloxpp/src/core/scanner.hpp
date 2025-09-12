@@ -1,8 +1,8 @@
 #ifndef SCANNER_HPP
 #define SCANNER_HPP
 
-#include "error.hpp"
-#include "tokens.hpp"
+#include "utils/error.hpp"
+#include "utils/tokens.hpp"
 
 #include <any>
 #include <iostream>
