@@ -36,6 +36,7 @@ shared_ptr<Stmt> Parser::declaration() {
             return function("function");
         }
 
+        // We match class declaration
         if (match({TokenType::CLASS})) {
             return class_declaration();
         }
@@ -71,7 +72,7 @@ shared_ptr<Stmt> Parser::class_declaration() {
     // We then consume the closing brack and throw an error otherwise
     consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
     // We then return the new Class
-    return std::make_unique<Class>(std::move(methods));
+    return std::make_unique<Class>(name, std::move(methods));
 }
 
 // Function to handle var_declar

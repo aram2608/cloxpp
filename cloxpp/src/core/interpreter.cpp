@@ -86,9 +86,15 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
     this->environment = previous;
 }
 
+// Function to visit class node
 any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
+    // We define the class name to the environment
     environment->define(stmt->name.lexeme, nullptr);
-    return std::any();
+    // We create a new LoxClass class and assign it to the
+    // environment
+    LoxClass klass = LoxClass(stmt->name.lexeme);
+    environment->assign(stmt->name, klass);
+    return {};
 }
 
 // Function to handle interpretation of return statements

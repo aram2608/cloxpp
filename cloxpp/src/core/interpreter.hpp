@@ -4,6 +4,7 @@
 #include "ast/expr.hpp"
 #include "ast/stmt.hpp"
 #include "callable/callable.hpp"
+#include "callable/lox_classes.hpp"
 #include "callable/lox_functions.hpp"
 #include "callable/native_functions.hpp"
 #include "runtime/environment.hpp"
