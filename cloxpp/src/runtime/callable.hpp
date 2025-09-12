@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CALLABLE_HPP
+#define CALLABLE_HPP
 
 #include <any>
 #include <chrono>
@@ -49,3 +50,5 @@ class NativeClock : public LoxCallable {
 };
 
 } // namespace CppLox
+
+#endif

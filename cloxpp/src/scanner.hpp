@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SCANNER_HPP
+#define SCANNER_HPP
+
 #include "error.hpp"
 #include "tokens.hpp"
 
@@ -52,3 +54,5 @@ class Scanner {
 };
 
 } // namespace CppLox
+
+#endif

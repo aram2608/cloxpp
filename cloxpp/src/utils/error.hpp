@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ERROR_HPP
+#define ERROR_HPP
 
 #include "tokens.hpp"
 
@@ -71,3 +72,5 @@ class LoxError {
 // Define static member variables
 inline bool CppLox::LoxError::had_error        = false;
 inline bool CppLox::LoxError::had_RuntimeError = false;
+
+#endif

@@ -27,9 +27,10 @@ if (n < 5) {
 print "== while ==";
 var w = 3;
 while (w > 0) {
-  print w;                // 3, 2, 1
+  print w;
   w = w - 1;
 }
+ // 3, 2, 1
 
 // ===== for =====
 print "== for ==";

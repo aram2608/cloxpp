@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EXPR_HPP
+#define EXPR_HPP
 
 #include "utils/tokens.hpp"
 
@@ -239,3 +240,5 @@ struct Variable : Expr, std::enable_shared_from_this<Variable> {
 };
 
 } // namespace CppLox
+
+#endif

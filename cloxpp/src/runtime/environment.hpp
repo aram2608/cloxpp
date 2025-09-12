@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENVIRONMENT_HPP
+#define ENVIRONMENT_HPP
 
 #include "error.hpp"
 #include "tokens.hpp"
@@ -21,9 +22,8 @@ class Environment : public std::enable_shared_from_this<Environment> {
     /*
      * We pass in an Environment pointer and move ownership
      * By default enclosing is a nullptr
-     * explicit prevents implicit conversions
      */
-    explicit Environment(std::shared_ptr<Environment> enclosing = nullptr)
+    Environment(std::shared_ptr<Environment> enclosing = nullptr)
         : enclosing(std::move(enclosing)) {
     }
 
@@ -64,6 +64,7 @@ class Environment : public std::enable_shared_from_this<Environment> {
     void assign_at(int distance, Token name, std::any value) {
         // we use the ancestor helper method to walk the environment chain and add
         // to the proper environment
+        std::cout << name.lexeme << "[assign at] " << "\n";
         ancestor(distance)->values[name.lexeme];
     }
 
@@ -107,3 +108,5 @@ class Environment : public std::enable_shared_from_this<Environment> {
 };
 
 } // namespace CppLox
+
+#endif

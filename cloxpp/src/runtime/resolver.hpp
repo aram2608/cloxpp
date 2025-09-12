@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RESOLVER_HPP
+#define RESOLVER_HPP
 
 #include "../interpreter.hpp"
 #include "error.hpp"
@@ -61,3 +62,5 @@ class Resolver : ExprVisitor, StmtVisitor {
 };
 
 } // namespace CppLox
+
+#endif

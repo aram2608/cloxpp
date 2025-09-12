@@ -9,7 +9,7 @@ using std::endl;
 int main(int argc, const char* argv[]) {
 
     // Create our Lox lang instance
-    //CppLox::Lox lox = CppLox::Lox();
+    // CppLox::Lox lox = CppLox::Lox();
 
     /*
      * We need to catch the number of command line arguments
@@ -29,12 +29,12 @@ int main(int argc, const char* argv[]) {
         // 1 argument should point to a file path
     } else if (argc == 2) {
         // Run Lox lang from file input
-        run_file(argv[1]);
+        CppLox::Lox::run_file(argv[1]);
 
         // Otherwise we run the REPL
     } else {
         cout << "Welcome to the Lox REPL!\n" << endl;
-        run_prompt();
+        CppLox::Lox::run_prompt();
         // make_test_tree();
     }
     return 0;

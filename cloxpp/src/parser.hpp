@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PARSER_HPP
+#define PARSER_HPP
 
 #include "error.hpp"
 #include "expr.hpp"
@@ -61,3 +62,5 @@ class Parser {
     void                               synchronize();
 };
 } // namespace CppLox
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STMT_HPP
+#define STMT_HPP
 
 #include "expr.hpp"
 #include "tokens.hpp"
@@ -195,3 +196,5 @@ struct Var : Stmt, std::enable_shared_from_this<Var> {
     std::shared_ptr<Expr> initializer;
 };
 } // namespace CppLox
+
+#endif

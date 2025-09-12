@@ -1,4 +1,6 @@
-#pragma once
+#ifndef INTERPRETER_HPP
+#define INTERPRETER_HPP
+
 #include "callable.hpp"
 #include "environment.hpp"
 #include "error.hpp"
@@ -69,3 +71,5 @@ class Interpreter : ExprVisitor, StmtVisitor {
 };
 
 } // namespace CppLox
+
+#endif

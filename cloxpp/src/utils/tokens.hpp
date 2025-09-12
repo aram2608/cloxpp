@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TOKENS_HPP
+#define TOKENS_HPP
 
 #include <any>
 #include <iostream>
@@ -108,3 +109,5 @@ class Token {
     int         line = 0;
 };
 } // namespace CppLox
+
+#endif

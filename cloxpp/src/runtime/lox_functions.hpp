@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LOX_FUNCTIONS_HPP
+#define LOX_FUNCTIONS_HPP
 
 #include "../interpreter.hpp"
 #include "callable.hpp"
@@ -28,3 +29,5 @@ class LoxFunction : public LoxCallable {
 };
 
 } // namespace CppLox
+
+#endif

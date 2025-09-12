@@ -1,14 +1,16 @@
 #include "lox.hpp"
 
+using namespace CppLox;
+
 // The main logic for our Lox program, handles scanning, parsing, etc.
-void run(std::string code) {
+void Lox::run(std::string code) {
     // Create our Interpreter instance
     CppLox::Interpreter interpreter{};
     // Create out Scanner instance
     CppLox::Scanner scanner = CppLox::Scanner(code);
     // Create tokens from source code
-    std::vector<CppLox::Token>       tokens = scanner.scan_tokens();
-    CppLox::Parser                   parser = CppLox::Parser(tokens);
+    std::vector<CppLox::Token>                 tokens = scanner.scan_tokens();
+    CppLox::Parser                             parser = CppLox::Parser(tokens);
     std::vector<std::shared_ptr<CppLox::Stmt>> stmts  = parser.parse();
 
     // Catch scanner and parser errors
@@ -30,12 +32,12 @@ void run(std::string code) {
 }
 
 // Function to wrap the run function around file contents
-void run_file(const std::string& filename) {
+void Lox::run_file(const std::string& filename) {
     // Slurp up file contents into a string
     std::string contents = slurp_file(filename);
 
     // Run our main logic
-    run(contents);
+    Lox::run(contents);
 
     // Catch any errors in our code
     if (CppLox::LoxError::had_error) {
@@ -49,7 +51,7 @@ void run_file(const std::string& filename) {
 }
 
 // Function for main REPL logic
-void run_prompt() {
+void Lox::run_prompt() {
     /*
      * We start by running the REPL in an infinite loop
      * We exit the loop as soon as exit() is used.
@@ -87,7 +89,7 @@ void run_prompt() {
 }
 
 // Function to slurp a files contents
-std::string slurp_file(const std::string& filename) {
+std::string Lox::slurp_file(const std::string& filename) {
     // We first create an ifstream object called file()
     std::ifstream file(filename);
 
