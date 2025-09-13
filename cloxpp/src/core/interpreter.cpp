@@ -90,10 +90,9 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
 any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
     // We define the class name to the environment
     environment->define(stmt->name.lexeme, nullptr);
-    // We create a new LoxClass class and assign it to the
-    // environment
-    LoxClass klass = LoxClass(stmt->name.lexeme);
-    environment->assign(stmt->name, klass);
+    // We create a new LoxClass class and assign it to the environment
+    shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->name.lexeme);
+    environment->assign(stmt->name, std::move(klass));
     return {};
 }
 
@@ -319,7 +318,7 @@ any Interpreter::visitCallExpr(shared_ptr<Call> expr) {
     shared_ptr<LoxCallable> function;
 
     // We add a check to ensure our callable is actually a Function type
-    if (callee.type() != typeid(shared_ptr<LoxFunction>)) {
+    if (callee.type() == typeid(shared_ptr<LoxFunction>)) {
         throw RuntimeError(expr->paren, "Can only call functions and classes.");
     }
     // If we pass our test we can cast our Function into a callable object
@@ -449,6 +448,16 @@ string Interpreter::make_string(const any& object) {
     }
     if (object.type() == typeid(bool)) {
         return std::any_cast<bool>(object) ? "true" : "false";
+    }
+
+    if (object.type() == typeid(std::shared_ptr<LoxFunction>)) {
+        return std::any_cast<std::shared_ptr<LoxFunction>>(object)->to_string();
+    }
+    if (object.type() == typeid(std::shared_ptr<LoxClass>)) {
+        return std::any_cast<std::shared_ptr<LoxClass>>(object)->to_string();
+    }
+    if (object.type() == typeid(std::shared_ptr<LoxInstance>)) {
+        return std::any_cast<std::shared_ptr<LoxInstance>>(object)->to_string();
     }
 
     return "Error in make_string: object type not recognized.";

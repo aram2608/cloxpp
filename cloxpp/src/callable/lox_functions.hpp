@@ -18,13 +18,22 @@ struct Function;
 // we override the same methods to make
 class LoxFunction : public LoxCallable {
   public:
+    /*
+    * Lox Function constructor, we pass in a pointer to the underlying function
+    * and environment
+    */
     LoxFunction(std::shared_ptr<Function> declaration, std::shared_ptr<Environment> closure);
+    // Override to convert to string
     std::string to_string() override;
+    // Override to represent arity()
     int         arity() override;
+    // Override to call method
     std::any    call(Interpreter& interpreter, std::vector<std::any> arguments) override;
 
   private:
+    // Pointer to declaration
     std::shared_ptr<Function>    declaration;
+    // Pointer to closure (enclosing environment)
     std::shared_ptr<Environment> closure;
 };
 
