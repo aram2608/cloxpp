@@ -87,8 +87,10 @@ struct Class : Stmt, std::enable_shared_from_this<Class> {
      * and a vector for functions corresponding to the class methods
      * we move ownership of the vector
      */
-    Class(Token name, std::vector<std::shared_ptr<Function>> methods)
-        : name(name), methods(std::move(methods)) {
+    Class(Token                                  name,
+          std::shared_ptr<Variable>              superclass,
+          std::vector<std::shared_ptr<Function>> methods)
+        : name(name), superclass(std::move(superclass)), methods(std::move(methods)) {
     }
 
     // We override the accept method
@@ -98,6 +100,8 @@ struct Class : Stmt, std::enable_shared_from_this<Class> {
 
     // Identifier token
     Token name;
+    // Pointer to superclass
+    std::shared_ptr<Variable> superclass;
     // Vector of methods
     std::vector<std::shared_ptr<Function>> methods;
 };

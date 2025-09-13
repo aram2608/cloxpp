@@ -5,8 +5,10 @@
 using namespace CppLox;
 
 // LoxClass constructor, we initialize with its name as a string and a method map
-LoxClass::LoxClass(std::string name, std::map<std::string, std::shared_ptr<LoxFunction>> methods)
-    : name(std::move(name)), methods(std::move(methods)) {
+LoxClass::LoxClass(std::string                                         name,
+                   std::shared_ptr<LoxClass>                           superclass,
+                   std::map<std::string, std::shared_ptr<LoxFunction>> methods)
+    : name(std::move(name)), superclass(std::move(superclass)), methods(std::move(methods)) {
 }
 
 // Override for call method
@@ -46,6 +48,13 @@ std::shared_ptr<LoxFunction> CppLox::LoxClass::find_method(std::string name) {
     if (methods.contains(name)) {
         return methods[name];
     }
+
+    // Test to see if a superclass is inheritted
+    if (superclass != nullptr) {
+        // If so we can return its methods
+        return superclass->find_method(name);
+    }
+
     // Otherwise return nullptr
     return nullptr;
 }

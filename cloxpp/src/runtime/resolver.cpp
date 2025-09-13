@@ -113,6 +113,18 @@ any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
     declare(stmt->name);
     define(stmt->name);
 
+    // If the passed in superclass exists we resolve it
+    if (stmt->superclass != nullptr) {
+        // We first check to see if the superclass name matches the class name
+        if (stmt->name.lexeme == stmt->superclass->name.lexeme) {
+            // If it does we throw an error
+            LoxError::error(stmt->superclass->name, "A class can't inherit from itself.");
+        } else {
+            // Otherwise we try to resolve
+            resolve(stmt->superclass);
+        }
+    }
+
     // We start our scope and save this as true
     begin_scope();
     // We use a reference since we want to modify the original

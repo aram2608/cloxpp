@@ -20,7 +20,9 @@ class LoxFunction;
 class LoxClass : public LoxCallable, public std::enable_shared_from_this<LoxClass> {
   public:
     // Constructor for LoxClass, we pass in its name
-    LoxClass(std::string name, std::map<std::string, std::shared_ptr<LoxFunction>> methods);
+    LoxClass(std::string                                         name,
+             std::shared_ptr<LoxClass>                           superclass,
+             std::map<std::string, std::shared_ptr<LoxFunction>> methods);
 
     // Override for call from LoxCallable interface
     std::any call(Interpreter& interpreter, std::vector<std::any> arguments) override;
@@ -34,6 +36,8 @@ class LoxClass : public LoxCallable, public std::enable_shared_from_this<LoxClas
 
     // Class name
     std::string name;
+    // Pointer to superclass
+    std::shared_ptr<LoxClass> superclass;
     // Map of methods
     std::map<std::string, std::shared_ptr<LoxFunction>> methods;
 };

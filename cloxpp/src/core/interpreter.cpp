@@ -90,6 +90,20 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
 
 // Function to visit class node
 any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
+    // We initialize our superclass object
+    std::shared_ptr<LoxClass> superklass;
+    // If the superclass is not empty
+    if (stmt->superclass != nullptr) {
+        // We evaluate and store the result, should be a LoxClass object
+        any superclass = evaluate(stmt->superclass);
+        // We then test if its a LoxClass object, and throw an error if not
+        if (superclass.type() != typeid(shared_ptr<LoxClass>)) {
+            throw RuntimeError(stmt->superclass->name, "Superclass must be a class.");
+        }
+        // We can then unwrap our superclass object
+        superklass = std::any_cast<std::shared_ptr<LoxClass>>(superclass);
+    }
+
     // We define the class name to the environment
     environment->define(stmt->name.lexeme, nullptr);
 
@@ -106,7 +120,7 @@ any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
     }
 
     // We create a new LoxClass class and assign it to the environment
-    shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->name.lexeme, methods);
+    shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->name.lexeme, superklass, methods);
     environment->assign(stmt->name, std::move(klass));
     return {};
 }

@@ -56,6 +56,15 @@ shared_ptr<Stmt> Parser::declaration() {
 shared_ptr<Stmt> Parser::class_declaration() {
     // We first need to consume the token identifier and kick an error otherwise
     Token name = consume(TokenType::IDENTIFIER, "Expect class name.");
+
+    // We initialize a superclass object
+    shared_ptr<Variable> superclass;
+    // If we match the '<' symbol, we consum the Token and create a new superclass object
+    if (match({TokenType::LESS})) {
+        consume(TokenType::IDENTIFIER, "Expect superclass name.");
+        superclass = std::make_shared<Variable>(previous());
+    }
+
     // We next need to consume the opening brace starting the class body
     consume(TokenType::LEFT_BRACE, "Expect '{' before class body.");
 
@@ -72,7 +81,7 @@ shared_ptr<Stmt> Parser::class_declaration() {
     // We then consume the closing brack and throw an error otherwise
     consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
     // We then return the new Class
-    return std::make_shared<Class>(std::move(name), std::move(methods));
+    return std::make_shared<Class>(std::move(name), superclass, std::move(methods));
 }
 
 // Function to handle var_declar
