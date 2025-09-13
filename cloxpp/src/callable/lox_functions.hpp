@@ -24,7 +24,9 @@ class LoxFunction : public LoxCallable {
      * Lox Function constructor, we pass in a pointer to the underlying function
      * and environment
      */
-    LoxFunction(std::shared_ptr<Function> declaration, std::shared_ptr<Environment> closure);
+    LoxFunction(std::shared_ptr<Function>    declaration,
+                std::shared_ptr<Environment> closure,
+                bool                         is_initializer);
     // Override to convert to string
     std::string to_string() override;
     // Override to represent arity()
@@ -33,6 +35,8 @@ class LoxFunction : public LoxCallable {
     std::any call(Interpreter& interpreter, std::vector<std::any> arguments) override;
 
     std::shared_ptr<LoxFunction> bind(std::shared_ptr<LoxInstance> instance);
+
+    bool is_initializer;
 
   private:
     // Pointer to declaration

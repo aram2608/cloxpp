@@ -13,7 +13,9 @@
 
 namespace CppLox {
 
-enum class FunctionType { NONE, FUNCTION, METHOD };
+enum class FunctionType { NONE, FUNCTION, METHOD, INIT };
+
+enum class ClassType { NONE, CLASS };
 
 class Resolver : ExprVisitor, StmtVisitor {
     // We need to store a reference to our interpreter to walk the nodes produced
@@ -21,6 +23,7 @@ class Resolver : ExprVisitor, StmtVisitor {
     // We create a vector of map objects to store our scopes
     std::vector<std::map<std::string, bool>> scopes;
     FunctionType                             current_function = FunctionType::NONE;
+    ClassType                                current_class    = ClassType::NONE;
 
   public:
     Resolver(Interpreter& interpreter);

@@ -99,7 +99,8 @@ any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
     // We iterate over each method in the Class methods vector
     for (shared_ptr<Function> method : stmt->methods) {
         // We create a function for each method
-        shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(method, environment);
+        shared_ptr<LoxFunction> function =
+            std::make_shared<LoxFunction>(method, environment, method->name.lexeme == "init");
         // We then add it to the map
         methods[method->name.lexeme] = function;
     }
@@ -143,7 +144,7 @@ any Interpreter::visitExpressionStmt(shared_ptr<ExpressionStmt> stmt) {
 any Interpreter::visitFunctionStmt(shared_ptr<Function> stmt) {
     // we create our function by passing in the statements and current environment
     // as the function is declared
-    shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(stmt, environment);
+    shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(stmt, environment, false);
     // we then define the function in the environemt
     environment->define(stmt->name.lexeme, function);
     return {};

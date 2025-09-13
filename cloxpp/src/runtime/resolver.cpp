@@ -89,6 +89,9 @@ any Resolver::visitReturnStmt(shared_ptr<ReturnStmt> stmt) {
     // We test if there is a returned expression and resolve it
     if (stmt->expr != nullptr) {
         resolve(stmt->expr);
+        if (current_function == FunctionType::INIT) {
+            LoxError::error(stmt->keyword, "Can't return a value from an initializer.");
+        }
     }
     return {};
 }
@@ -103,6 +106,10 @@ any Resolver::visitWhileStmt(shared_ptr<WhileStmt> while_stmt) {
 
 // Function to resolve classes
 any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
+    // We set the enclosing class and current class
+    ClassType enclosing_class = current_class;
+    current_class             = ClassType::CLASS;
+
     declare(stmt->name);
     define(stmt->name);
 
@@ -115,12 +122,17 @@ any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
     // We iterate over each method and resolve them
     for (const shared_ptr<Function>& method : stmt->methods) {
         FunctionType declaration = FunctionType::METHOD;
+        // If the method is init we change the function type
+        if (method->name.lexeme == "init") {
+            declaration = FunctionType::INIT;
+        }
         resolve_function(method, declaration);
     }
 
     // After resolving the class we end the scope
     end_scope();
-
+    // We return back to the enclosing class
+    current_class = enclosing_class;
     return {};
 }
 
@@ -133,7 +145,15 @@ any Resolver::visitAssignExpr(shared_ptr<Assign> expr) {
     return {};
 }
 
+// Function to resolve this statements
 any Resolver::visitThisExpr(shared_ptr<This> expr) {
+    // We test to see if we are inside of a class
+    if (current_class == ClassType::NONE) {
+        // If we are not we throw an error
+        LoxError::error(expr->keyword, "Can't use 'this' outside of a class.");
+        return {};
+    }
+    // Otherwise we resolve
     resolve_local(expr, expr->keyword);
     return {};
 }

@@ -10,8 +10,10 @@ using std::vector;
 // Constructor for lox function class, we pass in a declaration and environment
 // and move ownership
 LoxFunction::LoxFunction(std::shared_ptr<Function>    declaration,
-                         std::shared_ptr<Environment> closure)
-    : declaration(std::move(declaration)), closure(std::move(closure)) {
+                         std::shared_ptr<Environment> closure,
+                         bool                         is_initializer)
+    : declaration(std::move(declaration)), closure(std::move(closure)),
+      is_initializer(is_initializer) {
 }
 
 // A helper method to return the string representation of a function
@@ -45,7 +47,16 @@ any LoxFunction::call(Interpreter& interpreter, vector<any> arguments) {
     try {
         interpreter.execute_block(std::move(declaration->body), std::move(environment));
     } catch (Interpreter::Return value) {
+        // If we are in an init method we return the class instance
+        if (is_initializer) {
+            return closure->get_at(0, "this");
+        }
+        // otherwise we return the value
         return value.value;
+    }
+    // If we are in an init method we return the instance
+    if (is_initializer) {
+        return closure->get_at(0, "this");
     }
     return nullptr;
 }
@@ -58,5 +69,5 @@ std::shared_ptr<LoxFunction> LoxFunction::bind(std::shared_ptr<LoxInstance> inst
     environment->define("this", instance);
     // We then return a function with the declaration and environment
     // Thus every method, has a small 'world' with 'this' inside
-    return std::make_shared<LoxFunction>(declaration, environment);
+    return std::make_shared<LoxFunction>(declaration, environment, is_initializer);
 }
