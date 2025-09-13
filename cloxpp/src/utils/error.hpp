@@ -22,6 +22,12 @@ class RuntimeError : public std::runtime_error {
     }
 };
 
+class InvalidAssignment : public std::runtime_error {
+  public:
+    InvalidAssignment(std::string message) : std::runtime_error{message.c_str()} {
+    }
+};
+
 class LoxError {
     friend class Interpreter;
     friend class Parser;

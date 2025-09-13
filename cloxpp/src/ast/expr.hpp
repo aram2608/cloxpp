@@ -1,6 +1,7 @@
 #ifndef EXPR_HPP
 #define EXPR_HPP
 
+#include "utils/error.hpp"
 #include "utils/tokens.hpp"
 
 #include <any>
@@ -62,7 +63,7 @@ struct Expr {
 
     // Concrete default method for making assignments
     virtual std::shared_ptr<Expr> make_assignment(std::shared_ptr<Expr> value) const {
-        throw std::runtime_error("Invalid assignment target.");
+        throw InvalidAssignment("Invalid assignment target.");
     }
 };
 

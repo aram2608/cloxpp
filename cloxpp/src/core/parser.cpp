@@ -347,20 +347,13 @@ shared_ptr<Expr> Parser::assignment() {
         // We call assignment to recursivle parse the right hand side
         std::shared_ptr<Expr> value = assignment();
 
-        /*
-         * We try and cast the expression, if it works we extract the token
-         * and create a new assignment node
-         * if it fails it returns a nullptr and that is falsy in C++
-         * In the process of this we convert the rvalue expression to an lvalue
-         * expression
-         */
-        if (Variable* var = dynamic_cast<Variable*>(expr.get())) {
-            return std::make_shared<Assign>(var->name, std::move(value));
-        } else if (Get* get = dynamic_cast<Get*>(expr.get())) {
-            return std::make_shared<Set>(get->object, get->name, value);
+        // We try to make an assignment using the nodes assignment method
+        // otherwise we throw an error
+        try {
+        return expr->make_assignment(value);
+        } catch (InvalidAssignment) {
+            LoxError::error(equals, "Invalid assignment target.");
         }
-
-        error(equals, "Invalid assignment target.");
     }
     // We return the expression
     return expr;

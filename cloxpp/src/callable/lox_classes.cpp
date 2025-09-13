@@ -1,4 +1,5 @@
 #include "callable/lox_classes.hpp"
+
 #include "lox_classes.hpp"
 
 using namespace CppLox;
@@ -28,7 +29,7 @@ std::string LoxClass::to_string() {
 std::shared_ptr<LoxFunction> CppLox::LoxClass::find_method(std::string name) {
     // Test if function is contained inside the map
     if (methods.contains(name)) {
-      return methods[name];
+        return methods[name];
     }
     // Otherwise return nullptr
     return nullptr;
