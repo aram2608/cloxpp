@@ -106,11 +106,21 @@ any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
     declare(stmt->name);
     define(stmt->name);
 
+    // We start our scope and save this as true
+    begin_scope();
+    // We use a reference since we want to modify the original
+    std::map<std::string, bool>& scope = scopes.back();
+    scope["this"]                      = true;
+
     // We iterate over each method and resolve them
     for (const shared_ptr<Function>& method : stmt->methods) {
         FunctionType declaration = FunctionType::METHOD;
         resolve_function(method, declaration);
     }
+
+    // After resolving the class we end the scope
+    end_scope();
+
     return {};
 }
 
@@ -120,6 +130,11 @@ any Resolver::visitAssignExpr(shared_ptr<Assign> expr) {
     resolve(expr->value);
     // We then resolve the name
     resolve_local(expr, expr->name);
+    return {};
+}
+
+any Resolver::visitThisExpr(shared_ptr<This> expr) {
+    resolve_local(expr, expr->keyword);
     return {};
 }
 
@@ -189,7 +204,8 @@ any Resolver::visitVariableExpr(shared_ptr<Variable> expr) {
     // We first test if the scopes are empty and return
     if (!scopes.empty()) {
         // Next we look back into the scopes and store the first one
-        std::map<std::string, bool> scope = scopes.back();
+        // We use a reference since we want to modify the original
+        std::map<std::string, bool>& scope = scopes.back();
         // We then use find to search for our lexeme
         auto it = scope.find(expr->name.lexeme);
         // We test if the iterator is inside the scope and if the name is set to false
@@ -272,7 +288,7 @@ void Resolver::declare(Token name) {
         return;
     }
     // otherwise, we look at the last element in the map and add a new map
-    std::map<std::string, bool> scope = scopes.back();
+    std::map<std::string, bool>& scope = scopes.back();
 
     // We check to see if a variable has already been declared in the local scope
     auto it = scope.find(name.lexeme);
@@ -292,6 +308,8 @@ void Resolver::define(Token name) {
         return;
     }
     // otherwise we look to the last element and add the token as the key
-    // with true as its value
-    scopes.back()[name.lexeme] = true;
+    // with true as its value, we use a reference since we want to modify
+    // the original map
+    std::map<std::string, bool>& scope = scopes.back();
+    scope[name.lexeme]                 = true;
 }

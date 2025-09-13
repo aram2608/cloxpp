@@ -2,6 +2,7 @@
 #define LOX_FUNCTIONS_HPP
 
 #include "callable/callable.hpp"
+#include "callable/lox_classes.hpp"
 #include "core/interpreter.hpp"
 
 #include <any>
@@ -13,6 +14,7 @@ namespace CppLox {
 
 class Environment;
 struct Function;
+struct LoxInstance;
 
 // We create a new Lox function class that is similar to our Native Functions
 // we override the same methods to make
@@ -29,6 +31,8 @@ class LoxFunction : public LoxCallable {
     int arity() override;
     // Override to call method
     std::any call(Interpreter& interpreter, std::vector<std::any> arguments) override;
+
+    std::shared_ptr<LoxFunction> bind(std::shared_ptr<LoxInstance> instance);
 
   private:
     // Pointer to declaration

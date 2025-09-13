@@ -22,6 +22,7 @@ struct Literal;
 struct Variable;
 struct Get;
 struct Set;
+struct This;
 
 // Abstract visitor for different nodes
 struct ExprVisitor {
@@ -42,6 +43,7 @@ struct ExprVisitor {
     virtual std::any visitVariableExpr(std::shared_ptr<Variable> expr) = 0;
     virtual std::any visitGetExpr(std::shared_ptr<Get> expr)           = 0;
     virtual std::any visitSetExpr(std::shared_ptr<Set> expr)           = 0;
+    virtual std::any visitThisExpr(std::shared_ptr<This> expr)         = 0;
 };
 
 // Abstract base class, requires at least one virtual method
@@ -65,6 +67,18 @@ struct Expr {
     virtual std::shared_ptr<Expr> make_assignment(std::shared_ptr<Expr> value) const {
         throw InvalidAssignment("Invalid assignment target.");
     }
+};
+
+struct This : Expr, std::enable_shared_from_this<This> {
+    // This constructor
+    This(Token keyword) : keyword(keyword) {
+    }
+
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visitThisExpr(shared_from_this());
+    }
+
+    Token keyword;
 };
 
 struct Set : Expr, std::enable_shared_from_this<Set> {

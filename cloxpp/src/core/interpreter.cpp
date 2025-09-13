@@ -329,6 +329,12 @@ any Interpreter::visitGetExpr(shared_ptr<Get> expr) {
     throw RuntimeError(expr->name, "Only instances have properties.");
 }
 
+// Function to resolve This node
+any Interpreter::visitThisExpr(shared_ptr<This> expr) {
+    // We simply lookup 'this'
+    return variable_lookup(expr->keyword, expr);
+}
+
 // Function to handle visit the Setter node
 any Interpreter::visitSetExpr(shared_ptr<Set> expr) {
     // We first evaluate the underlying object

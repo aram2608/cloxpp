@@ -7,6 +7,7 @@ add_library(cloxpp_lib
     src/callable/lox_functions.cpp
     src/callable/native_functions.cpp
     src/callable/lox_classes.cpp
+    src/callable/lox_instance.cpp
 )
 
 find_package(magic_enum CONFIG QUIET)

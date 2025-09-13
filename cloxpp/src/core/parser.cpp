@@ -350,7 +350,7 @@ shared_ptr<Expr> Parser::assignment() {
         // We try to make an assignment using the nodes assignment method
         // otherwise we throw an error
         try {
-        return expr->make_assignment(value);
+            return expr->make_assignment(value);
         } catch (InvalidAssignment) {
             LoxError::error(equals, "Invalid assignment target.");
         }
@@ -530,6 +530,11 @@ shared_ptr<Expr> Parser::primary() {
     // Strings and nums
     if (match({TokenType::NUMBER, TokenType::STRING})) {
         return std::make_shared<Literal>(previous().literal);
+    }
+
+    // We match the this keyword
+    if (match({TokenType::THIS})) {
+        return std::make_shared<This>(previous());
     }
 
     // Identifiers

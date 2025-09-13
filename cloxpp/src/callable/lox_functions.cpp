@@ -1,5 +1,7 @@
 #include "callable/lox_functions.hpp"
 
+#include "lox_functions.hpp"
+
 using namespace CppLox;
 using std::any;
 using std::string;
@@ -46,4 +48,15 @@ any LoxFunction::call(Interpreter& interpreter, vector<any> arguments) {
         return value.value;
     }
     return nullptr;
+}
+
+// Function to bind this to class instance
+std::shared_ptr<LoxFunction> LoxFunction::bind(std::shared_ptr<LoxInstance> instance) {
+    // We create a new environment from the closure
+    std::shared_ptr<Environment> environment = std::make_shared<Environment>(closure);
+    // We then define this inside the LoxInstance
+    environment->define("this", instance);
+    // We then return a function with the declaration and environment
+    // Thus every method, has a small 'world' with 'this' inside
+    return std::make_shared<LoxFunction>(declaration, environment);
 }

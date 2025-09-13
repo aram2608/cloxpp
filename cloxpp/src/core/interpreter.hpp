@@ -7,6 +7,7 @@
 #include "callable/lox_classes.hpp"
 #include "callable/lox_functions.hpp"
 #include "callable/native_functions.hpp"
+#include "callable/lox_instance.hpp"
 #include "runtime/environment.hpp"
 #include "utils/error.hpp"
 #include "utils/tokens.hpp"
@@ -57,6 +58,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any visitIfStmt(std::shared_ptr<IfStmt> if_stmt) override;
     std::any visitWhileStmt(std::shared_ptr<WhileStmt> while_stmt) override;
 
+    std::any visitThisExpr(std::shared_ptr<This> expr) override;
     std::any visitSetExpr(std::shared_ptr<Set> expr) override;
     std::any visitGetExpr(std::shared_ptr<Get> expr) override;
     std::any visitCallExpr(std::shared_ptr<Call> expr) override;
