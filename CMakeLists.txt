@@ -9,4 +9,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_subdirectory(cloxpp)
 
 target_compile_options(cloxpp 
-    PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
+    PRIVATE 
+    -Wall 
+    -Wextra 
+    -Wpedantic 
+    -Wconversion
+    -Wpessimizing-move
+    -Wredundant-move
+    -Wmove
+    -Wrange-loop-construct
+)

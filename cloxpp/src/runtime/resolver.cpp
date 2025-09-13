@@ -105,6 +105,12 @@ any Resolver::visitWhileStmt(shared_ptr<WhileStmt> while_stmt) {
 any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
     declare(stmt->name);
     define(stmt->name);
+
+    // We iterate over each method and resolve them
+    for (const shared_ptr<Function>& method : stmt->methods) {
+        FunctionType declaration = FunctionType::METHOD;
+        resolve_function(method, declaration);
+    }
     return {};
 }
 
@@ -114,6 +120,19 @@ any Resolver::visitAssignExpr(shared_ptr<Assign> expr) {
     resolve(expr->value);
     // We then resolve the name
     resolve_local(expr, expr->name);
+    return {};
+}
+
+// Function to resolve Setter node
+any Resolver::visitSetExpr(shared_ptr<Set> expr) {
+    resolve(expr->value);
+    resolve(expr->object);
+    return {};
+}
+
+// Function to resolve the Getter node
+any Resolver::visitGetExpr(shared_ptr<Get> expr) {
+    resolve(expr->object);
     return {};
 }
 

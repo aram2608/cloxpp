@@ -50,7 +50,7 @@ struct ReturnStmt : Stmt, std::enable_shared_from_this<ReturnStmt> {
     // Constructor for the return statement, we pass in a pointer the optional
     // return value
     ReturnStmt(Token keyword, std::shared_ptr<Expr> expr)
-        : keyword(keyword), expr(std::move(expr)) {
+        : expr(std::move(expr)), keyword(keyword) {
     }
 
     // We override the accept method

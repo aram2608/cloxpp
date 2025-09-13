@@ -13,7 +13,7 @@
 
 namespace CppLox {
 
-enum class FunctionType { NONE, FUNCTION };
+enum class FunctionType { NONE, FUNCTION, METHOD };
 
 class Resolver : ExprVisitor, StmtVisitor {
     // We need to store a reference to our interpreter to walk the nodes produced
@@ -36,6 +36,8 @@ class Resolver : ExprVisitor, StmtVisitor {
     std::any visitWhileStmt(std::shared_ptr<WhileStmt> while_stmt) override;
     std::any visitClassStmt(std::shared_ptr<Class> stmt) override;
 
+    std::any visitSetExpr(std::shared_ptr<Set> expr) override;
+    std::any visitGetExpr(std::shared_ptr<Get> expr) override;
     std::any visitCallExpr(std::shared_ptr<Call> expr) override;
     std::any visitLogicalExpr(std::shared_ptr<Logical> expr) override;
     std::any visitAssignExpr(std::shared_ptr<Assign> expr) override;

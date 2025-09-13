@@ -1,5 +1,7 @@
 #include "core/interpreter.hpp"
 
+#include "interpreter.hpp"
+
 #include <chrono>
 #include <cmath>
 #include <iostream>
@@ -90,8 +92,20 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
 any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
     // We define the class name to the environment
     environment->define(stmt->name.lexeme, nullptr);
+
+    // We create a map to store our methods
+    std::map<string, shared_ptr<LoxFunction>> methods;
+
+    // We iterate over each method in the Class methods vector
+    for (shared_ptr<Function> method : stmt->methods) {
+        // We create a function for each method
+        shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(method, environment);
+        // We then add it to the map
+        methods[method->name.lexeme] = function;
+    }
+
     // We create a new LoxClass class and assign it to the environment
-    shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->name.lexeme);
+    shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->name.lexeme, methods);
     environment->assign(stmt->name, std::move(klass));
     return {};
 }
@@ -301,6 +315,37 @@ any Interpreter::visitUnaryExpr(shared_ptr<Unary> expr) {
     return {};
 }
 
+// Function to visit Getter node
+any Interpreter::visitGetExpr(shared_ptr<Get> expr) {
+    // We first evaluate and store the underlying object
+    std::any object = evaluate(expr->object);
+    // We test if the object is a LoxInstance
+    if (object.type() == typeid(shared_ptr<LoxInstance>)) {
+        // If so we return the value stored in the objects field
+        // We need to unwrap the std::any object first however
+        return std::any_cast<std::shared_ptr<LoxInstance>>(object)->get(expr->name);
+    }
+
+    throw RuntimeError(expr->name, "Only instances have properties.");
+}
+
+// Function to handle visit the Setter node
+any Interpreter::visitSetExpr(shared_ptr<Set> expr) {
+    // We first evaluate the underlying object
+    std::any object = evaluate(expr->object);
+
+    // If the object is not a Lox instance we toss an errors
+    if (object.type() != typeid(shared_ptr<LoxInstance>)) {
+        throw RuntimeError(expr->name, "Only instances have fields.");
+    }
+
+    // If our check passes, we evaluate the expression
+    std::any value = evaluate(expr->value);
+    // Then invoke the setter method and return the value
+    std::any_cast<std::shared_ptr<LoxInstance>>(object)->set(expr->name, value);
+    return value;
+}
+
 // Function to handle function calls
 any Interpreter::visitCallExpr(shared_ptr<Call> expr) {
     // we evaluate our calle and save it
@@ -315,25 +360,32 @@ any Interpreter::visitCallExpr(shared_ptr<Call> expr) {
     }
 
     // We forward declare our lox callable object
-    shared_ptr<LoxCallable> function;
+    shared_ptr<LoxCallable> callable;
 
     // We add a check to ensure our callable is actually a Function type
     if (callee.type() == typeid(shared_ptr<LoxFunction>)) {
+        // If we pass our test we can cast to a LoxFunction
+        // This is necessary to unwrap the any object
+        callable = std::any_cast<shared_ptr<LoxFunction>>(std::move(callee));
+    } else if (callee.type() == typeid(shared_ptr<LoxClass>)) {
+        // Or a to a LoxClass
+        // Similarly we need to unwrap the any object
+        callable = std::any_cast<shared_ptr<LoxClass>>(std::move(callee));
+    } else {
+        // Otherwise we throw a runtime error
         throw RuntimeError(expr->paren, "Can only call functions and classes.");
     }
-    // If we pass our test we can cast our Function into a callable object
-    function = std::any_cast<shared_ptr<LoxFunction>>(std::move(callee));
 
-    // We need to test our functions arity to ensure the correct number of args are
+    // We need to test our the callables arity to ensure the correct number of args are
     // passed
-    if (args.size() != function->arity()) {
+    if (args.size() != callable->arity()) {
         throw RuntimeError{expr->paren,
-                           "Expected " + std::to_string(function->arity()) + " arguments but got " +
+                           "Expected " + std::to_string(callable->arity()) + " arguments but got " +
                                std::to_string(args.size()) + "."};
     }
 
-    // we can then return a call to the function with the arguments
-    return function->call(*this, std::move(args));
+    // we can then return a call to the callable with the arguments
+    return callable->call(*this, std::move(args));
 }
 
 // To evaluate we recursively evaluate

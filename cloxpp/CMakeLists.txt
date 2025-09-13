@@ -14,7 +14,20 @@ target_link_libraries(cloxpp_lib PUBLIC magic_enum::magic_enum)
 
 target_include_directories(cloxpp_lib 
     PUBLIC 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/
+)
+
+target_compile_options(cloxpp_lib
+    PRIVATE
+    -Wall 
+    -Wextra 
+    -Wpedantic 
+    -Wconversion
+    -Wpessimizing-move
+    -Wredundant-move
+    -Wmove
+    -Wrange-loop-construct
+)
 
 add_executable(cloxpp 
     app/main.cpp

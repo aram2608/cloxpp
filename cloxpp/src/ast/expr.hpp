@@ -19,6 +19,8 @@ struct Unary;
 struct Grouping;
 struct Literal;
 struct Variable;
+struct Get;
+struct Set;
 
 // Abstract visitor for different nodes
 struct ExprVisitor {
@@ -37,6 +39,8 @@ struct ExprVisitor {
     virtual std::any visitGroupingExpr(std::shared_ptr<Grouping> expr) = 0;
     virtual std::any visitLiteralExpr(std::shared_ptr<Literal> expr)   = 0;
     virtual std::any visitVariableExpr(std::shared_ptr<Variable> expr) = 0;
+    virtual std::any visitGetExpr(std::shared_ptr<Get> expr)           = 0;
+    virtual std::any visitSetExpr(std::shared_ptr<Set> expr)           = 0;
 };
 
 // Abstract base class, requires at least one virtual method
@@ -53,22 +57,81 @@ struct Expr {
     // We need a default constructor to get the compiler to stop complaining
     Expr() = default;
 
-    // accept() method for visiting nodes, we pass in a reference to
-    // ExprVisitor&
+    // accept() method for visiting nodes, we pass in a reference to ExprVisitor&
     virtual std::any accept(ExprVisitor& visitor) = 0;
+
+    // Concrete default method for making assignments
+    virtual std::shared_ptr<Expr> make_assignment(std::shared_ptr<Expr> value) const {
+        throw std::runtime_error("Invalid assignment target.");
+    }
+};
+
+struct Set : Expr, std::enable_shared_from_this<Set> {
+    /*
+     * Constructor for our Set node, we pass in a pointer to the object and value
+     * as well as a Token for the name
+     */
+    Set(std::shared_ptr<Expr> object, Token name, std::shared_ptr<Expr> value)
+        : object(std::move(object)), name(name), value(std::move(value)) {
+    }
+
+    // Override accept method
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visitSetExpr(shared_from_this());
+    }
+
+    // Pointer to object
+    std::shared_ptr<Expr> object;
+    // Token name
+    Token name;
+    // Pointer to value
+    std::shared_ptr<Expr> value;
+};
+
+struct Get : Expr, std::enable_shared_from_this<Get> {
+    /*
+     * Constructor for the Get expression, we pass in a pointer to the object
+     * along with its name
+     */
+    Get(std::shared_ptr<Expr> object, Token name) : object(std::move(object)), name(name) {
+    }
+
+    // Override the accept method
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visitGetExpr(shared_from_this());
+    }
+
+    // Override for make_assignment method, if the object is a Get we can return a Set
+    std::shared_ptr<Expr> make_assignment(std::shared_ptr<Expr> value) const override {
+        return std::make_shared<Set>(object, name, std::move(value));
+    }
+
+    // Pointer to object
+    std::shared_ptr<Expr> object;
+    // Token name
+    Token name;
 };
 
 struct Call : Expr, std::enable_shared_from_this<Call> {
+    /*
+     * Constructor for Call expressions. Used to invoke callable objects, classes
+     * and functions. We pass in a shared pointer to the callee, the parenthesis token
+     * for error handling, and a vector of shared pointers for the arguments
+     */
     Call(std::shared_ptr<Expr> callee, Token paren, std::vector<std::shared_ptr<Expr>> args)
         : callee(std::move(callee)), paren(paren), args(std::move(args)) {
     }
 
+    // Override accept method
     std::any accept(ExprVisitor& visitor) override {
         return visitor.visitCallExpr(shared_from_this());
     }
 
-    std::shared_ptr<Expr>              callee;
-    Token                              paren;
+    // Pointer to callee
+    std::shared_ptr<Expr> callee;
+    // Token for parenthesis
+    Token paren;
+    // Vector of arguments
     std::vector<std::shared_ptr<Expr>> args;
 };
 
@@ -233,6 +296,11 @@ struct Variable : Expr, std::enable_shared_from_this<Variable> {
     // Override for the Expr accept method
     std::any accept(ExprVisitor& visitor) override {
         return visitor.visitVariableExpr(shared_from_this());
+    }
+
+    // Override for make assignment method, if the object is a Variable we can return an assignment
+    std::shared_ptr<Expr> make_assignment(std::shared_ptr<Expr> value) const override {
+        return std::make_shared<Assign>(name, std::move(value));
     }
 
     // Token for the name

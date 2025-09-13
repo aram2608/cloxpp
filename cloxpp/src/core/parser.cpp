@@ -117,7 +117,7 @@ shared_ptr<Stmt> Parser::statement() {
 
     if (match({TokenType::LEFT_BRACE})) {
         // We need to move ownership
-        return std::make_shared<Block>(std::move(block()));
+        return std::make_shared<Block>(block());
     }
 
     // If we dont reach the predefined stmt types return a base expression stmt
@@ -355,8 +355,9 @@ shared_ptr<Expr> Parser::assignment() {
          * expression
          */
         if (Variable* var = dynamic_cast<Variable*>(expr.get())) {
-            Token name = var->name;
-            return std::make_shared<Assign>(std::move(name), std::move(value));
+            return std::make_shared<Assign>(var->name, std::move(value));
+        } else if (Get* get = dynamic_cast<Get*>(expr.get())) {
+            return std::make_shared<Set>(get->object, get->name, value);
         }
 
         error(equals, "Invalid assignment target.");
@@ -489,7 +490,7 @@ shared_ptr<Expr> Parser::finish_call(shared_ptr<Expr> callee) {
             if (args.size() >= MAX_ARGS) {
                 error(peek(), "Can't have more than 255 arguments.");
             }
-            args.push_back(std::move(expression()));
+            args.push_back(expression());
         } while (match({TokenType::COMMA}));
     }
 
@@ -504,13 +505,16 @@ shared_ptr<Expr> Parser::call() {
     // we initialize our expr from primary
     shared_ptr<Expr> expr = primary();
 
-    // we continuously match left parenethesis and
-    // call the finish_call method
+    // we continuously match left parenethesis
     while (true) {
+        // We call the finish_call method if we match a parenthesis
         if (match({TokenType::LEFT_PAREN})) {
             expr = finish_call(std::move(expr));
-            // we break as soon as we dont match any more opening
-            // parenthesis
+            // If we match a dot we get a property instead
+        } else if (match({TokenType::DOT})) {
+            Token name = consume(TokenType::IDENTIFIER, "Expect property name after '.'.");
+            expr       = std::make_shared<Get>(expr, name);
+            // Otherwise we break
         } else {
             break;
         }
