@@ -96,8 +96,7 @@ any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
     // If the superclass is not empty
     if (stmt->superclass != nullptr) {
         // We evaluate and store the result, should be a LoxClass object
-        any superclass = evaluate(stmt->superclass);
-        std::cout << stmt->superclass->name.lexeme << std::endl;
+        superclass = evaluate(stmt->superclass);
         // We then test if its a LoxClass object, and throw an error if not
         if (superclass.type() != typeid(shared_ptr<LoxClass>)) {
             throw RuntimeError(stmt->superclass->name, "Superclass must be a class.");
@@ -109,10 +108,14 @@ any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
 
     // We create a new environment if we have a superclass
     if (stmt->superclass != nullptr) {
+        // We evaluate and store the result, should be a LoxClass object
+        superclass = evaluate(stmt->superclass);
+        // We then test if its a LoxClass object, and throw an error if not
+        if (superclass.type() != typeid(shared_ptr<LoxClass>)) {
+            throw RuntimeError(stmt->superclass->name, "Superclass must be a class.");
+        }
         // We then store a reference to the superclass
         environment = std::make_shared<Environment>(environment);
-        std::cout << "Define: " << typeid(superclass).name() << std::endl;
-        std::cout << superclass.type().name() << std::endl;
         environment->define("super", superclass);
     }
 
@@ -141,6 +144,8 @@ any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
     // We do one final check to ensure superklass is not a nullptr and return
     // to the enclosing environment
     if (superklass != nullptr) {
+        std::cerr << "[class] popping temp env @" << environment.get() << " -> enclosing @"
+                  << environment->enclosing.get() << "\n";
         environment = environment->enclosing;
     }
 
@@ -371,17 +376,8 @@ any Interpreter::visitGetExpr(shared_ptr<Get> expr) {
 // Function to interpret super expressions
 any Interpreter::visitSuperExpr(shared_ptr<Super> expr) {
     // We return the distance to the expression
-    int distance = locals[expr];
-
-    auto obj = environment->get_at(distance, "super");
-
-    if (obj.type() == typeid(shared_ptr<LoxClass>)) {
-        std::cout << typeid(obj).name() << std::endl;
-        std::cout << "yes" << std::endl;
-    } else {
-        std::cout << "Super: " << typeid(obj).name() << std::endl;
-        std::cout << "no" << std::endl;
-    }
+    int  distance = locals[expr];
+    auto val      = environment->get_at(distance, "super");
 
     // We then create a pointer to a LoxClass at the given distance
     shared_ptr<LoxClass> superclass =

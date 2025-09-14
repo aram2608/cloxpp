@@ -32,7 +32,6 @@ class Environment : public std::enable_shared_from_this<Environment> {
     void define(std::string name, std::any value) {
         // this method overrides id everytime however, since the [] operator
         // does not care if the object already exists or not
-        std::cout << name << std::endl;
         values[name] = value;
     }
 
@@ -40,7 +39,6 @@ class Environment : public std::enable_shared_from_this<Environment> {
         /*
          * We check the internal names string lexeme and make sure its
          * in the map
-
          */
         if (values.contains(name.lexeme)) {
             // We assign the lexeme to the value
@@ -74,8 +72,8 @@ class Environment : public std::enable_shared_from_this<Environment> {
             return values[name.lexeme];
         }
 
-        // We can ealk the chain of environments and recursivley search for
-        // the variable, if we dont find it we can throw an error
+        // We can walk the chain of environments and recursivley search for
+        // the variable
         if (enclosing != nullptr) {
             return enclosing->get(name);
         }

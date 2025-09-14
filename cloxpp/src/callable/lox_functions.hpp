@@ -37,12 +37,12 @@ class LoxFunction : public LoxCallable {
     std::shared_ptr<LoxFunction> bind(std::shared_ptr<LoxInstance> instance);
 
     bool is_initializer;
+    // Pointer to closure (enclosing environment)
+    std::shared_ptr<Environment> closure;
 
   private:
     // Pointer to declaration
     std::shared_ptr<Function> declaration;
-    // Pointer to closure (enclosing environment)
-    std::shared_ptr<Environment> closure;
 };
 
 } // namespace CppLox
