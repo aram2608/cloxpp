@@ -1,9 +1,0 @@
-== precedence ==
-true
-false
-== dangling else (associates to nearest if) ==
-2.000000
-== chained if/else with blocks ==
-yes
-== logical short-circuit (no side effects) ==
-0.000000

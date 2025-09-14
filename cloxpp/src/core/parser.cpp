@@ -461,7 +461,6 @@ shared_ptr<Expr> Parser::factor() {
         // We need to move ownership to the new expression
         expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
     }
-
     // Return og expr otherwise
     return expr;
 }

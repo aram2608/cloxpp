@@ -1,0 +1,13 @@
+class Counter {
+  init(value) {
+    this.value = value;
+  }
+
+  increment() {
+    this.value = this.value + 1;
+  }
+}
+
+var c = Counter(5);
+c.increment();
+print c.value; // expect 6

@@ -120,6 +120,7 @@ any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
             // If it does we throw an error
             LoxError::error(stmt->superclass->name, "A class can't inherit from itself.");
         }
+        current_class = ClassType::SUBCLASS;
         // Otherwise we try to resolve
         resolve(stmt->superclass);
     }
@@ -164,6 +165,16 @@ any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
 
 // Function to resolve super expression
 any Resolver::visitSuperExpr(shared_ptr<Super> expr) {
+    // We check to see if we are outside of a class body
+    if (current_class == ClassType::NONE) {
+        // We throw an error if so
+        LoxError::error(expr->keyword, "Can't use 'super' outside of a class.");
+        // We then check if we are not a sub class
+    } else if (current_class != ClassType::SUBCLASS) {
+        // We throw and error if so
+        LoxError::error(expr->keyword, "Can't use 'super' in a class with no superclass.");
+    }
+    // Otherwise we resolve the local variable
     resolve_local(expr, expr->keyword);
     return {};
 }
@@ -292,19 +303,23 @@ void Resolver::resolve(shared_ptr<Expr> expr) {
 
 // Function used to resolve local variables
 void Resolver::resolve_local(const shared_ptr<Expr>& expr, Token name) {
-    // We start at the inner most scope and work outwards to find the name
-    // We create a reverse iterator that starts at the last element and
-    // works it way to the first elemen
+    /*
+     * We start at the inner most scope and work outwards to find the name
+     * We create a reverse iterator that starts at the last element and
+     * works it way to the first element
+     */
     for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
         /*
          * If we match the name, we ask the interpreter to resolve it and pass in
          * the number corresponding the scope
          * if its in the current scope we get 0
-         * if its the enclosing scope - 1
-         * if its the scope outside of the immediate enclosing scope - 2
+         * if its the enclosing scope we get 1
+         * if its the scope outside of the immediate enclosing scope we get 2
          * etc...
          */
         if (it->contains(name.lexeme)) {
+            // We calculate the distance between the beginning of the reverse iterator
+            // and the current increment
             interpreter.resolve(expr, std::distance(scopes.rbegin(), it));
             return;
         }

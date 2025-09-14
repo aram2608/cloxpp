@@ -1,0 +1,16 @@
+class A {
+  init(x) {
+    this.x = x;
+  }
+}
+
+class B < A {
+  init(x, y) {
+    super.init(x);
+    this.y = y;
+  }
+}
+
+var b = B(1, 2);
+print b.x; // expect 1
+print b.y; // expect 2

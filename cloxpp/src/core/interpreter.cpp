@@ -144,8 +144,6 @@ any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
     // We do one final check to ensure superklass is not a nullptr and return
     // to the enclosing environment
     if (superklass != nullptr) {
-        std::cerr << "[class] popping temp env @" << environment.get() << " -> enclosing @"
-                  << environment->enclosing.get() << "\n";
         environment = environment->enclosing;
     }
 

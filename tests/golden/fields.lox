@@ -1,0 +1,4 @@
+class Bag {}
+var bag = Bag();
+bag.item = "apple";
+print bag.item; // expect "apple"

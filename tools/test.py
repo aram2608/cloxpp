@@ -47,7 +47,7 @@ def write_log(input_file: Path, output: Path, stdout: str) -> None:
     input_file = Path(input_file)
 
     # We first need to create a new file using the file count and _expected.tokens extension
-    new_file = input_file.stem + ".expected"
+    new_file = input_file.stem + ".stdout"
 
     # We append the new_file to output PosixPath using the / operator
     log = Path(output) / new_file

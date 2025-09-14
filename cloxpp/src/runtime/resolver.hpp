@@ -15,7 +15,7 @@ namespace CppLox {
 
 enum class FunctionType { NONE, FUNCTION, METHOD, INIT };
 
-enum class ClassType { NONE, CLASS };
+enum class ClassType { NONE, CLASS, SUBCLASS };
 
 class Resolver : ExprVisitor, StmtVisitor {
     // We need to store a reference to our interpreter to walk the nodes produced

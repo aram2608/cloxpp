@@ -1,0 +1,6 @@
+class Greeter {
+  sayHi() {
+    print "Hi!";
+  }
+}
+Greeter().sayHi(); // expect "Hi!"
