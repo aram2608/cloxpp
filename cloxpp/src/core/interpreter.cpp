@@ -6,6 +6,7 @@
 #include <cmath>
 #include <iostream>
 #include <thread>
+#include <typeinfo>
 
 using namespace CppLox;
 using std::any;
@@ -90,22 +91,30 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
 
 // Function to visit class node
 any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
-    // We initialize our superclass object
-    std::shared_ptr<LoxClass> superklass;
+    // We create an object to store superclass
+    any superclass;
     // If the superclass is not empty
     if (stmt->superclass != nullptr) {
         // We evaluate and store the result, should be a LoxClass object
         any superclass = evaluate(stmt->superclass);
+        std::cout << stmt->superclass->name.lexeme << std::endl;
         // We then test if its a LoxClass object, and throw an error if not
         if (superclass.type() != typeid(shared_ptr<LoxClass>)) {
             throw RuntimeError(stmt->superclass->name, "Superclass must be a class.");
         }
-        // We can then unwrap our superclass object
-        superklass = std::any_cast<std::shared_ptr<LoxClass>>(superclass);
     }
 
     // We define the class name to the environment
     environment->define(stmt->name.lexeme, nullptr);
+
+    // We create a new environment if we have a superclass
+    if (stmt->superclass != nullptr) {
+        // We then store a reference to the superclass
+        environment = std::make_shared<Environment>(environment);
+        std::cout << "Define: " << typeid(superclass).name() << std::endl;
+        std::cout << superclass.type().name() << std::endl;
+        environment->define("super", superclass);
+    }
 
     // We create a map to store our methods
     std::map<string, shared_ptr<LoxFunction>> methods;
@@ -119,8 +128,23 @@ any Interpreter::visitClassStmt(shared_ptr<Class> stmt) {
         methods[method->name.lexeme] = function;
     }
 
-    // We create a new LoxClass class and assign it to the environment
+    // We initialize our superclass object as nullptr
+    std::shared_ptr<LoxClass> superklass = nullptr;
+    // We can then try to cast if the type id matches a LoxClass
+    if (superclass.type() == typeid(std::shared_ptr<LoxClass>)) {
+        superklass = std::any_cast<std::shared_ptr<LoxClass>>(superclass);
+    }
+
+    // We create a new LoxClass class
     shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->name.lexeme, superklass, methods);
+
+    // We do one final check to ensure superklass is not a nullptr and return
+    // to the enclosing environment
+    if (superklass != nullptr) {
+        environment = environment->enclosing;
+    }
+
+    // We then assign our created LoxClass to the environment
     environment->assign(stmt->name, std::move(klass));
     return {};
 }
@@ -344,7 +368,46 @@ any Interpreter::visitGetExpr(shared_ptr<Get> expr) {
     throw RuntimeError(expr->name, "Only instances have properties.");
 }
 
-// Function to resolve This node
+// Function to interpret super expressions
+any Interpreter::visitSuperExpr(shared_ptr<Super> expr) {
+    // We return the distance to the expression
+    int distance = locals[expr];
+
+    auto obj = environment->get_at(distance, "super");
+
+    if (obj.type() == typeid(shared_ptr<LoxClass>)) {
+        std::cout << typeid(obj).name() << std::endl;
+        std::cout << "yes" << std::endl;
+    } else {
+        std::cout << "Super: " << typeid(obj).name() << std::endl;
+        std::cout << "no" << std::endl;
+    }
+
+    // We then create a pointer to a LoxClass at the given distance
+    shared_ptr<LoxClass> superclass =
+        std::any_cast<shared_ptr<LoxClass>>(environment->get_at(distance, "super"));
+
+    /*
+     * We then create an instance of 'this' with a bit of a hack
+     * since we control the layout of the environments 'this' and 'super' are always
+     * in the same one, so we reach into the same map and retrive 'this'
+     */
+    shared_ptr<LoxInstance> object =
+        std::any_cast<shared_ptr<LoxInstance>>(environment->get_at(distance - 1, "this"));
+
+    // We can now look up and bind the method starting at the super class
+    shared_ptr<LoxFunction> method = superclass->find_method(expr->method.lexeme);
+
+    // If the method is a nullptr, we throw an error
+    if (method == nullptr) {
+        throw RuntimeError(expr->method, "Undefined property '" + expr->method.lexeme + "'.");
+    }
+
+    // Otherwise we bind
+    return method->bind(object);
+}
+
+// Function to interpret This node
 any Interpreter::visitThisExpr(shared_ptr<This> expr) {
     // We simply lookup 'this'
     return variable_lookup(expr->keyword, expr);
@@ -430,24 +493,7 @@ any Interpreter::visitVariableExpr(shared_ptr<Variable> expr) {
     return variable_lookup(expr->name, expr);
 }
 
-// debugging snippet
-// std::any Interpreter::visitVariableExpr(std::shared_ptr<Variable> expr) {
-//     int dist = -1;
-//     if (auto it = locals.find(expr); it != locals.end()) {
-//         dist = it->second;
-//     }
-
-//     std::cerr << "[get] " << expr->name.lexeme << " dist=" << dist << " env@" << environment
-//               << "\n";
-
-//     if (dist != -1) {
-//         return environment->get_at(dist, expr->name.lexeme);
-//     }
-//     return globals->get(expr->name);
-// }
-
 // Function to test logical operations
-// Pass in const ref since this is read only
 bool Interpreter::is_truthy(const any& object) {
     // We use the type() method to test if we have a nullptr or
     // a boolean

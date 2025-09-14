@@ -119,10 +119,18 @@ any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
         if (stmt->name.lexeme == stmt->superclass->name.lexeme) {
             // If it does we throw an error
             LoxError::error(stmt->superclass->name, "A class can't inherit from itself.");
-        } else {
-            // Otherwise we try to resolve
-            resolve(stmt->superclass);
         }
+        // Otherwise we try to resolve
+        resolve(stmt->superclass);
+    }
+
+    // If we have a superclass
+    if (stmt->superclass != nullptr) {
+        // We start scope
+        begin_scope();
+        // We then retrieve the scope and add 'super' as true
+        std::map<std::string, bool>& scope = scopes.back();
+        scope["super"]                     = true;
     }
 
     // We start our scope and save this as true
@@ -143,8 +151,20 @@ any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
 
     // After resolving the class we end the scope
     end_scope();
+
+    // We end the scope of the superclass
+    if (stmt->superclass != nullptr) {
+        end_scope();
+    }
+
     // We return back to the enclosing class
     current_class = enclosing_class;
+    return {};
+}
+
+// Function to resolve super expression
+any Resolver::visitSuperExpr(shared_ptr<Super> expr) {
+    resolve_local(expr, expr->keyword);
     return {};
 }
 

@@ -23,6 +23,7 @@ struct Variable;
 struct Get;
 struct Set;
 struct This;
+struct Super;
 
 // Abstract visitor for different nodes
 struct ExprVisitor {
@@ -44,6 +45,7 @@ struct ExprVisitor {
     virtual std::any visitGetExpr(std::shared_ptr<Get> expr)           = 0;
     virtual std::any visitSetExpr(std::shared_ptr<Set> expr)           = 0;
     virtual std::any visitThisExpr(std::shared_ptr<This> expr)         = 0;
+    virtual std::any visitSuperExpr(std::shared_ptr<Super> expr)       = 0;
 };
 
 // Abstract base class, requires at least one virtual method
@@ -69,11 +71,27 @@ struct Expr {
     }
 };
 
+struct Super : Expr, std::enable_shared_from_this<Super> {
+    Super(Token keyword, Token method) : keyword(keyword), method(method) {
+    }
+
+    // Override the accept method
+    std::any accept(ExprVisitor& visitor) {
+        return visitor.visitSuperExpr(shared_from_this());
+    }
+
+    // Tokens for super keyword and method name
+    Token keyword;
+    Token method;
+};
+
 struct This : Expr, std::enable_shared_from_this<This> {
     // This constructor
+    // It onlt takes a keyword
     This(Token keyword) : keyword(keyword) {
     }
 
+    // Override for accept method
     std::any accept(ExprVisitor& visitor) override {
         return visitor.visitThisExpr(shared_from_this());
     }

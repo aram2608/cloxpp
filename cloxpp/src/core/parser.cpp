@@ -59,7 +59,7 @@ shared_ptr<Stmt> Parser::class_declaration() {
 
     // We initialize a superclass object
     shared_ptr<Variable> superclass;
-    // If we match the '<' symbol, we consum the Token and create a new superclass object
+    // If we match the '<' symbol, we consume the Token and create a new superclass object
     if (match({TokenType::LESS})) {
         consume(TokenType::IDENTIFIER, "Expect superclass name.");
         superclass = std::make_shared<Variable>(previous());
@@ -539,6 +539,17 @@ shared_ptr<Expr> Parser::primary() {
     // Strings and nums
     if (match({TokenType::NUMBER, TokenType::STRING})) {
         return std::make_shared<Literal>(previous().literal);
+    }
+
+    // Super expressions
+    if (match({TokenType::SUPER})) {
+        // We save the super keyword
+        Token keyword = previous();
+        // We consume the dot after and throw an error if not present
+        consume(TokenType::DOT, "Expect '.' after 'super'.");
+        // We consume the proceeding token and return a Super expression
+        Token method = consume(TokenType::IDENTIFIER, "Expect superclass method name.");
+        return std::make_shared<Super>(keyword, method);
     }
 
     // We match the this keyword
