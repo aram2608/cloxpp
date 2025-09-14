@@ -220,7 +220,7 @@ any Interpreter::visitWhileStmt(shared_ptr<WhileStmt> stmt) {
         // we evaluate the statements in the body
         execute(stmt->body);
         // debugging snippet for infitine while loops
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        // std::this_thread::sleep_for(std::chrono::seconds(2));
     }
     return {};
 }
@@ -340,10 +340,11 @@ any Interpreter::visitBinaryExpr(shared_ptr<Binary> expr) {
     return {};
 }
 
-//
+// Function to vist unary operation node
 any Interpreter::visitUnaryExpr(shared_ptr<Unary> expr) {
+    // We first evaluate the right most expression
     any right = evaluate(expr->right);
-
+    // We then match the TokenType
     switch (expr->op.type) {
     case TokenType::BANG:
         return !is_truthy(right);
@@ -533,14 +534,14 @@ bool Interpreter::is_equal(const any& me, const any& you) {
 void Interpreter::check_num_operand(const Token& op, const any& operand) {
     if (operand.type() == typeid(double))
         return;
-    throw RuntimeError{op, "Operand must be a number."};
+    throw RuntimeError(op, "Operand must be a number.");
 }
 
 // Function to test for multiple numerical types, binary expressions
 void Interpreter::check_num_operands(const Token& op, const any& op_a, const any& op_b) {
     if (op_a.type() == typeid(double) && op_b.type() == typeid(double))
         return;
-    throw RuntimeError{op, "Operands must be a numbers."};
+    throw RuntimeError(op, "Operands must be numbers.");
 }
 
 // Functions to convert types to strings
