@@ -1,38 +1,26 @@
 cmake_minimum_required(VERSION 3.16)
-project(cloxpp VERSION 1.0.0 LANGUAGES CXX)
+project(cloxpp-monorepo VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-option(TREE_WALK "Build tree walker interpreter" OFF)
-option(VM_BUILD "Build VM interpreter" OFF)
+option(BUILD_CLOXPPTW "Build tree walker interpreter" OFF)
+option(BUILD_CLOXPPVM "Build VM interpreter" OFF)
 
-if(NOT TREE_WALK AND NOT VM_BUILD)
-  message(FATAL_ERROR "Nothing to build: enable -TREE_WALK=ON or -VM_BUILD=ON")
+if(NOT BUILD_CLOXPPTW AND NOT BUILD_CLOXPPVM)
+  message(FATAL_ERROR "Nothing to build: enable -BUILD_CLOXPPTW=ON or -BUILD_CLOXPPVM=ON")
 endif()
 
-if(TREE_WALK AND VM_BUILD)
-  message(FATAL_ERROR "Choose only one of TREE_WALK or VM_BUILD")
+if(BUILD_CLOXPPTW AND BUILD_CLOXPPVM)
+  message(FATAL_ERROR "Choose only one of BUILD_CLOXPPTW or BUILD_CLOXPPVM")
 endif()
 
-if(TREE_WALK)
+if(BUILD_CLOXPPTW)
     add_subdirectory(cloxpptw)
 endif()
 
-if(VM_BUILD)
+if(BUILD_CLOXPPVM)
     add_subdirectory(cloxppvm)
 endif()
-
-target_compile_options(cloxpp 
-    PRIVATE 
-    -Wall 
-    -Wextra 
-    -Wpedantic 
-    -Wconversion
-    -Wpessimizing-move
-    -Wredundant-move
-    -Wmove
-    -Wrange-loop-construct
-)

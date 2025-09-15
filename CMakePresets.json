@@ -1,0 +1,58 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 19, "patch": 0 },
+
+  "configurePresets": [
+    {
+      "name": "tw-debug",
+      "displayName": "cloxpptw (Debug)",
+      "binaryDir": "${sourceDir}/build/cloxpptw-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "BUILD_CLOXPPTW": "ON",
+        "BUILD_CLOXPPVM": "OFF"
+      }
+    },
+    {
+      "name": "tw-release",
+      "displayName": "cloxpptw (Release)",
+      "binaryDir": "${sourceDir}/build/cloxpptw-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "BUILD_CLOXPPTW": "ON",
+        "BUILD_CLOXPPVM": "OFF"
+      }
+    },
+    {
+      "name": "vm-debug",
+      "displayName": "cloxppvm (Debug)",
+      "binaryDir": "${sourceDir}/build/cloxppvm-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "BUILD_CLOXPPTW": "OFF",
+        "BUILD_CLOXPPVM": "ON"
+      }
+    },
+    {
+      "name": "vm-release",
+      "displayName": "cloxppvm (Release)",
+      "binaryDir": "${sourceDir}/build/cloxppvm-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "BUILD_CLOXPPTW": "OFF",
+        "BUILD_CLOXPPVM": "ON"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    { "name": "tw-debug", "configurePreset": "tw-debug" },
+    { "name": "tw-release", "configurePreset": "tw-release" },
+    { "name": "vm-debug", "configurePreset": "vm-debug" },
+    { "name": "vm-release", "configurePreset": "vm-release" }
+  ]
+}

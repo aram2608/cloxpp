@@ -30,7 +30,7 @@ target_compile_options(cloxpp_lib
     -Wrange-loop-construct
 )
 
-add_executable(cloxpp 
+add_executable(cloxpptw
     app/main.cpp
 )
-target_link_libraries(cloxpp PRIVATE cloxpp_lib)
+target_link_libraries(cloxpptw PRIVATE cloxpp_lib)

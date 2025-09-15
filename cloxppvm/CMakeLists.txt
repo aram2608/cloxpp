@@ -1,3 +1,3 @@
-add_executable(cloxpp 
+add_executable(cloxppvm
     app/main.cpp
 )
