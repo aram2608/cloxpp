@@ -1,13 +1,13 @@
 add_library(cloxpp_lib
-    src/core/lox.cpp
-    src/core/scanner.cpp
-    src/core/parser.cpp
-    src/core/interpreter.cpp
-    src/runtime/resolver.cpp
-    src/callable/lox_functions.cpp
-    src/callable/native_functions.cpp
-    src/callable/lox_classes.cpp
-    src/callable/lox_instance.cpp
+    loxlib/core/lox.cpp
+    loxlib/core/scanner.cpp
+    loxlib/core/parser.cpp
+    loxlib/core/interpreter.cpp
+    loxlib/runtime/resolver.cpp
+    loxlib/callable/lox_functions.cpp
+    loxlib/callable/native_functions.cpp
+    loxlib/callable/lox_classes.cpp
+    loxlib/callable/lox_instance.cpp
 )
 
 find_package(magic_enum CONFIG QUIET)
@@ -15,7 +15,7 @@ target_link_libraries(cloxpp_lib PUBLIC magic_enum::magic_enum)
 
 target_include_directories(cloxpp_lib 
     PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/
+    ${CMAKE_CURRENT_SOURCE_DIR}/loxlib/
 )
 
 target_compile_options(cloxpp_lib

@@ -1,4 +1,4 @@
-#include "../src/core/lox.hpp"
+#include "../loxlib/core/lox.hpp"
 
 #include <cstdlib>
 #include <iostream>
