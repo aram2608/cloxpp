@@ -23,7 +23,7 @@ Interpreter::Interpreter() {
      * we use a shared_ptr since they are much more forgiving than unique_ptrs when it comes to
      * ownership
      */
-    globals->define("clock", shared_ptr<NativeClock>{});
+    globals->define("clock", std::shared_ptr<NativeClock>{std::make_shared<NativeClock>()});
 }
 
 /*
@@ -446,6 +446,9 @@ any Interpreter::visitCallExpr(shared_ptr<Call> expr) {
         // If we pass our test we can cast to a LoxFunction
         // This is necessary to unwrap the any object
         callable = std::any_cast<shared_ptr<LoxFunction>>(std::move(callee));
+        // We add a check for our single native function
+    } else if (callee.type() == typeid(shared_ptr<NativeClock>)) {
+        callable = std::any_cast<std::shared_ptr<NativeClock>>(std::move(callee));
     } else if (callee.type() == typeid(shared_ptr<LoxClass>)) {
         // Or a to a LoxClass
         // Similarly we need to unwrap the any object
