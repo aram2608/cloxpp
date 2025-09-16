@@ -299,6 +299,53 @@ shared_ptr<Function> Parser::function(std::string kind) {
     return std::make_shared<Function>(std::move(name), std::move(parameters), std::move(body));
 }
 
+shared_ptr<Expr> Parser::finish_call(shared_ptr<Expr> callee) {
+    // By default we set a match number of args
+    const size_t MAX_ARGS = 255;
+
+    // we create our vector of unique ptrs to our arguments
+    vector<shared_ptr<Expr>> args;
+    // we check if we have met a right parenthesis
+    if (!check(TokenType::RIGHT_PAREN)) {
+        // if we havent we continuously push_back arguments after matching a
+        // comma
+        do {
+            if (args.size() >= MAX_ARGS) {
+                error(peek(), "Can't have more than 255 arguments.");
+            }
+            args.push_back(expression());
+        } while (match({TokenType::COMMA}));
+    }
+
+    // we consume the closing parenthesis
+    Token paren = consume(TokenType::RIGHT_PAREN, "Expect ')' after arguments.");
+
+    // we return our call node
+    return std::make_shared<Call>(std::move(callee), paren, std::move(args));
+}
+
+shared_ptr<Expr> Parser::call() {
+    // we initialize our expr from primary
+    shared_ptr<Expr> expr = primary();
+
+    // we continuously match left parenethesis
+    while (true) {
+        // We call the finish_call method if we match a parenthesis
+        if (match({TokenType::LEFT_PAREN})) {
+            expr = finish_call(std::move(expr));
+            // If we match a dot we get a property instead
+        } else if (match({TokenType::DOT})) {
+            Token name = consume(TokenType::IDENTIFIER, "Expect property name after '.'.");
+            expr       = std::make_shared<Get>(expr, name);
+            // Otherwise we break
+        } else {
+            break;
+        }
+    }
+    // we then return our expression
+    return expr;
+}
+
 // Function to handle expression statement
 shared_ptr<Stmt> Parser::expression_statement() {
     // Creates our base expressions
@@ -347,14 +394,14 @@ shared_ptr<Expr> Parser::expression() {
  */
 shared_ptr<Expr> Parser::assignment() {
     // We first need to initialize our expression
-    std::shared_ptr<Expr> expr = _or();
+    shared_ptr<Expr> expr = conditional();
 
     // We need to match and =
     if (match({TokenType::EQUAL})) {
         // If we match an = sign we need to save the token
         Token equals = previous();
-        // We call assignment to recursivle parse the right hand side
-        std::shared_ptr<Expr> value = assignment();
+        // We call assignment to recursively parse the right hand side
+        shared_ptr<Expr> value = assignment();
 
         // We try to make an assignment using the nodes assignment method
         // otherwise we throw an error
@@ -365,6 +412,26 @@ shared_ptr<Expr> Parser::assignment() {
         }
     }
     // We return the expression
+    return expr;
+}
+
+// Function to visit the ternary '?' op node
+shared_ptr<Expr> Parser::conditional() {
+    // We capture the conditional expression
+    shared_ptr<Expr> expr = _or();
+    // If we match the ternary operator
+    if (match({TokenType::QUESTION})) {
+        // We store it for error handling
+        Token tern = previous();
+        // Then capture the expression to the left and right of the ':'
+        shared_ptr<Expr> left = expression();
+        consume(TokenType::COLON, "Expected ':'.");
+        shared_ptr<Expr> right = conditional();
+        // We can then create the condtional node and return it
+        expr =
+            std::make_shared<Condtional>(std::move(expr), tern, std::move(left), std::move(right));
+        return expr;
+    }
     return expr;
 }
 
@@ -437,16 +504,17 @@ shared_ptr<Expr> Parser::comparison() {
     return expr;
 }
 
+// Function to handle 'terms', + and - operations
 shared_ptr<Expr> Parser::term() {
+    // We capture the first expression
     shared_ptr<Expr> expr = factor();
-
+    // We continuously match + and - tokens and add them to the Binary expression node
     while (match({TokenType::MINUS, TokenType::PLUS})) {
         Token            op    = previous();
         shared_ptr<Expr> right = factor();
         // We need to move ownership to the new expression
         expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
     }
-
     return expr;
 }
 
@@ -473,55 +541,23 @@ shared_ptr<Expr> Parser::unary() {
         Token            op    = previous();
         shared_ptr<Expr> right = unary();
         return std::make_shared<Unary>(op, std::move(right));
+    } else if (match({TokenType::MINUS_MINUS})) {
+        return prefixoperator();
+    } else if (match({TokenType::PLUS_PLUS})) {
+        return prefixoperator();
     }
     return call();
 }
 
-shared_ptr<Expr> Parser::finish_call(shared_ptr<Expr> callee) {
-    // By default we set a match number of args
-    const size_t MAX_ARGS = 255;
-
-    // we create our vector of unique ptrs to our arguments
-    vector<shared_ptr<Expr>> args;
-    // we check if we have met a right parenthesis
-    if (!check(TokenType::RIGHT_PAREN)) {
-        // if we havent we continuously push_back arguments after matching a
-        // comma
-        do {
-            if (args.size() >= MAX_ARGS) {
-                error(peek(), "Can't have more than 255 arguments.");
-            }
-            args.push_back(expression());
-        } while (match({TokenType::COMMA}));
-    }
-
-    // we consume the closing parenthesis
-    Token paren = consume(TokenType::RIGHT_PAREN, "Expect ')' after arguments.");
-
-    // we return our call node
-    return std::make_shared<Call>(std::move(callee), paren, std::move(args));
-}
-
-shared_ptr<Expr> Parser::call() {
-    // we initialize our expr from primary
-    shared_ptr<Expr> expr = primary();
-
-    // we continuously match left parenethesis
-    while (true) {
-        // We call the finish_call method if we match a parenthesis
-        if (match({TokenType::LEFT_PAREN})) {
-            expr = finish_call(std::move(expr));
-            // If we match a dot we get a property instead
-        } else if (match({TokenType::DOT})) {
-            Token name = consume(TokenType::IDENTIFIER, "Expect property name after '.'.");
-            expr       = std::make_shared<Get>(expr, name);
-            // Otherwise we break
-        } else {
-            break;
-        }
-    }
-    // we then return our expression
-    return expr;
+// Helper function to catch prefix operators
+shared_ptr<Expr> Parser::prefixoperator() {
+    // We save the previous operator token and expression and create a new
+    // PreFixOp node
+    Token            op   = previous();
+    shared_ptr<Expr> expr = unary();
+    // We save the token name as well
+    Token name = previous();
+    return std::make_shared<PreFixOp>(op, name, std::move(expr));
 }
 
 // Function to handle the atomic units of Lox

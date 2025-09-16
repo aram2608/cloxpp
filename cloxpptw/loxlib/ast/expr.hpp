@@ -14,6 +14,7 @@ namespace CppLox {
 // Forward declarations
 struct Call;
 struct Logical;
+struct Condtional;
 struct Assign;
 struct Binary;
 struct Unary;
@@ -24,6 +25,7 @@ struct Get;
 struct Set;
 struct This;
 struct Super;
+struct PreFixOp;
 
 // Abstract visitor for different nodes
 struct ExprVisitor {
@@ -34,18 +36,20 @@ struct ExprVisitor {
      * return type is std::any since it is type safe and allows for storage
      * of unknown types similarly to void *
      */
-    virtual std::any visitCallExpr(std::shared_ptr<Call> expr)         = 0;
-    virtual std::any visitLogicalExpr(std::shared_ptr<Logical> expr)   = 0;
-    virtual std::any visitAssignExpr(std::shared_ptr<Assign> expr)     = 0;
-    virtual std::any visitBinaryExpr(std::shared_ptr<Binary> expr)     = 0;
-    virtual std::any visitUnaryExpr(std::shared_ptr<Unary> expr)       = 0;
-    virtual std::any visitGroupingExpr(std::shared_ptr<Grouping> expr) = 0;
-    virtual std::any visitLiteralExpr(std::shared_ptr<Literal> expr)   = 0;
-    virtual std::any visitVariableExpr(std::shared_ptr<Variable> expr) = 0;
-    virtual std::any visitGetExpr(std::shared_ptr<Get> expr)           = 0;
-    virtual std::any visitSetExpr(std::shared_ptr<Set> expr)           = 0;
-    virtual std::any visitThisExpr(std::shared_ptr<This> expr)         = 0;
-    virtual std::any visitSuperExpr(std::shared_ptr<Super> expr)       = 0;
+    virtual std::any visitCallExpr(std::shared_ptr<Call> expr)             = 0;
+    virtual std::any visitLogicalExpr(std::shared_ptr<Logical> expr)       = 0;
+    virtual std::any visitAssignExpr(std::shared_ptr<Assign> expr)         = 0;
+    virtual std::any visitBinaryExpr(std::shared_ptr<Binary> expr)         = 0;
+    virtual std::any visitUnaryExpr(std::shared_ptr<Unary> expr)           = 0;
+    virtual std::any visitGroupingExpr(std::shared_ptr<Grouping> expr)     = 0;
+    virtual std::any visitLiteralExpr(std::shared_ptr<Literal> expr)       = 0;
+    virtual std::any visitVariableExpr(std::shared_ptr<Variable> expr)     = 0;
+    virtual std::any visitGetExpr(std::shared_ptr<Get> expr)               = 0;
+    virtual std::any visitSetExpr(std::shared_ptr<Set> expr)               = 0;
+    virtual std::any visitThisExpr(std::shared_ptr<This> expr)             = 0;
+    virtual std::any visitSuperExpr(std::shared_ptr<Super> expr)           = 0;
+    virtual std::any visitConditonalExpr(std::shared_ptr<Condtional> expr) = 0;
+    virtual std::any visitPreFixOpExpr(std::shared_ptr<PreFixOp> expr)     = 0;
 };
 
 // Abstract base class, requires at least one virtual method
@@ -69,6 +73,48 @@ struct Expr {
     virtual std::shared_ptr<Expr> make_assignment(std::shared_ptr<Expr> value) const {
         throw InvalidAssignment("Invalid assignment target.");
     }
+};
+
+struct PreFixOp : Expr, std::enable_shared_from_this<PreFixOp> {
+    /*
+     * Constructor for PreFixOp node, we pass in a token for operator to help with error
+     * handling, we also pass in our target expression
+     */
+    PreFixOp(Token op, Token name, std::shared_ptr<Expr> target)
+        : op(op), name(name), target(std::move(target)) {
+    }
+
+    // Override accept method
+    std::any accept(ExprVisitor& visitor) override {
+        return visitor.visitPreFixOpExpr(shared_from_this());
+    }
+
+    Token                 op;
+    Token                 name;
+    std::shared_ptr<Expr> target;
+};
+
+struct Condtional : Expr, std::enable_shared_from_this<Condtional> {
+    Condtional(std::shared_ptr<Expr> condition,
+               Token                 op,
+               std::shared_ptr<Expr> truth_expr,
+               std::shared_ptr<Expr> false_expr)
+        : condition(std::move(condition)), truth_expr(std::move(truth_expr)),
+          false_expr(std::move(false_expr)), op(op) {
+    }
+
+    std::any accept(ExprVisitor& visitor) {
+        return visitor.visitConditonalExpr(shared_from_this());
+    }
+
+    // Pointer to condition we need to evaluate
+    std::shared_ptr<Expr> condition;
+    // Pointer to the expression we return if the condition is true
+    std::shared_ptr<Expr> truth_expr;
+    // Pointer to the expression we return if the condition is false
+    std::shared_ptr<Expr> false_expr;
+    // Token for the operator for error handling
+    Token op;
 };
 
 struct Super : Expr, std::enable_shared_from_this<Super> {

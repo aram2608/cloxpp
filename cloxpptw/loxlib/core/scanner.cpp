@@ -70,11 +70,10 @@ void Scanner::scan() {
         add_token(TokenType::DOT);
         break;
     case '-':
-        // add_token(match('+') ? TokenType::MINUS_MINUS : TokenType::MINUS);
-        add_token(TokenType::MINUS);
+        add_token(match('-') ? TokenType::MINUS_MINUS : TokenType::MINUS);
         break;
     case '+':
-        add_token(TokenType::PLUS);
+        add_token(match('+') ? TokenType::PLUS_PLUS : TokenType::PLUS);
         break;
     case ';':
         add_token(TokenType::SEMICOLON);

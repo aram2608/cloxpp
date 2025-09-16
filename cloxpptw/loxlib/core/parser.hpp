@@ -52,6 +52,7 @@ class Parser {
     std::shared_ptr<Expr>              finish_call(std::shared_ptr<Expr> callee);
     std::shared_ptr<Expr>              call();
     std::shared_ptr<Expr>              primary();
+    std::shared_ptr<Expr>              prefixoperator();
     bool                               match(std::initializer_list<TokenType> types);
     Token                              consume(TokenType type, std::string message);
     bool                               check(TokenType type);

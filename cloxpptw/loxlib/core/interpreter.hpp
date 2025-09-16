@@ -58,6 +58,7 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any visitIfStmt(std::shared_ptr<IfStmt> if_stmt) override;
     std::any visitWhileStmt(std::shared_ptr<WhileStmt> while_stmt) override;
 
+    std::any visitConditonalExpr(std::shared_ptr<Condtional> expr) override;
     std::any visitSuperExpr(std::shared_ptr<Super> expr) override;
     std::any visitThisExpr(std::shared_ptr<This> expr) override;
     std::any visitSetExpr(std::shared_ptr<Set> expr) override;
@@ -70,7 +71,10 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any visitGroupingExpr(std::shared_ptr<Grouping> expr) override;
     std::any visitLiteralExpr(std::shared_ptr<Literal> expr) override;
     std::any visitVariableExpr(std::shared_ptr<Variable> expr) override;
+    std::any visitPreFixOpExpr(std::shared_ptr<PreFixOp> expr) override;
 
+    void        check_and_assign(std::shared_ptr<Assign> expr, std::any value);
+    void        check_and_assign(std::shared_ptr<PreFixOp> expr, std::any value);
     bool        is_truthy(const std::any& object);
     bool        is_equal(const std::any& me, const std::any& you);
     void        check_num_operand(const Token& op, const std::any& operand);

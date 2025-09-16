@@ -1,0 +1,38 @@
+// 1) Only the chosen branch should evaluate (side effects)
+var n = 0;
+fun inc() { n = n + 1; return n; }
+var pickLeft  = true  ? inc() : (n = 999);
+var afterL = n;  // expect 1
+var pickRight = false ? (n = 999) : inc();
+var afterR = n;  // expect 2
+print pickLeft;  // 1
+print afterL;    // 1
+print pickRight; // 2
+print afterR;    // 2
+
+// 2) Right-associativity
+print true ? false ? "A" : "B" : "C"; // expect "B"  (parses as true ? (false ? A : B) : C)
+print false ? "X" : false ? "Y" : "Z"; // expect "Z"
+
+// 3) Precedence vs or/and
+print false or true ? "t" : "f";     // expect "t"   (false or (true ? ...))
+print true and false ? "t" : "f";    // expect "f"   ((true and false) ? ...)
+
+// 4) Works inside assignment and as condition
+var a = 0;
+a = (a == 0) ? 10 : 20;  // expect a = 10
+print a;
+print (a ? "truthy" : "falsey"); // expect "truthy" (non-false/nil is truthy)
+
+// 5) Nested parentheses / grouping
+print (false ? "no" : (false ? "no" : "yes")); // expect "yes"
+
+// 6) Arms can contain assignments and calls
+var x = 1;
+false ? (x = 100) : (x = 200);
+print x; // expect 200
+
+// 7) Numbers/strings flow through unchanged
+print (1 < 2) ? 42 : 99;       // expect 42
+print (nil) ? "yes" : "no";    // expect "no"   (nil is falsey)
+print (false) ? "yes" : "no";  // expect "no"

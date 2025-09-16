@@ -39,6 +39,8 @@ class Resolver : ExprVisitor, StmtVisitor {
     std::any visitWhileStmt(std::shared_ptr<WhileStmt> while_stmt) override;
     std::any visitClassStmt(std::shared_ptr<Class> stmt) override;
 
+    std::any visitPreFixOpExpr(std::shared_ptr<PreFixOp> expr) override;
+    std::any visitConditonalExpr(std::shared_ptr<Condtional> expr) override;
     std::any visitSuperExpr(std::shared_ptr<Super> expr) override;
     std::any visitThisExpr(std::shared_ptr<This> expr) override;
     std::any visitSetExpr(std::shared_ptr<Set> expr) override;

@@ -241,36 +241,12 @@ any Interpreter::visitVarStmt(shared_ptr<Var> stmt) {
     return {};
 }
 
-// Function to handle logical and, or operations
-any Interpreter::visitLogicalExpr(shared_ptr<Logical> expr) {
-    // we first evaluate and store the left expressions value
-    any left = evaluate(expr->left);
-
-    // we then test to see if the value is truthy or not
-    // we can then short circuit
-    if (expr->op.type == TokenType::OR) {
-        if (is_truthy(left))
-            return left;
-    } else {
-        if (!is_truthy(left))
-            return left;
-    }
-
-    // otherwise we return the right value
-    return evaluate(expr->right);
-}
-
 // Function to visit Assignment nodes
 any Interpreter::visitAssignExpr(shared_ptr<Assign> expr) {
     // // We evalute the expression and save its value
     any value = evaluate(expr->value);
     // We first need to search the locals map for our expression
-    if (locals.contains(expr)) {
-        int distance = locals.at(expr);
-        environment->assign_at(distance, expr->name, value);
-    } else {
-        globals->assign(expr->name, value);
-    }
+    check_and_assign(expr, value);
     // We then return our value
     return value;
 }
@@ -358,6 +334,34 @@ any Interpreter::visitUnaryExpr(shared_ptr<Unary> expr) {
     return {};
 }
 
+std::any CppLox::Interpreter::visitPreFixOpExpr(shared_ptr<PreFixOp> expr) {
+    // We evaluate the right side expression
+    any right = evaluate(expr->target);
+    // We ensure that the operand type matches a number
+    check_num_operand(expr->op, right);
+    // We then can cast the value to a double
+    double value = std::any_cast<double>(right);
+
+    // We try and match a MINUS_MINUS or PLUS_PLUS token
+    if (expr->op.type == TokenType::MINUS_MINUS) {
+        // We first decrement our value
+        value = --value;
+        // We check our environments for the variable and assign
+        check_and_assign(expr, value);
+        // We can then return our value
+        return value;
+    } else if (expr->op.type == TokenType::PLUS_PLUS) {
+        // We first increment our value
+        value = ++value;
+        // We then check our environment and assign
+        check_and_assign(expr, value);
+        // We can then return our value
+        return value;
+    }
+    // Inaccesible so we return none
+    return {};
+}
+
 // Function to visit Getter node
 any Interpreter::visitGetExpr(shared_ptr<Get> expr) {
     // We first evaluate and store the underlying object
@@ -370,6 +374,41 @@ any Interpreter::visitGetExpr(shared_ptr<Get> expr) {
     }
 
     throw RuntimeError(expr->name, "Only instances have properties.");
+}
+
+// Function to handle logical and, or operations
+any Interpreter::visitLogicalExpr(shared_ptr<Logical> expr) {
+    // we first evaluate and store the left expressions value
+    any left = evaluate(expr->left);
+
+    // we then test to see if the value is truthy or not
+    // we can then short circuit
+    if (expr->op.type == TokenType::OR) {
+        if (is_truthy(left))
+            return left;
+    } else {
+        if (!is_truthy(left))
+            return left;
+    }
+
+    // otherwise we return the right value
+    return evaluate(expr->right);
+}
+
+// Function to handle conditonal 'q' tests
+any Interpreter::visitConditonalExpr(std::shared_ptr<Condtional> expr) {
+    // We evaluate the underlying conditon
+    any condition = evaluate(expr->condition);
+    // We test to see if the condition is truthy
+    if (is_truthy(condition)) {
+        // If it is we evaluate the truth expression and return it
+        return evaluate(expr->truth_expr);
+    } else {
+        // Otherwise we return the false expression
+        return evaluate(expr->false_expr);
+    }
+    // Not sure how to handle errors here so this will be a placeholder for now
+    LoxError::error(expr->op, "Improper use.");
 }
 
 // Function to interpret super expressions
@@ -491,6 +530,28 @@ any Interpreter::visitVariableExpr(shared_ptr<Variable> expr) {
     return variable_lookup(expr->name, expr);
 }
 
+// Helper method to search for an expression and variable in our environments
+void Interpreter::check_and_assign(shared_ptr<Assign> expr, any value) {
+    // We first need to search the locals map for our expression
+    if (locals.contains(expr)) {
+        int distance = locals.at(expr);
+        environment->assign_at(distance, expr->name, value);
+    } else {
+        globals->assign(expr->name, value);
+    }
+}
+
+// Overload for variable search
+void Interpreter::check_and_assign(shared_ptr<PreFixOp> expr, any value) {
+    // We first need to search the locals map for our expression
+    if (locals.contains(expr)) {
+        int distance = locals.at(expr);
+        environment->assign_at(distance, expr->name, value);
+    } else {
+        globals->assign(expr->name, value);
+    }
+}
+
 // Function to test logical operations
 bool Interpreter::is_truthy(const any& object) {
     // We use the type() method to test if we have a nullptr or
@@ -584,9 +645,9 @@ string Interpreter::make_string(const any& object) {
 any Interpreter::variable_lookup(Token name, shared_ptr<Expr> expr) {
     // We search the map using find and return an iterator of positions
     auto it = locals.find(expr);
-    // We test to see if the distance is found in the map
+    // We test to see if the distance is found in the locals map
     if (it != locals.end()) {
-        // If it is we return it from the environment
+        // If it is, we return it from the environment
         return environment->get_at(it->second, name.lexeme);
     } else {
         // If not we retrieve it from the global scope

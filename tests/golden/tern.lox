@@ -1,0 +1,24 @@
+// Basic conditional
+print 1 < 2 ? "yes" : "no"; // expect "yes"
+
+// False branch
+print 2 < 1 ? "oops" : "works"; // expect "works"
+
+// Nesting
+print true ? (false ? "inner-yes" : "inner-no") : "outer-no"; 
+// expect "inner-no"
+
+// With variables
+var x = 10;
+var y = 20;
+print x > y ? x : y; // expect 20
+
+// Inside an expression
+print (true ? 5 : 100) + 3; // expect 8
+
+// Mixing with logical ops
+print false or (true ? true : false); // expect true
+
+// Edge: chained conditionals
+print 5 == 5 ? "equal" : 5 < 5 ? "less" : "greater";
+// expect "equal"

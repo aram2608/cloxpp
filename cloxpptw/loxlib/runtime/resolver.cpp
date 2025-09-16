@@ -163,6 +163,20 @@ any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
     return {};
 }
 
+any Resolver::visitPreFixOpExpr(shared_ptr<PreFixOp> expr) {
+    resolve(expr->target);
+    resolve_local(expr, expr->name);
+    return {};
+}
+
+// Function to resolve conditional expressions
+any Resolver::visitConditonalExpr(shared_ptr<Condtional> expr) {
+    resolve(expr->condition);
+    resolve(expr->truth_expr);
+    resolve(expr->false_expr);
+    return {};
+}
+
 // Function to resolve super expression
 any Resolver::visitSuperExpr(shared_ptr<Super> expr) {
     // We check to see if we are outside of a class body
