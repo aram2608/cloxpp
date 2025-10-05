@@ -1,41 +1,35 @@
 #include "../loxlib/core/lox.hpp"
 
 #include <cstdlib>
+#include <cxxopts.hpp>
 #include <iostream>
-
-using std::cout;
-using std::endl;
 
 int main(int argc, const char* argv[]) {
 
-    // Create our Lox lang instance
-    // CppLox::Lox lox = CppLox::Lox();
+    // We create our argument parser
+    cxxopts::Options options("cloxpp", "Implementation of jlox in C++");
 
-    /*
-     * We need to catch the number of command line arguments
-     * More than 1 should exit with a failure status
-     * In C++ argc is argument count and argv is argument vector, a vector
-     * containing
-     * pointers to the arguments themselves
-     *
-     * argc is an integer and stores the number of arguments used including
-     * the name
-     * of the program itself. As such the default value of argc is always 1.
-     */
-    if (argc > 2) {
-        cout << "Usage: cloxpp [script] \n";
-        std::exit(EXIT_FAILURE);
+    // We add our options
+    // By default options are added as booleans so we need to add a type
+    // in order to properly parse args
+    options.add_options()("h,help", "help")("repl", "REPL Entry Point")("f,file", "Lox Script", cxxopts::value<std::string>());
 
-        // 1 argument should point to a file path
-    } else if (argc == 2) {
-        // Run Lox lang from file input
-        CppLox::Lox::run_file(argv[1]);
+    // We use a try block in case the user makes a crazy input for some reason
+    try {
+        // We can now parse our options
+        auto result{options.parse(argc, argv)};
 
-        // Otherwise we run the REPL
-    } else {
-        cout << "Welcome to the Lox REPL!\n" << endl;
-        CppLox::Lox::run_prompt();
-        // make_test_tree();
+        if (result.count("help")) {
+            std::cout << options.help() << std::endl;
+        } else if (result.count("file")) {
+            CppLox::Lox::run_file(result["file"].as<std::string>());
+            return 0;
+        } else if (result.count("repl")) {
+            CppLox::Lox::run_prompt();
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error parsing arguments: " << e.what() << std::endl;
     }
+
     return 0;
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# # We set a variable for the path to vcpkg and export to env
+# We set a variable for the path to vcpkg and export to env
 VCPKG_ROOT="${VCPKG_ROOT:-$HOME/dev/tools/vcpkg}"
 export VCPKG_ROOT
 

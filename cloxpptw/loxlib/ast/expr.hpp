@@ -89,12 +89,20 @@ struct PreFixOp : Expr, std::enable_shared_from_this<PreFixOp> {
         return visitor.visitPreFixOpExpr(shared_from_this());
     }
 
-    Token                 op;
-    Token                 name;
+    // Token for our operator
+    Token op;
+    // Token for the variable name
+    Token name;
+    // Target expression, pointer to variable value
     std::shared_ptr<Expr> target;
 };
 
 struct Condtional : Expr, std::enable_shared_from_this<Condtional> {
+    /*
+     * Constructor for the Condtional node, we pass in a pointer to the conditon
+     * the token for the ternary operator for error handling, and pointers to the
+     * expressions we return if true and if false
+     */
     Condtional(std::shared_ptr<Expr> condition,
                Token                 op,
                std::shared_ptr<Expr> truth_expr,
@@ -103,6 +111,7 @@ struct Condtional : Expr, std::enable_shared_from_this<Condtional> {
           false_expr(std::move(false_expr)), op(op) {
     }
 
+    // Override for accept method
     std::any accept(ExprVisitor& visitor) {
         return visitor.visitConditonalExpr(shared_from_this());
     }

@@ -11,7 +11,8 @@ add_library(cloxpp_lib
 )
 
 find_package(magic_enum CONFIG QUIET)
-target_link_libraries(cloxpp_lib PUBLIC magic_enum::magic_enum)
+find_package(cxxopts CONFIG REQUIRED)
+target_link_libraries(cloxpp_lib PUBLIC magic_enum::magic_enum cxxopts::cxxopts)
 
 target_include_directories(cloxpp_lib 
     PUBLIC 

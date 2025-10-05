@@ -14,12 +14,11 @@ def extract_files(path: Path) -> list:
     files = path.glob("*.lox")
     return files
 
-
 def orchestrator(files: list, path: Path, dry: bool) -> None:
     # We loop through each file
     for f in files:
         # We save the command we would like to run as a list
-        cmd = ["./build/cloxpp/cloxpp", f]
+        cmd = ["./build/cloxpptw/cloxpptw", f]
 
         # We now run subprocess.run and store the result
         # capture_ouput caputes stderr and stdout
@@ -70,7 +69,11 @@ def write_stderr(input_file: Path, output: Path, stderr: str):
 
 
 @app.command()
-def main(path: Path, dry: Annotated[bool, typer.Option("-d")] = False) -> None:
+def main(
+    path: Path,
+    tree_walk: Annotated[bool, typer.Option("-tw")] = True,
+    dry: Annotated[bool, typer.Option("-d")] = False,
+) -> None:
     """
     A helper script to run a series of test cases for the Lox language.
 

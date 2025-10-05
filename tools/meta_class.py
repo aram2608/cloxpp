@@ -11,16 +11,19 @@ class AttributeInitType(type):
 
         # Return the new object.
         return obj
-    
+
+
 class Car(metaclass=AttributeInitType):
     @property
     def description(self) -> str:
         """Return a description of this car."""
         return " ".join(str(value) for value in self.__dict__.values())
-    
-new_car = Car(make='Toyota', model='Prius', year=2005, color='Green', engine='Hybrid')
+
+
+new_car = Car(make="Toyota", model="Prius", year=2005, color="Green", engine="Hybrid")
 
 print(new_car.description)
+
 
 class Python:
     def __init__(self):
@@ -33,7 +36,7 @@ class Python:
     @property
     def set_name(self):
         return self.name
-    
+
     @set_name.setter
     def set_name(self, name):
         print(f"Setting {self.name} to {name}")
@@ -45,6 +48,7 @@ class Python:
 
     def say_name(self):
         print(self.name)
+
 
 Python.get_class_name
 

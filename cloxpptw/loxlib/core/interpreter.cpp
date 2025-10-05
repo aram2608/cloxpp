@@ -34,7 +34,6 @@ void Interpreter::interpret(const vector<shared_ptr<Stmt>>& stmts) {
     try {
         // We then iterate through them and execute one by one
         for (const shared_ptr<Stmt>& stmt : stmts) {
-            // We need to dereference our pointer
             execute(stmt);
         }
     } catch (RuntimeError error) {
@@ -384,11 +383,13 @@ any Interpreter::visitLogicalExpr(shared_ptr<Logical> expr) {
     // we then test to see if the value is truthy or not
     // we can then short circuit
     if (expr->op.type == TokenType::OR) {
-        if (is_truthy(left))
+        if (is_truthy(left)) {
             return left;
+        }
     } else {
-        if (!is_truthy(left))
+        if (!is_truthy(left)) {
             return left;
+        }
     }
 
     // otherwise we return the right value

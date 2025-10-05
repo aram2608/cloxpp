@@ -144,6 +144,8 @@ void Scanner::scan() {
 // Helper function to advance to next character
 char Scanner::advance() {
     // We index the source string by incrementing the current position
+    // We use the rightside ++ operator since it returns the original value before
+    // incremmenting, this prevents indexing out of bounds
     return source[current++];
 }
 
@@ -181,8 +183,9 @@ bool Scanner::match(char expected) {
  */
 char Scanner::peek() {
     // If we are at the end of the file we can return thi
-    if (is_end())
+    if (is_end()) {
         return '\0';
+    }
     return source[current];
 }
 

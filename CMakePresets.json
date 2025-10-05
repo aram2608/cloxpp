@@ -6,7 +6,7 @@
     {
       "name": "tw-debug",
       "displayName": "cloxpptw (Debug)",
-      "binaryDir": "${sourceDir}/build/cloxpptw-debug",
+      "binaryDir": "${sourceDir}/build/",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
@@ -17,7 +17,7 @@
     {
       "name": "tw-release",
       "displayName": "cloxpptw (Release)",
-      "binaryDir": "${sourceDir}/build/cloxpptw-release",
+      "binaryDir": "${sourceDir}/build/",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
@@ -28,7 +28,7 @@
     {
       "name": "vm-debug",
       "displayName": "cloxppvm (Debug)",
-      "binaryDir": "${sourceDir}/build/cloxppvm-debug",
+      "binaryDir": "${sourceDir}/build/",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
@@ -39,7 +39,7 @@
     {
       "name": "vm-release",
       "displayName": "cloxppvm (Release)",
-      "binaryDir": "${sourceDir}/build/cloxppvm-release",
+      "binaryDir": "${sourceDir}/build/",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
