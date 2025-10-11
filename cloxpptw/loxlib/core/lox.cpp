@@ -58,6 +58,8 @@ void Lox::run_prompt() {
      * Otherwise we evalutate the input
      */
     while (true) {
+        // A little prompt to pretty up the repl a bit
+        std::cout << ">>> " << std::flush;
         std::string code;
         /*
          * Read the whole line, spaces included
