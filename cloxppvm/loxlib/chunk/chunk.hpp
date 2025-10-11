@@ -2,6 +2,9 @@
 #define CLOX_CHUNK_HPP
 
 #include "../common.hpp"
+#include "value/value.hpp"
+
+#include <algorithm>
 
 /*
  * In Bytecode format, each instruction is stored as a single byte object
@@ -10,8 +13,7 @@
  */
 
 // I am opting for a scoped enum since they are a bit safer
-// traditional enums can be implicitly converted to integers which is not ideal
-enum class OpCode { OP_RETURN };
+enum class OpCode { OP_RETURN, OP_CONSTANT };
 
 // We create a custom formatter for out enum class
 template <> struct fmt::formatter<OpCode> : formatter<string_view> {
@@ -22,11 +24,14 @@ struct Chunk {
     Chunk(std::string name);
     // Funciton to push OpCodes onto our "stack"
     void write_chunk(OpCode byte);
+    void write_chunk(std::uint8_t byte);
+    int add_constant(Value value);
     void dissasemble();
     // C++ has a dynamic array already as a vector so count and capacity are
     // redundant for now
     std::string name;
-    std::vector<OpCode> code;
+    std::vector<std::uint8_t> code;
+    ValueArray constants;
 };
 
 #endif
