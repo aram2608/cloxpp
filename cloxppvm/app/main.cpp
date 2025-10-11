@@ -1,6 +1,11 @@
+#include "../loxlib/chunk/chunk.hpp"
+
 #include <iostream>
 
 int main(int argc, const char **argv) {
-    std::cout << "Hello world!" << std::endl;
+    Chunk chunk = Chunk("test chunk");
+    chunk.write_chunk(OpCode::OP_RETURN);
+
+    chunk.dissasemble();
     return 0;
 }
