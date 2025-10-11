@@ -67,8 +67,7 @@ class Token {
   public:
     // Token class constructor
     Token(TokenType type, std::string lexeme, std::any literal, int line)
-        : type(type), lexeme(lexeme), literal(literal), line(line) {
-    }
+        : type(type), lexeme(lexeme), literal(literal), line(line) {}
 
     // Function to turn Tokens into strings
     // We do not want to modify anything so we declare this as a const member
@@ -106,10 +105,10 @@ class Token {
         return "(" + tok_type + " , " + lexeme + " , " + literal_txt + ")";
     }
 
-    TokenType   type;
+    TokenType type;
     std::string lexeme;
-    std::any    literal;
-    int         line = 0;
+    std::any literal;
+    int line = 0;
 };
 } // namespace CppLox
 

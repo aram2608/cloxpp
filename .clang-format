@@ -15,24 +15,5 @@ ReflowComments: true
 SortIncludes: true
 IncludeBlocks: Regroup
 
-# spacing & alignment
-SpacesInParentheses: false
-SpaceAfterCStyleCast: true
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: true
-SpaceBeforeParens: ControlStatements
-PointerAlignment: Left
-ReferenceAlignment: Left
-
 # keep diffs tidy; avoid one-liners
 AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: None
-InsertTrailingCommas: Wrapped
-
-# namespaces/classes
-NamespaceIndentation: None
-
-# needed to avoid the bin packing error for trailing comma wrapped
-BinPackArguments: false
-BinPackParameters: false

@@ -24,13 +24,12 @@ class Interpreter : ExprVisitor, StmtVisitor {
     // We make LoxFunction a friend class so we can throw it the return value
     friend class LoxFunction;
     struct Return {
-        Return(std::any value) : value(value) {
-        }
+        Return(std::any value) : value(value) {}
         std::any value;
     };
 
   public:
-    std::shared_ptr<Environment>         globals = std::make_shared<Environment>();
+    std::shared_ptr<Environment> globals = std::make_shared<Environment>();
     std::map<std::shared_ptr<Expr>, int> locals;
 
   private:
@@ -39,13 +38,13 @@ class Interpreter : ExprVisitor, StmtVisitor {
   public:
     Interpreter();
 
-    void     interpret(const std::vector<std::shared_ptr<Stmt>>& stmts);
-    void     resolve(std::shared_ptr<Expr> expr, int depth);
-    void     execute(std::shared_ptr<Stmt> stmt);
-    void     execute_block(const std::vector<std::shared_ptr<Stmt>>& stmts,
-                           std::shared_ptr<Environment>              env);
+    void interpret(const std::vector<std::shared_ptr<Stmt>> &stmts);
+    void resolve(std::shared_ptr<Expr> expr, int depth);
+    void execute(std::shared_ptr<Stmt> stmt);
+    void execute_block(const std::vector<std::shared_ptr<Stmt>> &stmts,
+                       std::shared_ptr<Environment> env);
     std::any evaluate(std::shared_ptr<Expr> expr);
-    bool     repl{false};
+    bool repl{false};
 
   private:
     std::any visitClassStmt(std::shared_ptr<Class> stmt) override;
@@ -73,14 +72,14 @@ class Interpreter : ExprVisitor, StmtVisitor {
     std::any visitVariableExpr(std::shared_ptr<Variable> expr) override;
     std::any visitPreFixOpExpr(std::shared_ptr<PreFixOp> expr) override;
 
-    void        check_and_assign(std::shared_ptr<Assign> expr, std::any value);
-    void        check_and_assign(std::shared_ptr<PreFixOp> expr, std::any value);
-    bool        is_truthy(const std::any& object);
-    bool        is_equal(const std::any& me, const std::any& you);
-    void        check_num_operand(const Token& op, const std::any& operand);
-    void        check_num_operands(const Token& op, const std::any& op_a, const std::any& op_b);
-    std::string make_string(const std::any& object);
-    std::any    variable_lookup(Token name, std::shared_ptr<Expr> expr);
+    void check_and_assign(std::shared_ptr<Assign> expr, std::any value);
+    void check_and_assign(std::shared_ptr<PreFixOp> expr, std::any value);
+    bool is_truthy(const std::any &object);
+    bool is_equal(const std::any &me, const std::any &you);
+    void check_num_operand(const Token &op, const std::any &operand);
+    void check_num_operands(const Token &op, const std::any &op_a, const std::any &op_b);
+    std::string make_string(const std::any &object);
+    std::any variable_lookup(Token name, std::shared_ptr<Expr> expr);
 };
 
 } // namespace CppLox

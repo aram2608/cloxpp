@@ -12,7 +12,7 @@
 namespace CppLox {
 class Scanner {
     // Source code and tokens
-    std::string        source;
+    std::string source;
     std::vector<Token> tokens{};
     // Attributes to keep track of string index
     //  Start of string
@@ -26,8 +26,7 @@ class Scanner {
     // Constructor for parsing code
     Scanner(std::string source);
     // Default constructor
-    Scanner() : source("") {
-    }
+    Scanner() : source("") {}
 
     std::vector<Token> scan_tokens();
 

@@ -5,14 +5,12 @@
 using namespace CppLox;
 
 // LoxClass constructor, we initialize with its name as a string and a method map
-LoxClass::LoxClass(std::string                                         name,
-                   std::shared_ptr<LoxClass>                           superclass,
+LoxClass::LoxClass(std::string name, std::shared_ptr<LoxClass> superclass,
                    std::map<std::string, std::shared_ptr<LoxFunction>> methods)
-    : name(std::move(name)), superclass(std::move(superclass)), methods(std::move(methods)) {
-}
+    : name(std::move(name)), superclass(std::move(superclass)), methods(std::move(methods)) {}
 
 // Override for call method
-std::any LoxClass::call(Interpreter& interpreter, std::vector<std::any> arguments) {
+std::any LoxClass::call(Interpreter &interpreter, std::vector<std::any> arguments) {
     // We intialize our instance
     std::shared_ptr<LoxInstance> instance = std::make_shared<LoxInstance>(shared_from_this());
     // We search for an init method
@@ -38,9 +36,7 @@ int LoxClass::arity() {
 }
 
 // Function to return classes name as a string
-std::string LoxClass::to_string() {
-    return name;
-}
+std::string LoxClass::to_string() { return name; }
 
 // Function to lookup methods in the map
 std::shared_ptr<LoxFunction> CppLox::LoxClass::find_method(std::string name) {

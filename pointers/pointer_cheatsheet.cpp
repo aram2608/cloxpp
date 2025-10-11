@@ -7,10 +7,10 @@ int main() {
     int a = 42;
     // reference (alias for a)
     // if we change r it changes a, and vice versa.
-    int& r = a;
+    int &r = a;
     // pointer to a
     // stores the memory adress
-    int* p = &a;
+    int *p = &a;
 
     cout << "a  = " << a << "   at address " << &a << endl;
     cout << "r  = " << r << "   at address " << &r << endl;

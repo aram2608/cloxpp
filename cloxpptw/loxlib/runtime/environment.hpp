@@ -22,8 +22,7 @@ class Environment : public std::enable_shared_from_this<Environment> {
      * By default enclosing is a nullptr
      */
     Environment(std::shared_ptr<Environment> enclosing = nullptr)
-        : enclosing(std::move(enclosing)) {
-    }
+        : enclosing(std::move(enclosing)) {}
 
     // shared_ptr to the Environment
     std::shared_ptr<Environment> enclosing;

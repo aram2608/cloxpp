@@ -18,14 +18,12 @@ class RuntimeError : public std::runtime_error {
     // token
     RuntimeError(Token token, std::string message)
         // string.c_str() returns a pointer to the underlying character
-        : std::runtime_error{message.c_str()}, token{token} {
-    }
+        : std::runtime_error{message.c_str()}, token{token} {}
 };
 
 class InvalidAssignment : public std::runtime_error {
   public:
-    InvalidAssignment(std::string message) : std::runtime_error{message.c_str()} {
-    }
+    InvalidAssignment(std::string message) : std::runtime_error{message.c_str()} {}
 };
 
 class LoxError {
@@ -53,9 +51,7 @@ class LoxError {
      * the object we inherit the string from can get destroyed and we still have
      * access to the message We do the same for the tokens
      */
-    static void error(int line, std::string message) {
-        report(line, "", message);
-    }
+    static void error(int line, std::string message) { report(line, "", message); }
     // Error overload
     static void error(Token token, std::string message) {
         if (token.type == TokenType::eof) {
@@ -66,7 +62,7 @@ class LoxError {
     }
 
     // Function to report runtime errors
-    static void runtime_error(const RuntimeError& error) {
+    static void runtime_error(const RuntimeError &error) {
         std::cerr << error.what() << "\n[line " << error.token.line << "]\n";
         had_RuntimeError = true;
     }
@@ -75,7 +71,7 @@ class LoxError {
 } // namespace CppLox
 
 // Define static member variables
-inline bool CppLox::LoxError::had_error        = false;
+inline bool CppLox::LoxError::had_error = false;
 inline bool CppLox::LoxError::had_RuntimeError = false;
 
 #endif

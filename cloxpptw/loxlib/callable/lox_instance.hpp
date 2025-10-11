@@ -29,7 +29,7 @@ struct LoxInstance : std::enable_shared_from_this<LoxInstance> {
     void set(Token name, std::any value);
 
     // Pointer to class
-    std::shared_ptr<LoxClass>       klass;
+    std::shared_ptr<LoxClass> klass;
     std::map<std::string, std::any> fields;
 };
 

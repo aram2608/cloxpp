@@ -7,13 +7,12 @@ using std::any;
 using std::shared_ptr;
 using std::vector;
 
-Resolver::Resolver(Interpreter& interpreter) : interpreter(interpreter) {
-}
+Resolver::Resolver(Interpreter &interpreter) : interpreter(interpreter) {}
 
 // Overload to resolve vectors of statements
-void Resolver::resolve(const vector<shared_ptr<Stmt>>& stmts) {
+void Resolver::resolve(const vector<shared_ptr<Stmt>> &stmts) {
     // We loop over const refs of each statement and resolve them
-    for (const shared_ptr<Stmt>& stmt : stmts) {
+    for (const shared_ptr<Stmt> &stmt : stmts) {
         resolve(stmt);
     }
 }
@@ -108,7 +107,7 @@ any Resolver::visitWhileStmt(shared_ptr<WhileStmt> while_stmt) {
 any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
     // We set the enclosing class and current class
     ClassType enclosing_class = current_class;
-    current_class             = ClassType::CLASS;
+    current_class = ClassType::CLASS;
 
     declare(stmt->name);
     define(stmt->name);
@@ -130,18 +129,18 @@ any Resolver::visitClassStmt(shared_ptr<Class> stmt) {
         // We start scope
         begin_scope();
         // We then retrieve the scope and add 'super' as true
-        std::map<std::string, bool>& scope = scopes.back();
-        scope["super"]                     = true;
+        std::map<std::string, bool> &scope = scopes.back();
+        scope["super"] = true;
     }
 
     // We start our scope and save this as true
     begin_scope();
     // We use a reference since we want to modify the original
-    std::map<std::string, bool>& scope = scopes.back();
-    scope["this"]                      = true;
+    std::map<std::string, bool> &scope = scopes.back();
+    scope["this"] = true;
 
     // We iterate over each method and resolve them
-    for (const shared_ptr<Function>& method : stmt->methods) {
+    for (const shared_ptr<Function> &method : stmt->methods) {
         FunctionType declaration = FunctionType::METHOD;
         // If the method is init we change the function type
         if (method->name.lexeme == "init") {
@@ -235,7 +234,7 @@ any Resolver::visitCallExpr(shared_ptr<Call> expr) {
 
     // We then loop over each argument in the arguments vector and resolve
     // them one by one
-    for (const shared_ptr<Expr>& args : expr->args) {
+    for (const shared_ptr<Expr> &args : expr->args) {
         resolve(args);
     }
     return {};
@@ -272,9 +271,7 @@ any Resolver::visitGroupingExpr(shared_ptr<Grouping> expr) {
 }
 
 // Function to resolve literals
-any Resolver::visitLiteralExpr(shared_ptr<Literal> expr) {
-    return {};
-}
+any Resolver::visitLiteralExpr(shared_ptr<Literal> expr) { return {}; }
 
 // Function to resolve variable expression
 any Resolver::visitVariableExpr(shared_ptr<Variable> expr) {
@@ -282,7 +279,7 @@ any Resolver::visitVariableExpr(shared_ptr<Variable> expr) {
     if (!scopes.empty()) {
         // Next we look back into the scopes and store the first one
         // We use a reference since we want to modify the original
-        std::map<std::string, bool>& scope = scopes.back();
+        std::map<std::string, bool> &scope = scopes.back();
         // We then use find to search for our lexeme
         auto it = scope.find(expr->name.lexeme);
         // We test if the iterator is inside the scope and if the name is set to false
@@ -296,27 +293,19 @@ any Resolver::visitVariableExpr(shared_ptr<Variable> expr) {
 }
 
 // Function to begin store the start of a scope into our vector of maps
-void Resolver::begin_scope() {
-    scopes.push_back(std::map<std::string, bool>());
-}
+void Resolver::begin_scope() { scopes.push_back(std::map<std::string, bool>()); }
 
 // Function to delete the last element in a vector
-void Resolver::end_scope() {
-    scopes.pop_back();
-}
+void Resolver::end_scope() { scopes.pop_back(); }
 
 // Helper method to resolve statements
-void Resolver::resolve(shared_ptr<Stmt> stmt) {
-    stmt->accept(*this);
-}
+void Resolver::resolve(shared_ptr<Stmt> stmt) { stmt->accept(*this); }
 
 // Overload for resolve helper method to resolve expression instead
-void Resolver::resolve(shared_ptr<Expr> expr) {
-    expr->accept(*this);
-}
+void Resolver::resolve(shared_ptr<Expr> expr) { expr->accept(*this); }
 
 // Function used to resolve local variables
-void Resolver::resolve_local(const shared_ptr<Expr>& expr, Token name) {
+void Resolver::resolve_local(const shared_ptr<Expr> &expr, Token name) {
     /*
      * We start at the inner most scope and work outwards to find the name
      * We create a reverse iterator that starts at the last element and
@@ -369,7 +358,7 @@ void Resolver::declare(Token name) {
         return;
     }
     // otherwise, we look at the last element in the map and add a new map
-    std::map<std::string, bool>& scope = scopes.back();
+    std::map<std::string, bool> &scope = scopes.back();
 
     // We check to see if a variable has already been declared in the local scope
     auto it = scope.find(name.lexeme);
@@ -391,6 +380,6 @@ void Resolver::define(Token name) {
     // otherwise we look to the last element and add the token as the key
     // with true as its value, we use a reference since we want to modify
     // the original map
-    std::map<std::string, bool>& scope = scopes.back();
-    scope[name.lexeme]                 = true;
+    std::map<std::string, bool> &scope = scopes.back();
+    scope[name.lexeme] = true;
 }

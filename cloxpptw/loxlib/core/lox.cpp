@@ -9,9 +9,9 @@ void Lox::run(std::string code) {
     // Create out Scanner instance
     CppLox::Scanner scanner = CppLox::Scanner(code);
     // Create tokens from source code
-    std::vector<CppLox::Token>                 tokens = scanner.scan_tokens();
-    CppLox::Parser                             parser = CppLox::Parser(tokens);
-    std::vector<std::shared_ptr<CppLox::Stmt>> stmts  = parser.parse();
+    std::vector<CppLox::Token> tokens = scanner.scan_tokens();
+    CppLox::Parser parser = CppLox::Parser(tokens);
+    std::vector<std::shared_ptr<CppLox::Stmt>> stmts = parser.parse();
 
     // Catch scanner and parser errors
     if (CppLox::LoxError::had_error) {
@@ -32,7 +32,7 @@ void Lox::run(std::string code) {
 }
 
 // Function to wrap the run function around file contents
-void Lox::run_file(const std::string& filename) {
+void Lox::run_file(const std::string &filename) {
     // Slurp up file contents into a string
     std::string contents = slurp_file(filename);
 
@@ -84,14 +84,14 @@ void Lox::run_prompt() {
             // Evaulate text contents
         } else {
             run(code);
-            CppLox::LoxError::had_error        = false;
+            CppLox::LoxError::had_error = false;
             CppLox::LoxError::had_RuntimeError = false;
         }
     }
 }
 
 // Function to slurp a files contents
-std::string Lox::slurp_file(const std::string& filename) {
+std::string Lox::slurp_file(const std::string &filename) {
     // We first create an ifstream object called file()
     std::ifstream file(filename);
 

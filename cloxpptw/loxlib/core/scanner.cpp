@@ -11,21 +11,11 @@ using std::vector;
 Scanner::Scanner(string source)
     // We initialize our reserved keywords map
     : keywords{
-          {"and", TokenType::AND},
-          {"class", TokenType::CLASS},
-          {"else", TokenType::ELSE},
-          {"false", TokenType::FALSE},
-          {"for", TokenType::FOR},
-          {"fun", TokenType::FUN},
-          {"if", TokenType::IF},
-          {"nil", TokenType::NIL},
-          {"or", TokenType::OR},
-          {"print", TokenType::PRINT},
-          {"return", TokenType::RETURN},
-          {"super", TokenType::SUPER},
-          {"this", TokenType::THIS},
-          {"true", TokenType::TRUE},
-          {"var", TokenType::VAR},
+          {"and", TokenType::AND},     {"class", TokenType::CLASS},   {"else", TokenType::ELSE},
+          {"false", TokenType::FALSE}, {"for", TokenType::FOR},       {"fun", TokenType::FUN},
+          {"if", TokenType::IF},       {"nil", TokenType::NIL},       {"or", TokenType::OR},
+          {"print", TokenType::PRINT}, {"return", TokenType::RETURN}, {"super", TokenType::SUPER},
+          {"this", TokenType::THIS},   {"true", TokenType::TRUE},     {"var", TokenType::VAR},
           {"while", TokenType::WHILE},
       } {
     this->source = source;
@@ -156,9 +146,7 @@ void Scanner::add_token(TokenType type, std::any literal) {
 }
 
 // Creates new token from lexeme
-void Scanner::add_token(TokenType type) {
-    add_token(type, nullptr);
-}
+void Scanner::add_token(TokenType type) { add_token(type, nullptr); }
 
 // Function to handle multicharacter operators
 // Like advance but conditional
@@ -319,14 +307,10 @@ void Scanner::add_identifier() {
 }
 
 // A helper function to test if we are at the end of the file
-bool Scanner::is_end() {
-    return current >= source.length();
-}
+bool Scanner::is_end() { return current >= source.length(); }
 
 // Utility function to test if a value is a digit
-bool Scanner::is_digit(char c) {
-    return c >= '0' && c <= '9';
-}
+bool Scanner::is_digit(char c) { return c >= '0' && c <= '9'; }
 
 // Helper function to catch characters that are letters
 bool Scanner::is_alpha(char c) {

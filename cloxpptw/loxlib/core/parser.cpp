@@ -9,9 +9,7 @@ using std::vector;
 
 // Constructor for Parser class
 // We take in a vector of tokens to consume
-Parser::Parser(vector<Token> tokens) {
-    this->tokens = tokens;
-}
+Parser::Parser(vector<Token> tokens) { this->tokens = tokens; }
 
 // Function to parse code
 vector<shared_ptr<Stmt>> Parser::parse() {
@@ -161,8 +159,8 @@ shared_ptr<Stmt> Parser::if_statement() {
     }
 
     // We return a shared_ptr to the statement, we must move ownership
-    return std::make_shared<IfStmt>(
-        std::move(condition), std::move(then_branch), std::move(else_branch));
+    return std::make_shared<IfStmt>(std::move(condition), std::move(then_branch),
+                                    std::move(else_branch));
 }
 
 // Function to create a while statement
@@ -336,7 +334,7 @@ shared_ptr<Expr> Parser::call() {
             // If we match a dot we get a property instead
         } else if (match({TokenType::DOT})) {
             Token name = consume(TokenType::IDENTIFIER, "Expect property name after '.'.");
-            expr       = std::make_shared<Get>(expr, name);
+            expr = std::make_shared<Get>(expr, name);
             // Otherwise we break
         } else {
             break;
@@ -374,9 +372,7 @@ vector<shared_ptr<Stmt>> Parser::block() {
 }
 
 // Function to handle the parsing of expressions
-shared_ptr<Expr> Parser::expression() {
-    return assignment();
-}
+shared_ptr<Expr> Parser::expression() { return assignment(); }
 
 /*
  * Function to handle parsing assignments
@@ -443,7 +439,7 @@ shared_ptr<Expr> Parser::_or() {
     // If we match the or keyword, we add a token and the right most expression
     // through the _and() method
     while (match({TokenType::OR})) {
-        Token            op    = previous();
+        Token op = previous();
         shared_ptr<Expr> right = _and();
         // we create a new pointer to a Logical node and move ownership
         expr = std::make_shared<Logical>(std::move(expr), std::move(op), std::move(right));
@@ -460,7 +456,7 @@ shared_ptr<Expr> Parser::_and() {
     // If we match the and keyword, we add a token and the right most expression
     // through the equality() method
     while (match({TokenType::AND})) {
-        Token            op    = previous();
+        Token op = previous();
         shared_ptr<Expr> right = equality();
         // we create a new pointer to a Logical node and move ownership
         expr = std::make_shared<Logical>(std::move(expr), std::move(op), std::move(right));
@@ -479,7 +475,7 @@ shared_ptr<Expr> Parser::equality() {
     // We search for a != or a == then break, we do this with the match method
     while (match({TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL})) {
         // We consume tokens and expressions until we break the loop
-        Token            op    = previous();
+        Token op = previous();
         shared_ptr<Expr> right = comparison();
         // We have to move since shared_ptrs are read only
         expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
@@ -495,7 +491,7 @@ shared_ptr<Expr> Parser::comparison() {
     // we no longer come across a comparison operator
     while (match(
         {TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL})) {
-        Token            op    = previous();
+        Token op = previous();
         shared_ptr<Expr> right = term();
         // We need to move ownership to the new expression
         expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
@@ -510,7 +506,7 @@ shared_ptr<Expr> Parser::term() {
     shared_ptr<Expr> expr = factor();
     // We continuously match + and - tokens and add them to the Binary expression node
     while (match({TokenType::MINUS, TokenType::PLUS})) {
-        Token            op    = previous();
+        Token op = previous();
         shared_ptr<Expr> right = factor();
         // We need to move ownership to the new expression
         expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
@@ -524,7 +520,7 @@ shared_ptr<Expr> Parser::factor() {
     shared_ptr<Expr> expr = unary();
     // Loop until we dont come across multi or division anymore
     while (match({TokenType::STAR, TokenType::SLASH, TokenType::MOD})) {
-        Token            op    = previous();
+        Token op = previous();
         shared_ptr<Expr> right = unary();
         // We need to move ownership to the new expression
         expr = std::make_shared<Binary>(std::move(expr), op, std::move(right));
@@ -538,7 +534,7 @@ shared_ptr<Expr> Parser::unary() {
     // We can match either the - or ! operators
     if (match({TokenType::BANG, TokenType::MINUS})) {
         // We store the token types and make a new unary node
-        Token            op    = previous();
+        Token op = previous();
         shared_ptr<Expr> right = unary();
         return std::make_shared<Unary>(op, std::move(right));
     } else if (match({TokenType::MINUS_MINUS})) {
@@ -553,7 +549,7 @@ shared_ptr<Expr> Parser::unary() {
 shared_ptr<Expr> Parser::prefixoperator() {
     // We save the previous operator token and expression and create a new
     // PreFixOp node
-    Token            op   = previous();
+    Token op = previous();
     shared_ptr<Expr> expr = unary();
     // We save the token name as well
     Token name = previous();
@@ -645,21 +641,15 @@ Token Parser::advance() {
 }
 
 // Function to check if we have reach the EOF token
-bool Parser::is_end() {
-    return peek().type == TokenType::eof;
-}
+bool Parser::is_end() { return peek().type == TokenType::eof; }
 /*
  * Function to peek at the current token
  * We return a read only reference since we don't
  * want an expensive copy everytime
  */
-Token Parser::peek() {
-    return tokens.at(current);
-}
+Token Parser::peek() { return tokens.at(current); }
 
-Token Parser::previous() {
-    return tokens.at(current - 1);
-}
+Token Parser::previous() { return tokens.at(current - 1); }
 
 Parser::ParseError Parser::error(Token token, std::string message) {
     LoxError::error(token, message);

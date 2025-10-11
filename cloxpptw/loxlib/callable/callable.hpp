@@ -14,10 +14,10 @@ class Interpreter;
 // we inherit from this class
 class LoxCallable {
   public:
-    virtual int         arity()                                                         = 0;
-    virtual std::any    call(Interpreter& interpreter, std::vector<std::any> arguments) = 0;
-    virtual std::string to_string()                                                     = 0;
-    virtual ~LoxCallable()                                                              = default;
+    virtual int arity() = 0;
+    virtual std::any call(Interpreter &interpreter, std::vector<std::any> arguments) = 0;
+    virtual std::string to_string() = 0;
+    virtual ~LoxCallable() = default;
 };
 
 } // namespace CppLox

@@ -19,16 +19,16 @@ enum class ClassType { NONE, CLASS, SUBCLASS };
 
 class Resolver : ExprVisitor, StmtVisitor {
     // We need to store a reference to our interpreter to walk the nodes produced
-    Interpreter& interpreter;
+    Interpreter &interpreter;
     // We create a vector of map objects to store our scopes
     std::vector<std::map<std::string, bool>> scopes;
-    FunctionType                             current_function = FunctionType::NONE;
-    ClassType                                current_class    = ClassType::NONE;
+    FunctionType current_function = FunctionType::NONE;
+    ClassType current_class = ClassType::NONE;
 
   public:
-    Resolver(Interpreter& interpreter);
+    Resolver(Interpreter &interpreter);
     // Function to resolve lists of statements
-    void     resolve(const std::vector<std::shared_ptr<Stmt>>& stmts);
+    void resolve(const std::vector<std::shared_ptr<Stmt>> &stmts);
     std::any visitBlockStmt(std::shared_ptr<Block> stmt) override;
     std::any visitVarStmt(std::shared_ptr<Var> stmt) override;
     std::any visitIfStmt(std::shared_ptr<IfStmt> stmt) override;
@@ -62,7 +62,7 @@ class Resolver : ExprVisitor, StmtVisitor {
     // Overload to resolve expression
     void resolve(std::shared_ptr<Expr> expr);
     // Helper method to resolve local variables
-    void resolve_local(const std::shared_ptr<Expr>& expr, Token name);
+    void resolve_local(const std::shared_ptr<Expr> &expr, Token name);
     // Helper method to resolve functions, their paremeters, and body statements
     void resolve_function(std::shared_ptr<Function> function, FunctionType type);
 

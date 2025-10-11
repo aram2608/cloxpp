@@ -9,25 +9,19 @@ using std::vector;
 
 // Constructor for lox function class, we pass in a declaration and environment
 // and move ownership
-LoxFunction::LoxFunction(std::shared_ptr<Function>    declaration,
-                         std::shared_ptr<Environment> closure,
-                         bool                         is_initializer)
+LoxFunction::LoxFunction(std::shared_ptr<Function> declaration,
+                         std::shared_ptr<Environment> closure, bool is_initializer)
     : declaration(std::move(declaration)), closure(std::move(closure)),
-      is_initializer(is_initializer) {
-}
+      is_initializer(is_initializer) {}
 
 // A helper method to return the string representation of a function
-string LoxFunction::to_string() {
-    return "<fn " + declaration->name.lexeme + ">";
-}
+string LoxFunction::to_string() { return "<fn " + declaration->name.lexeme + ">"; }
 
 // We return an integer value of the number of parameters
-int LoxFunction::arity() {
-    return declaration->params.size();
-}
+int LoxFunction::arity() { return declaration->params.size(); }
 
 // we override the LoxCallable call method
-any LoxFunction::call(Interpreter& interpreter, vector<any> arguments) {
+any LoxFunction::call(Interpreter &interpreter, vector<any> arguments) {
     /*
      * functions need to have their own enviroment, this is to ensure they have
      * their own scope

@@ -5,12 +5,9 @@
 
 using namespace CppLox;
 
-LoxInstance::LoxInstance(std::shared_ptr<LoxClass> klass) : klass(std::move(klass)) {
-}
+LoxInstance::LoxInstance(std::shared_ptr<LoxClass> klass) : klass(std::move(klass)) {}
 
-std::string LoxInstance::to_string() {
-    return klass->name + " instance";
-}
+std::string LoxInstance::to_string() { return klass->name + " instance"; }
 
 std::any LoxInstance::get(Token name) {
     // We check if the map contains the lexeme
@@ -29,6 +26,4 @@ std::any LoxInstance::get(Token name) {
     throw RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
 }
 
-void LoxInstance::set(Token name, std::any value) {
-    fields[name.lexeme] = value;
-}
+void LoxInstance::set(Token name, std::any value) { fields[name.lexeme] = value; }

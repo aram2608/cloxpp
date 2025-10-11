@@ -30,10 +30,10 @@ Interpreter::Interpreter() {
  * Main logic for interpreting a program
  * We pass in a vector of shared_ptrs
  */
-void Interpreter::interpret(const vector<shared_ptr<Stmt>>& stmts) {
+void Interpreter::interpret(const vector<shared_ptr<Stmt>> &stmts) {
     try {
         // We then iterate through them and execute one by one
-        for (const shared_ptr<Stmt>& stmt : stmts) {
+        for (const shared_ptr<Stmt> &stmt : stmts) {
             execute(stmt);
         }
     } catch (RuntimeError error) {
@@ -48,15 +48,11 @@ void Interpreter::resolve(shared_ptr<Expr> expr, int depth) {
 }
 
 // Helper function to execute statemtent
-void Interpreter::execute(shared_ptr<Stmt> stmt) {
-    stmt->accept(*this);
-}
+void Interpreter::execute(shared_ptr<Stmt> stmt) { stmt->accept(*this); }
 
 // Helper method to send the expression back to visitor
 // implementation
-any Interpreter::evaluate(shared_ptr<Expr> expr) {
-    return expr->accept(*this);
-}
+any Interpreter::evaluate(shared_ptr<Expr> expr) { return expr->accept(*this); }
 
 /*
  * Function to iterate and execute over each statement in the block statement
@@ -64,8 +60,8 @@ any Interpreter::evaluate(shared_ptr<Expr> expr) {
  * a const ref of pointers so we do not deplete the vector before
  * iteration is finished
  */
-void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
-                                shared_ptr<Environment>         env) {
+void Interpreter::execute_block(const vector<shared_ptr<Stmt>> &stmts,
+                                shared_ptr<Environment> env) {
     // We first need to store the first environment
     shared_ptr<Environment> previous = this->environment;
 
@@ -74,7 +70,7 @@ void Interpreter::execute_block(const vector<shared_ptr<Stmt>>& stmts,
 
     // We then try to iterate over the stmts in the vector
     try {
-        for (const shared_ptr<Stmt>& stmt : stmts) {
+        for (const shared_ptr<Stmt> &stmt : stmts) {
             execute(stmt);
         }
         // We try and catch all exceptios
@@ -254,7 +250,7 @@ any Interpreter::visitAssignExpr(shared_ptr<Assign> expr) {
 any Interpreter::visitBinaryExpr(shared_ptr<Binary> expr) {
     // We evaluate left and right expressions
     // we need to dereference the shared_ptr
-    any left  = evaluate(expr->left);
+    any left = evaluate(expr->left);
     any right = evaluate(expr->right);
 
     // We catch each Binary op type
@@ -415,8 +411,8 @@ any Interpreter::visitConditonalExpr(std::shared_ptr<Condtional> expr) {
 // Function to interpret super expressions
 any Interpreter::visitSuperExpr(shared_ptr<Super> expr) {
     // We return the distance to the expression
-    int  distance = locals[expr];
-    auto val      = environment->get_at(distance, "super");
+    int distance = locals[expr];
+    auto val = environment->get_at(distance, "super");
 
     // We then create a pointer to a LoxClass at the given distance
     shared_ptr<LoxClass> superclass =
@@ -474,7 +470,7 @@ any Interpreter::visitCallExpr(shared_ptr<Call> expr) {
     vector<any> args;
     // we iterate over the vector of Expr args
     // we make sure its const ref so that we dont deplete the vector too quickly
-    for (const shared_ptr<Expr>& arg : expr->args) {
+    for (const shared_ptr<Expr> &arg : expr->args) {
         args.push_back(evaluate(arg));
     }
 
@@ -501,9 +497,9 @@ any Interpreter::visitCallExpr(shared_ptr<Call> expr) {
     // We need to test our the callables arity to ensure the correct number of args are
     // passed
     if (args.size() != callable->arity()) {
-        throw RuntimeError{expr->paren,
-                           "Expected " + std::to_string(callable->arity()) + " arguments but got " +
-                               std::to_string(args.size()) + "."};
+        throw RuntimeError{expr->paren, "Expected " + std::to_string(callable->arity()) +
+                                            " arguments but got " + std::to_string(args.size()) +
+                                            "."};
     }
 
     // we can then return a call to the callable with the arguments
@@ -554,7 +550,7 @@ void Interpreter::check_and_assign(shared_ptr<PreFixOp> expr, any value) {
 }
 
 // Function to test logical operations
-bool Interpreter::is_truthy(const any& object) {
+bool Interpreter::is_truthy(const any &object) {
     // We use the type() method to test if we have a nullptr or
     // a boolean
     if (object.type() == typeid(nullptr)) {
@@ -570,7 +566,7 @@ bool Interpreter::is_truthy(const any& object) {
 }
 
 // Function to handle equality testing for types in Lox
-bool Interpreter::is_equal(const any& me, const any& you) {
+bool Interpreter::is_equal(const any &me, const any &you) {
     // Test two nullptrs are equal
     if (me.type() == typeid(nullptr) && you.type() == typeid(nullptr)) {
         return true;
@@ -596,21 +592,21 @@ bool Interpreter::is_equal(const any& me, const any& you) {
 }
 
 // Function to test for numerical types, unary ops
-void Interpreter::check_num_operand(const Token& op, const any& operand) {
+void Interpreter::check_num_operand(const Token &op, const any &operand) {
     if (operand.type() == typeid(double))
         return;
     throw RuntimeError(op, "Operand must be a number.");
 }
 
 // Function to test for multiple numerical types, binary expressions
-void Interpreter::check_num_operands(const Token& op, const any& op_a, const any& op_b) {
+void Interpreter::check_num_operands(const Token &op, const any &op_a, const any &op_b) {
     if (op_a.type() == typeid(double) && op_b.type() == typeid(double))
         return;
     throw RuntimeError(op, "Operands must be numbers.");
 }
 
 // Functions to convert types to strings
-string Interpreter::make_string(const any& object) {
+string Interpreter::make_string(const any &object) {
     if (object.type() == typeid(nullptr))
         return "nil";
 

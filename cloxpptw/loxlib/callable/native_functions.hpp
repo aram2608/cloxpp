@@ -18,7 +18,7 @@ class NativeClock : public LoxCallable {
 
     // to make the call, we pass in a reference to the Interpreter and the list
     // of arguments we wish to run
-    std::any call(Interpreter& interpreter, std::vector<std::any> arguments) override;
+    std::any call(Interpreter &interpreter, std::vector<std::any> arguments) override;
 
     // A way to represent the method as a string
     std::string to_string() override;

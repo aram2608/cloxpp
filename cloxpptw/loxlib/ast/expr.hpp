@@ -36,20 +36,20 @@ struct ExprVisitor {
      * return type is std::any since it is type safe and allows for storage
      * of unknown types similarly to void *
      */
-    virtual std::any visitCallExpr(std::shared_ptr<Call> expr)             = 0;
-    virtual std::any visitLogicalExpr(std::shared_ptr<Logical> expr)       = 0;
-    virtual std::any visitAssignExpr(std::shared_ptr<Assign> expr)         = 0;
-    virtual std::any visitBinaryExpr(std::shared_ptr<Binary> expr)         = 0;
-    virtual std::any visitUnaryExpr(std::shared_ptr<Unary> expr)           = 0;
-    virtual std::any visitGroupingExpr(std::shared_ptr<Grouping> expr)     = 0;
-    virtual std::any visitLiteralExpr(std::shared_ptr<Literal> expr)       = 0;
-    virtual std::any visitVariableExpr(std::shared_ptr<Variable> expr)     = 0;
-    virtual std::any visitGetExpr(std::shared_ptr<Get> expr)               = 0;
-    virtual std::any visitSetExpr(std::shared_ptr<Set> expr)               = 0;
-    virtual std::any visitThisExpr(std::shared_ptr<This> expr)             = 0;
-    virtual std::any visitSuperExpr(std::shared_ptr<Super> expr)           = 0;
+    virtual std::any visitCallExpr(std::shared_ptr<Call> expr) = 0;
+    virtual std::any visitLogicalExpr(std::shared_ptr<Logical> expr) = 0;
+    virtual std::any visitAssignExpr(std::shared_ptr<Assign> expr) = 0;
+    virtual std::any visitBinaryExpr(std::shared_ptr<Binary> expr) = 0;
+    virtual std::any visitUnaryExpr(std::shared_ptr<Unary> expr) = 0;
+    virtual std::any visitGroupingExpr(std::shared_ptr<Grouping> expr) = 0;
+    virtual std::any visitLiteralExpr(std::shared_ptr<Literal> expr) = 0;
+    virtual std::any visitVariableExpr(std::shared_ptr<Variable> expr) = 0;
+    virtual std::any visitGetExpr(std::shared_ptr<Get> expr) = 0;
+    virtual std::any visitSetExpr(std::shared_ptr<Set> expr) = 0;
+    virtual std::any visitThisExpr(std::shared_ptr<This> expr) = 0;
+    virtual std::any visitSuperExpr(std::shared_ptr<Super> expr) = 0;
     virtual std::any visitConditonalExpr(std::shared_ptr<Condtional> expr) = 0;
-    virtual std::any visitPreFixOpExpr(std::shared_ptr<PreFixOp> expr)     = 0;
+    virtual std::any visitPreFixOpExpr(std::shared_ptr<PreFixOp> expr) = 0;
 };
 
 // Abstract base class, requires at least one virtual method
@@ -67,7 +67,7 @@ struct Expr {
     Expr() = default;
 
     // accept() method for visiting nodes, we pass in a reference to ExprVisitor&
-    virtual std::any accept(ExprVisitor& visitor) = 0;
+    virtual std::any accept(ExprVisitor &visitor) = 0;
 
     // Concrete default method for making assignments
     virtual std::shared_ptr<Expr> make_assignment(std::shared_ptr<Expr> value) const {
@@ -81,11 +81,10 @@ struct PreFixOp : Expr, std::enable_shared_from_this<PreFixOp> {
      * handling, we also pass in our target expression
      */
     PreFixOp(Token op, Token name, std::shared_ptr<Expr> target)
-        : op(op), name(name), target(std::move(target)) {
-    }
+        : op(op), name(name), target(std::move(target)) {}
 
     // Override accept method
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitPreFixOpExpr(shared_from_this());
     }
 
@@ -103,16 +102,13 @@ struct Condtional : Expr, std::enable_shared_from_this<Condtional> {
      * the token for the ternary operator for error handling, and pointers to the
      * expressions we return if true and if false
      */
-    Condtional(std::shared_ptr<Expr> condition,
-               Token                 op,
-               std::shared_ptr<Expr> truth_expr,
+    Condtional(std::shared_ptr<Expr> condition, Token op, std::shared_ptr<Expr> truth_expr,
                std::shared_ptr<Expr> false_expr)
         : condition(std::move(condition)), truth_expr(std::move(truth_expr)),
-          false_expr(std::move(false_expr)), op(op) {
-    }
+          false_expr(std::move(false_expr)), op(op) {}
 
     // Override for accept method
-    std::any accept(ExprVisitor& visitor) {
+    std::any accept(ExprVisitor &visitor) {
         return visitor.visitConditonalExpr(shared_from_this());
     }
 
@@ -127,13 +123,10 @@ struct Condtional : Expr, std::enable_shared_from_this<Condtional> {
 };
 
 struct Super : Expr, std::enable_shared_from_this<Super> {
-    Super(Token keyword, Token method) : keyword(keyword), method(method) {
-    }
+    Super(Token keyword, Token method) : keyword(keyword), method(method) {}
 
     // Override the accept method
-    std::any accept(ExprVisitor& visitor) {
-        return visitor.visitSuperExpr(shared_from_this());
-    }
+    std::any accept(ExprVisitor &visitor) { return visitor.visitSuperExpr(shared_from_this()); }
 
     // Tokens for super keyword and method name
     Token keyword;
@@ -143,11 +136,10 @@ struct Super : Expr, std::enable_shared_from_this<Super> {
 struct This : Expr, std::enable_shared_from_this<This> {
     // This constructor
     // It onlt takes a keyword
-    This(Token keyword) : keyword(keyword) {
-    }
+    This(Token keyword) : keyword(keyword) {}
 
     // Override for accept method
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitThisExpr(shared_from_this());
     }
 
@@ -160,11 +152,10 @@ struct Set : Expr, std::enable_shared_from_this<Set> {
      * as well as a Token for the name
      */
     Set(std::shared_ptr<Expr> object, Token name, std::shared_ptr<Expr> value)
-        : object(std::move(object)), name(name), value(std::move(value)) {
-    }
+        : object(std::move(object)), name(name), value(std::move(value)) {}
 
     // Override accept method
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitSetExpr(shared_from_this());
     }
 
@@ -181,11 +172,10 @@ struct Get : Expr, std::enable_shared_from_this<Get> {
      * Constructor for the Get expression, we pass in a pointer to the object
      * along with its name
      */
-    Get(std::shared_ptr<Expr> object, Token name) : object(std::move(object)), name(name) {
-    }
+    Get(std::shared_ptr<Expr> object, Token name) : object(std::move(object)), name(name) {}
 
     // Override the accept method
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitGetExpr(shared_from_this());
     }
 
@@ -207,11 +197,10 @@ struct Call : Expr, std::enable_shared_from_this<Call> {
      * for error handling, and a vector of shared pointers for the arguments
      */
     Call(std::shared_ptr<Expr> callee, Token paren, std::vector<std::shared_ptr<Expr>> args)
-        : callee(std::move(callee)), paren(paren), args(std::move(args)) {
-    }
+        : callee(std::move(callee)), paren(paren), args(std::move(args)) {}
 
     // Override accept method
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitCallExpr(shared_from_this());
     }
 
@@ -230,11 +219,10 @@ struct Logical : Expr, std::enable_shared_from_this<Logical> {
      * expression we wish to compare
      */
     Logical(std::shared_ptr<Expr> left, Token op, std::shared_ptr<Expr> right)
-        : left(std::move(left)), op(op), right(std::move(right)) {
-    }
+        : left(std::move(left)), op(op), right(std::move(right)) {}
 
     // Override the accept method from expr
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitLogicalExpr(shared_from_this());
     }
 
@@ -254,11 +242,10 @@ struct Assign : Expr, std::enable_shared_from_this<Assign> {
      * bound variable
      */
     Assign(Token name, std::shared_ptr<Expr> value)
-        : name(std::move(name)), value(std::move(value)) {
-    }
+        : name(std::move(name)), value(std::move(value)) {}
 
     // Override the accept method from expr
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitAssignExpr(shared_from_this());
     }
 
@@ -278,15 +265,14 @@ struct Binary : Expr, std::enable_shared_from_this<Binary> {
      * to the Binary class and copy construct op to op
      */
     Binary(std::shared_ptr<Expr> left, Token op, std::shared_ptr<Expr> right)
-        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {
-    }
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {}
 
     /*
      * We override the virtual method from the ExprVisitor
      * and pass in a dereferenced pointer to the node object
      * it should return a Binary&
      */
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitBinaryExpr(shared_from_this());
     }
 
@@ -306,15 +292,14 @@ struct Grouping : Expr, std::enable_shared_from_this<Grouping> {
      * and in our list initialization we move ownership of the expression
      * to our member
      */
-    Grouping(std::shared_ptr<Expr> expr) : expr(std::move(expr)) {
-    }
+    Grouping(std::shared_ptr<Expr> expr) : expr(std::move(expr)) {}
 
     /*
      * We override the virtual method from the ExprVisitor
      * and pass in a dereferenced pointer to the node object,
      * it should return a Grouping&
      */
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitGroupingExpr(shared_from_this());
     }
 
@@ -329,15 +314,14 @@ struct Literal : Expr, std::enable_shared_from_this<Literal> {
      * Constructor for our Literal node, it takes in any value and in
      * the list initalization, we move ownership to the member value
      */
-    Literal(std::any value) : value(std::move(value)) {
-    }
+    Literal(std::any value) : value(std::move(value)) {}
 
     /*
      * We override the virtual method from the ExprVisitor
      * and pass in a dereferenced pointer to the node object
      * it should return a Literal&
      */
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitLiteralExpr(shared_from_this());
     }
 
@@ -355,15 +339,14 @@ struct Unary : Expr, std::enable_shared_from_this<Unary> {
      * expression In our list initialization, we move ownership of the token and
      * right expression to the members
      */
-    Unary(Token op, std::shared_ptr<Expr> right) : op(std::move(op)), right(std::move(right)) {
-    }
+    Unary(Token op, std::shared_ptr<Expr> right) : op(std::move(op)), right(std::move(right)) {}
 
     /*
      * We override the virtual method from the ExprVisitor
      * and pass in a dereferenced pointer to the node object
      * it should return a Unary&
      */
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitUnaryExpr(shared_from_this());
     }
 
@@ -378,11 +361,10 @@ struct Variable : Expr, std::enable_shared_from_this<Variable> {
     /*
      * Constructor for the variable now, we pass in an name token
      */
-    Variable(Token name) : name(std::move(name)) {
-    }
+    Variable(Token name) : name(std::move(name)) {}
 
     // Override for the Expr accept method
-    std::any accept(ExprVisitor& visitor) override {
+    std::any accept(ExprVisitor &visitor) override {
         return visitor.visitVariableExpr(shared_from_this());
     }
 
