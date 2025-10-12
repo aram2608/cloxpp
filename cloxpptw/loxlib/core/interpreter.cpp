@@ -255,26 +255,32 @@ any Interpreter::visitBinaryExpr(shared_ptr<Binary> expr) {
 
     // We catch each Binary op type
     switch (expr->op.type) {
-    case TokenType::BANG_EQUAL:
+    case TokenType::BANG_EQUAL: {
         return !is_equal(left, right);
-    case TokenType::EQUAL_EQUAL:
+    }
+    case TokenType::EQUAL_EQUAL: {
         return is_equal(left, right);
+    }
         // Comparison operation
-    case TokenType::GREATER:
+    case TokenType::GREATER: {
         check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) > std::any_cast<double>(right);
-    case TokenType::GREATER_EQUAL:
+    }
+    case TokenType::GREATER_EQUAL: {
         check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) >= std::any_cast<double>(right);
-    case TokenType::LESS:
+    }
+    case TokenType::LESS: {
         check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) < std::any_cast<double>(right);
-    case TokenType::LESS_EQUAL:
+    }
+    case TokenType::LESS_EQUAL: {
         check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) <= std::any_cast<double>(right);
+    }
     // + is an overloaded operator that can handle both string concat
     // and division
-    case TokenType::PLUS:
+    case TokenType::PLUS: {
         // test if both types are doubles then add
         if (left.type() == typeid(double) && right.type() == typeid(double)) {
             return std::any_cast<double>(left) + std::any_cast<double>(right);
@@ -287,24 +293,29 @@ any Interpreter::visitBinaryExpr(shared_ptr<Binary> expr) {
 
         // Catch operations where strings or nums are not used
         throw RuntimeError(expr->op, "Operands must be two numbers or two strings.");
-    case TokenType::MINUS:
+    }
+    case TokenType::MINUS: {
         // cast to doubles and subtract
         check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) - std::any_cast<double>(right);
-    case TokenType::SLASH:
+    }
+    case TokenType::SLASH: {
         // cast to doubles and divide
         check_num_operands(expr->op, left, right);
         if (std::any_cast<double>(right) == double(0)) {
             throw RuntimeError(expr->op, "Division by 0 not allowed.");
         }
         return std::any_cast<double>(left) / std::any_cast<double>(right);
-    case TokenType::STAR:
+    }
+    case TokenType::STAR: {
         // cast to doubles and multiply
         check_num_operands(expr->op, left, right);
         return std::any_cast<double>(left) * std::any_cast<double>(right);
-    case TokenType::MOD:
+    }
+    case TokenType::MOD: {
         check_num_operands(expr->op, left, right);
         return std::fmod(std::any_cast<double>(left), std::any_cast<double>(right));
+    }
     }
 
     // Unreachable so we return an empty std::any{}
@@ -317,13 +328,15 @@ any Interpreter::visitUnaryExpr(shared_ptr<Unary> expr) {
     any right = evaluate(expr->right);
     // We then match the TokenType
     switch (expr->op.type) {
-    case TokenType::BANG:
+    case TokenType::BANG: {
         return !is_truthy(right);
-    case TokenType::MINUS:
+    }
+    case TokenType::MINUS: {
         check_num_operand(expr->op, right);
         // We cast the value from the right expression to a double
         // then apply the unary op and return
         return -std::any_cast<double>(right);
+    }
     }
     // Unreachable so we return an empty std::any{}
     return {};

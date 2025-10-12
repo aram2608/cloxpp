@@ -3,6 +3,7 @@ find_package(fmt CONFIG REQUIRED)
 add_library(loxlib
     loxlib/chunk/chunk.cpp
     loxlib/value/value.cpp
+    loxlib/vm/vm.cpp
 )
 
 target_link_libraries(loxlib

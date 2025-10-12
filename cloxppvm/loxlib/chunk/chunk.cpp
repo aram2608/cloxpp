@@ -6,12 +6,34 @@ auto fmt::formatter<OpCode>::format(OpCode op_code, format_context &ctx) const
     -> format_context::iterator {
     string_view name = "Unknown opcode";
     switch (op_code) {
-    case OpCode::OP_RETURN:
+    case OpCode::OP_RETURN: {
         name = "OP_RETURN";
         break;
-    case OpCode::OP_CONSTANT:
+    }
+    case OpCode::OP_CONSTANT: {
         name = "OP_CONSTANT";
         break;
+    }
+    case OpCode::OP_NEGATE: {
+        name = "OP_NEGATE";
+        break;
+    }
+    case OpCode::OP_ADD: {
+        name = "OP_ADD";
+        break;
+    }
+    case OpCode::OP_SUBTRACT: {
+        name = "OP_SUBTRACT";
+        break;
+    }
+    case OpCode::OP_DIVIDE: {
+        name = "OP_DIVIDE";
+        break;
+    }
+    case OpCode::OP_MULTIPLY: {
+        name = "OP_MULTIPLY";
+        break;
+    }
     }
     return formatter<string_view>::format(name, ctx);
 }
@@ -88,6 +110,31 @@ void Chunk::dissasemble() {
                        constants.values[constant_index]);
             // We now need to advance past the opcode and constant value
             it += 2;
+            break;
+        }
+        case OpCode::OP_ADD: {
+            fmt::print("{}\n", instruction);
+            it += 1;
+            break;
+        }
+        case OpCode::OP_SUBTRACT: {
+            fmt::print("{}\n", instruction);
+            it += 1;
+            break;
+        }
+        case OpCode::OP_MULTIPLY: {
+            fmt::print("{}\n", instruction);
+            it += 1;
+            break;
+        }
+        case OpCode::OP_DIVIDE: {
+            fmt::print("{}\n", instruction);
+            it += 1;
+            break;
+        }
+        case OpCode::OP_NEGATE: {
+            fmt::print("{}\n", instruction);
+            it += 1;
             break;
         }
         default: {

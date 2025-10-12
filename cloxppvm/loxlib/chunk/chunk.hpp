@@ -13,7 +13,15 @@
  */
 
 // I am opting for a scoped enum since they are a bit safer
-enum class OpCode { OP_RETURN, OP_CONSTANT };
+enum class OpCode {
+    OP_RETURN,
+    OP_CONSTANT,
+    OP_ADD,
+    OP_SUBTRACT,
+    OP_MULTIPLY,
+    OP_DIVIDE,
+    OP_NEGATE
+};
 
 // We create a custom formatter for out enum class
 template <> struct fmt::formatter<OpCode> : formatter<string_view> {
