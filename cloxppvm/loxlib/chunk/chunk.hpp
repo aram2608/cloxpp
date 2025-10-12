@@ -23,14 +23,15 @@ template <> struct fmt::formatter<OpCode> : formatter<string_view> {
 struct Chunk {
     Chunk(std::string name);
     // Funciton to push OpCodes onto our "stack"
-    void write_chunk(OpCode byte);
-    void write_chunk(std::uint8_t byte);
+    void write_chunk(OpCode byte, int line);
+    void write_chunk(std::uint8_t byte, int line);
     int add_constant(Value value);
     void dissasemble();
     // C++ has a dynamic array already as a vector so count and capacity are
     // redundant for now
     std::string name;
     std::vector<std::uint8_t> code;
+    std::vector<int> lines;
     ValueArray constants;
 };
 
