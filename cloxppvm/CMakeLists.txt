@@ -1,14 +1,19 @@
 find_package(fmt CONFIG REQUIRED)
+find_package(cxxopts CONFIG REQUIRED)
+find_package(magic_enum CONFIG QUIET)
 
 add_library(loxlib
     loxlib/chunk/chunk.cpp
     loxlib/value/value.cpp
     loxlib/vm/vm.cpp
+    loxlib/compiler/compiler.cpp
 )
 
 target_link_libraries(loxlib
     PUBLIC
     fmt::fmt
+    cxxopts::cxxopts
+    magic_enum::magic_enum
 )
 
 target_include_directories(loxlib

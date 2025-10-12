@@ -24,13 +24,11 @@ int main(int argc, const char *argv[]) {
             std::cout << options.help() << std::endl;
         } else if (result.count("file")) {
             CppLox::Lox::run_file(result["file"].as<std::string>());
-            return 0;
         } else if (result.count("repl")) {
             CppLox::Lox::run_prompt();
         }
     } catch (const std::exception &e) {
         std::cerr << "Error parsing arguments: " << e.what() << std::endl;
     }
-
     return 0;
 }

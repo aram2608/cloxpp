@@ -1,5 +1,7 @@
 #include "core/scanner.hpp"
 
+#include "scanner.hpp"
+
 using namespace CppLox;
 using std::string;
 using std::vector;

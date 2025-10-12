@@ -2,11 +2,11 @@
 
 #include "vm.hpp"
 
-VM::VM(Chunk chunk) : chunk(chunk) {}
+VM::VM(std::string source) : chunk("test chunk") {}
 
 InterpretResult VM::interpret() {
     ip = 0;
-    return run();
+    return InterpretResult::INTERPRET_OK;
 }
 
 InterpretResult VM::run() {
@@ -23,25 +23,28 @@ InterpretResult VM::run() {
             break;
         }
         case OpCode::OP_ADD: {
-            binary_op(std::plus<void>{});
+            binary_op(std::plus<>{});
             ip += 1;
             break;
         }
         case OpCode::OP_SUBTRACT: {
-            binary_op(std::minus<void>{});
+            binary_op(std::minus<>{});
             ip += 1;
             break;
         }
         case OpCode::OP_DIVIDE: {
-            binary_op(std::divides<void>{});
+            binary_op(std::divides<>{});
+            ip += 1;
+            break;
+        }
+        case OpCode::OP_MULTIPLY: {
+            binary_op(std::multiplies<>{});
             ip += 1;
             break;
         }
         case OpCode::OP_NEGATE: {
             // We need to store the top value
-            Value constant = stack.top();
-            // We remove that value
-            stack.pop();
+            Value constant = stack.pop();
             // We can then negate the value
             stack.push((-constant));
             ip += 1;
@@ -49,8 +52,7 @@ InterpretResult VM::run() {
         }
         case OpCode::OP_RETURN: {
             // We simply print the top value then pop it off the stack
-            fmt::print("{}\n", stack.top());
-            stack.pop();
+            fmt::print("{}\n", stack.pop());
             return InterpretResult::INTERPRET_OK;
             break;
         }
@@ -60,8 +62,7 @@ InterpretResult VM::run() {
 
 void VM::debug_stack() {
     for (int it = 0; it < stack.size(); ++it) {
-        fmt::print("{}", stack.top());
-        stack.pop();
+        fmt::print("{}", stack.pop());
     }
 }
 

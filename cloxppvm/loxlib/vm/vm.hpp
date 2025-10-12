@@ -3,15 +3,16 @@
 
 #include "../common.hpp"
 #include "chunk/chunk.hpp"
+#include "compiler/compiler.hpp"
+#include "utilities/stack.hpp"
 
 #include <functional>
-#include <stack>
 #include <type_traits>
 
 enum class InterpretResult { INTERPRET_OK, INTERPRET_COMPILE_ERROR, INTERPRET_RUNTIME_ERROR };
 
 struct VM {
-    VM(Chunk chunk);
+    VM(std::string source);
     InterpretResult interpret();
     InterpretResult run();
     void debug_stack();
@@ -19,7 +20,7 @@ struct VM {
     template <class Op> inline void binary_op(Op op);
     Chunk chunk;
     std::size_t ip;
-    std::stack<Value> stack;
+    Stack<Value, 256> stack;
 };
 
 #endif
