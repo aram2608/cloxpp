@@ -1,6 +1,31 @@
-true
-true
-true
-false
-true
-false
+Token: PRINT print 1
+Token: NUMBER 5 1
+Token: EQUAL_EQUAL == 1
+Token: NUMBER 5 1
+Token: SEMICOLON ; 1
+Token: PRINT print 2
+Token: NUMBER 5 2
+Token: BANG_EQUAL != 2
+Token: NUMBER 3 2
+Token: SEMICOLON ; 2
+Token: PRINT print 3
+Token: NUMBER 2 3
+Token: LESS < 3
+Token: NUMBER 10 3
+Token: SEMICOLON ; 3
+Token: PRINT print 4
+Token: NUMBER 2 4
+Token: GREATER > 4
+Token: NUMBER 10 4
+Token: SEMICOLON ; 4
+Token: PRINT print 5
+Token: NUMBER 7 5
+Token: LESS_EQUAL <= 5
+Token: NUMBER 7 5
+Token: SEMICOLON ; 5
+Token: PRINT print 6
+Token: NUMBER 9 6
+Token: GREATER_EQUAL >= 6
+Token: NUMBER 10 6
+Token: SEMICOLON ; 6
+Token: EOF  6

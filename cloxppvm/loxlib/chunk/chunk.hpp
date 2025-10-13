@@ -23,7 +23,7 @@ enum class OpCode {
     OP_NEGATE
 };
 
-// We create a custom formatter for out enum class
+// We create a custom formatter for our enum class
 template <> struct fmt::formatter<OpCode> : formatter<string_view> {
     auto format(OpCode op_code, format_context &ctx) const -> format_context::iterator;
 };

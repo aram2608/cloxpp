@@ -1,1 +1,13 @@
-Foo instance
+Token: CLASS class 1
+Token: LEFT_BRACE { 1
+Token: RIGHT_BRACE } 1
+Token: VAR var 2
+Token: IDENTIFIER foo 2
+Token: EQUAL = 2
+Token: LEFT_PAREN ( 2
+Token: RIGHT_PAREN ) 2
+Token: SEMICOLON ; 2
+Token: PRINT print 3
+Token: IDENTIFIER foo 3
+Token: SEMICOLON ; 3
+Token: EOF  3

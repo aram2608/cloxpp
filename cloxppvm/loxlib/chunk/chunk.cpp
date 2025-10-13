@@ -1,8 +1,8 @@
 #include "chunk/chunk.hpp"
 
 // This function formats the OpCode into a string form that makes it easier
-// to dissassemble code
-auto fmt::formatter<OpCode>::format(OpCode op_code, format_context &ctx) const
+// to dissassemble code using fmt
+inline auto fmt::formatter<OpCode>::format(OpCode op_code, format_context &ctx) const
     -> format_context::iterator {
     string_view name = "Unknown opcode";
     switch (op_code) {

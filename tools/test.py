@@ -18,7 +18,7 @@ def orchestrator(files: list, path: Path, dry: bool) -> None:
     # We loop through each file
     for f in files:
         # We save the command we would like to run as a list
-        cmd = ["./build/cloxpptw/cloxpptw", f]
+        cmd = ["./build/cloxppvm/cloxppvm", f]
 
         # We now run subprocess.run and store the result
         # capture_ouput caputes stderr and stdout

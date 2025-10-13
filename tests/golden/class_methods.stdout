@@ -1,1 +1,19 @@
-Hi!
+Token: CLASS class 1
+Token: LEFT_BRACE { 1
+Token: IDENTIFIER sayHi 2
+Token: LEFT_PAREN ( 2
+Token: RIGHT_PAREN ) 2
+Token: LEFT_BRACE { 2
+Token: PRINT print 3
+Token: STRING "Hi!" 3
+Token: SEMICOLON ; 3
+Token: RIGHT_BRACE } 4
+Token: RIGHT_BRACE } 5
+Token: LEFT_PAREN ( 6
+Token: RIGHT_PAREN ) 6
+Token: DOT . 6
+Token: IDENTIFIER sayHi 6
+Token: LEFT_PAREN ( 6
+Token: RIGHT_PAREN ) 6
+Token: SEMICOLON ; 6
+Token: EOF  6

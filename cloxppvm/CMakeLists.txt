@@ -7,13 +7,13 @@ add_library(loxlib
     loxlib/value/value.cpp
     loxlib/vm/vm.cpp
     loxlib/compiler/compiler.cpp
+    loxlib/scanner/scanner.cpp
 )
 
 target_link_libraries(loxlib
     PUBLIC
     fmt::fmt
     cxxopts::cxxopts
-    magic_enum::magic_enum
 )
 
 target_include_directories(loxlib

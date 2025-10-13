@@ -1,2 +1,44 @@
-B method
-A method
+Token: CLASS class 1
+Token: LEFT_BRACE { 1
+Token: LEFT_PAREN ( 2
+Token: RIGHT_PAREN ) 2
+Token: LEFT_BRACE { 2
+Token: PRINT print 2
+Token: STRING "A method" 2
+Token: SEMICOLON ; 2
+Token: RIGHT_BRACE } 2
+Token: RIGHT_BRACE } 3
+Token: CLASS class 5
+Token: LESS < 5
+Token: LEFT_BRACE { 5
+Token: LEFT_PAREN ( 6
+Token: RIGHT_PAREN ) 6
+Token: LEFT_BRACE { 6
+Token: PRINT print 6
+Token: STRING "B method" 6
+Token: SEMICOLON ; 6
+Token: RIGHT_BRACE } 6
+Token: LEFT_PAREN ( 7
+Token: RIGHT_PAREN ) 7
+Token: LEFT_BRACE { 7
+Token: SUPER super 7
+Token: DOT . 7
+Token: LEFT_PAREN ( 7
+Token: RIGHT_PAREN ) 7
+Token: SEMICOLON ; 7
+Token: RIGHT_BRACE } 7
+Token: RIGHT_BRACE } 8
+Token: VAR var 10
+Token: EQUAL = 10
+Token: LEFT_PAREN ( 10
+Token: RIGHT_PAREN ) 10
+Token: SEMICOLON ; 10
+Token: DOT . 11
+Token: LEFT_PAREN ( 11
+Token: RIGHT_PAREN ) 11
+Token: SEMICOLON ; 11
+Token: DOT . 12
+Token: LEFT_PAREN ( 12
+Token: RIGHT_PAREN ) 12
+Token: SEMICOLON ; 12
+Token: EOF  12

@@ -1,7 +1,64 @@
-yes
-works
-inner-no
-20.000000
-8.000000
-true
-equal
+Token: PRINT print 2
+Token: NUMBER 1 2
+Token: LESS < 2
+Token: NUMBER 2 2
+Token: STRING "yes" 2
+Token: STRING "no" 2
+Token: SEMICOLON ; 2
+Token: PRINT print 5
+Token: NUMBER 2 5
+Token: LESS < 5
+Token: NUMBER 1 5
+Token: STRING "oops" 5
+Token: STRING "works" 5
+Token: SEMICOLON ; 5
+Token: PRINT print 8
+Token: TRUE true 8
+Token: LEFT_PAREN ( 8
+Token: FALSE false 8
+Token: STRING "inner-yes" 8
+Token: STRING "inner-no" 8
+Token: RIGHT_PAREN ) 8
+Token: STRING "outer-no" 8
+Token: SEMICOLON ; 8
+Token: VAR var 12
+Token: EQUAL = 12
+Token: NUMBER 10 12
+Token: SEMICOLON ; 12
+Token: VAR var 13
+Token: EQUAL = 13
+Token: NUMBER 20 13
+Token: SEMICOLON ; 13
+Token: PRINT print 14
+Token: GREATER > 14
+Token: SEMICOLON ; 14
+Token: PRINT print 17
+Token: LEFT_PAREN ( 17
+Token: TRUE true 17
+Token: NUMBER 5 17
+Token: NUMBER 100 17
+Token: RIGHT_PAREN ) 17
+Token: PLUS + 17
+Token: NUMBER 3 17
+Token: SEMICOLON ; 17
+Token: PRINT print 20
+Token: FALSE false 20
+Token: OR or 20
+Token: LEFT_PAREN ( 20
+Token: TRUE true 20
+Token: TRUE true 20
+Token: FALSE false 20
+Token: RIGHT_PAREN ) 20
+Token: SEMICOLON ; 20
+Token: PRINT print 23
+Token: NUMBER 5 23
+Token: EQUAL_EQUAL == 23
+Token: NUMBER 5 23
+Token: STRING "equal" 23
+Token: NUMBER 5 23
+Token: LESS < 23
+Token: NUMBER 5 23
+Token: STRING "less" 23
+Token: STRING "greater" 23
+Token: SEMICOLON ; 23
+Token: EOF  25

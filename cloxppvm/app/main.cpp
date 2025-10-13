@@ -1,4 +1,5 @@
 #include "../loxlib/chunk/chunk.hpp"
+#include "../loxlib/scanner/scanner.hpp"
 #include "../loxlib/vm/vm.hpp"
 
 #include <cxxopts.hpp>
@@ -66,20 +67,30 @@ int main(int argc, const char **argv) {
     options.add_options()("h,help", "This message")("r,repl", "REPL entry point")(
         "f,file", "Lox Script", cxxopts::value<std::string>());
 
-    try {
-        // We can now parse our options
-        auto result{options.parse(argc, argv)};
+    std::filesystem::path file = argv[1];
+    std::string source = slurp_file(file);
+    Scanner scanner = Scanner(source);
+    scanner.scan_tokens();
+    scanner.debug();
 
-        if (result.count("help")) {
-            std::cout << options.help() << std::endl;
-        } else if (result.count("file")) {
-            run_file(result["file"].as<std::string>());
-        } else if (result.count("repl")) {
-            repl();
-        }
-    } catch (const std::exception &e) {
-        std::cerr << "Error parsing arguments: " << e.what() << std::endl;
-        exit(64);
-    }
+    // try {
+    //     // We can now parse our options
+    //     auto result{options.parse(argc, argv)};
+
+    //     if (result.count("help")) {
+    //         std::cout << options.help() << std::endl;
+    //     } else if (result.count("file")) {
+    //         // run_file(result["file"].as<std::string>());
+    //         std::filesystem::path source = result["file"].as<std::string>();
+    //         Scanner scanner = Scanner(slurp_file(source));
+    //         scanner.scan_tokens();
+    //         scanner.debug();
+    //     } else if (result.count("repl")) {
+    //         repl();
+    //     }
+    // } catch (const std::exception &e) {
+    //     std::cerr << "Error parsing arguments: " << e.what() << std::endl;
+    //     exit(64);
+    // }
     return 0;
 }

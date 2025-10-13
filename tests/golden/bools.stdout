@@ -1,4 +1,15 @@
-true
-false
-false
-true
+Token: PRINT print 1
+Token: TRUE true 1
+Token: SEMICOLON ; 1
+Token: PRINT print 2
+Token: FALSE false 2
+Token: SEMICOLON ; 2
+Token: PRINT print 3
+Token: BANG ! 3
+Token: TRUE true 3
+Token: SEMICOLON ; 3
+Token: PRINT print 4
+Token: BANG ! 4
+Token: FALSE false 4
+Token: SEMICOLON ; 4
+Token: EOF  4

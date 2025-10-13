@@ -21,7 +21,7 @@ template <typename T, std::size_t N = 256> class Stack {
         // We check the upper bounds
         if (top_ >= N) {
             fmt::print(stderr, "Stack overflow");
-            exit(64));
+            exit(64);
         }
         // We post-increment and save the value
         data_[top_++] = value;

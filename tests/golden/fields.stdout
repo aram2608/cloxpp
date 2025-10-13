@@ -1,1 +1,18 @@
-apple
+Token: CLASS class 1
+Token: LEFT_BRACE { 1
+Token: RIGHT_BRACE } 1
+Token: VAR var 2
+Token: EQUAL = 2
+Token: LEFT_PAREN ( 2
+Token: RIGHT_PAREN ) 2
+Token: SEMICOLON ; 2
+Token: DOT . 3
+Token: IDENTIFIER item 3
+Token: EQUAL = 3
+Token: STRING "apple" 3
+Token: SEMICOLON ; 3
+Token: PRINT print 4
+Token: DOT . 4
+Token: IDENTIFIER item 4
+Token: SEMICOLON ; 4
+Token: EOF  4

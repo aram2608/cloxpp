@@ -69,13 +69,9 @@ void VM::debug_stack() {
 // A little helper for binary operators
 template <class Op> inline void VM::binary_op(Op op) {
     // We get the second value
-    double b = stack.top();
-    // We then remove it from the stack
-    stack.pop();
+    double b = stack.pop();
     // We then get the ssecond value
-    double a = stack.top();
-    // We then remove it from the stack
-    stack.pop();
+    double a = stack.pop();
     // We add a division by zero check
     if constexpr (std::is_same_v<Op, std::divides<void>>) {
         if (b == 0.0) {

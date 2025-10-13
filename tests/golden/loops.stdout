@@ -1,17 +1,44 @@
-10.000000
-9.000000
-8.000000
-7.000000
-6.000000
-5.000000
-4.000000
-3.000000
-2.000000
-1.000000
-0.000000
- 
-5.000000
-4.000000
-3.000000
-2.000000
-1.000000
+Token: IDENTIFIER for 1
+Token: LEFT_PAREN ( 1
+Token: VAR var 1
+Token: IDENTIFIER i 1
+Token: EQUAL = 1
+Token: NUMBER 10 1
+Token: SEMICOLON ; 1
+Token: IDENTIFIER i 1
+Token: GREATER_EQUAL >= 1
+Token: NUMBER 0 1
+Token: SEMICOLON ; 1
+Token: MINUS - 1
+Token: MINUS - 1
+Token: IDENTIFIER i 1
+Token: RIGHT_PAREN ) 1
+Token: LEFT_BRACE { 1
+Token: PRINT print 2
+Token: IDENTIFIER i 2
+Token: SEMICOLON ; 2
+Token: RIGHT_BRACE } 3
+Token: VAR var 5
+Token: IDENTIFIER it 5
+Token: EQUAL = 5
+Token: NUMBER 5 5
+Token: SEMICOLON ; 5
+Token: PRINT print 6
+Token: STRING " " 6
+Token: SEMICOLON ; 6
+Token: WHILE while 8
+Token: LEFT_PAREN ( 8
+Token: IDENTIFIER it 8
+Token: GREATER > 8
+Token: NUMBER 0 8
+Token: RIGHT_PAREN ) 8
+Token: LEFT_BRACE { 8
+Token: PRINT print 9
+Token: IDENTIFIER it 9
+Token: SEMICOLON ; 9
+Token: MINUS - 10
+Token: MINUS - 10
+Token: IDENTIFIER it 10
+Token: SEMICOLON ; 10
+Token: RIGHT_BRACE } 11
+Token: EOF  11
