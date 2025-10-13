@@ -20,16 +20,16 @@ struct Scanner {
     void number();
     void identifier();
     void identifier_type();
-    void check_keyword(int begin, std::string_view rest, TokenType type);
+    void check_keyword(int start, std::string_view rest, TokenType type);
     bool is_digit(char c);
     bool is_alpha(char c);
     bool is_end();
     void debug();
-    int start;
-    int current;
-    int line;
-    std::string source;
-    std::vector<Token> tokens;
+    int start_;
+    int current_;
+    int line_;
+    std::string source_;
+    std::vector<Token> tokens_;
 };
 
 #endif

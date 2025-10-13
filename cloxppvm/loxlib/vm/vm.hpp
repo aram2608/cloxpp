@@ -18,9 +18,9 @@ struct VM {
     void debug_stack();
 
     template <class Op> inline void binary_op(Op op);
-    Chunk chunk;
-    std::size_t ip;
-    Stack<Value, 256> stack;
+    Chunk chunk_;
+    std::size_t ip_;
+    Stack<Value, 256> stack_;
 };
 
 #endif

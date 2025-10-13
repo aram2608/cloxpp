@@ -37,10 +37,10 @@ struct Chunk {
     void dissasemble();
     // C++ has a dynamic array already as a vector so count and capacity are
     // redundant for now
-    std::string name;
-    std::vector<std::uint8_t> code;
-    std::vector<int> lines;
-    ValueArray constants;
+    std::string name_;
+    std::vector<std::uint8_t> code_;
+    std::vector<int> lines_;
+    ValueArray constants_;
 };
 
 #endif

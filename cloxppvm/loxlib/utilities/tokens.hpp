@@ -63,11 +63,11 @@ template <> struct fmt::formatter<TokenType> : formatter<string_view> {
 };
 
 struct Token {
-    Token(TokenType type, std::string lexeme, int line) : type(type), lexeme(lexeme), line(line) {};
+    Token(TokenType type, std::string lexeme, int line) : type_(type), lexeme_(lexeme), line_(line) {};
 
-    TokenType type;
-    std::string lexeme;
-    int line;
+    TokenType type_;
+    std::string lexeme_;
+    int line_;
 };
 
 #endif

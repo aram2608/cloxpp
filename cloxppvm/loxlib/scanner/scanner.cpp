@@ -1,21 +1,21 @@
 #include "scanner/scanner.hpp"
 
-Scanner::Scanner(std::string source) : source(source) {
-    start = 0;
-    current = 0;
-    line = 1;
+Scanner::Scanner(std::string source) : source_(source) {
+    start_ = 0;
+    current_ = 0;
+    line_ = 1;
 }
 
 void Scanner::scan_tokens() {
     // We loop as long as we are not to the end of the file
     while (!is_end()) {
         // We save the starting position of the new lexeme
-        start = current;
+        start_ = current_;
         // We then commence scanning
         scan();
     }
     // At the end of scanning we place an EOF token
-    tokens.emplace_back(TokenType::eof, "", line);
+    tokens_.emplace_back(TokenType::eof, "", line_);
 }
 
 // The main logic to scan for tokens, we match the current char and pass off
@@ -39,7 +39,7 @@ void Scanner::scan() {
     case '\t':
         break;
     case '\n': {
-        ++line;
+        ++line_;
         break;
     }
     case '(': {
@@ -119,7 +119,7 @@ void Scanner::string() {
     // We consume until we reach the end "
     while (peek() != '"' && !is_end()) {
         if (peek() == '\n') {
-            ++line;
+            ++line_;
         }
         // We advance for as long as we are in the loop
         advance();
@@ -168,7 +168,7 @@ void Scanner::identifier() {
 // funky trie (DFA) state machine type thing
 void Scanner::identifier_type() {
     // We match against the character at the start of our lexeme
-    switch (source[start]) {
+    switch (source_[start_]) {
     case 'a': {
         check_keyword(1, "nd", TokenType::AND);
         break;
@@ -182,8 +182,8 @@ void Scanner::identifier_type() {
         break;
     }
     case 'f': {
-        if (current - start > 1) {
-            switch (source[start + 1]) {
+        if (current_ - start_ > 1) {
+            switch (source_[start_ + 1]) {
             case 'a': {
                 check_keyword(2, "lse", TokenType::FALSE);
                 break;
@@ -225,8 +225,8 @@ void Scanner::identifier_type() {
         break;
     }
     case 't': {
-        if (current - start > 1) {
-            switch (source[start + 1]) {
+        if (current_ - start_ > 1) {
+            switch (source_[start_ + 1]) {
             case 'h': {
                 check_keyword(2, "is", TokenType::THIS);
                 break;
@@ -251,13 +251,13 @@ void Scanner::identifier_type() {
 }
 
 // Function to check for our keywords
-void Scanner::check_keyword(int first_char, std::string_view rest, TokenType type) {
+void Scanner::check_keyword(int start, std::string_view rest, TokenType type) {
     // We calculate the current position from the current position and
     // the start of this lexeme
-    std::size_t len = current - start;
+    std::size_t len = current_ - start_;
     // We check if the length is as big as the start character plus the size
     // of the string we are viewing
-    if (len == first_char + rest.size()) {
+    if (len == start + rest.size()) {
         /*
          * We get a raw pointer to the very first character in our source string
          * we then add the start position of the lexeme and the first char
@@ -266,7 +266,7 @@ void Scanner::check_keyword(int first_char, std::string_view rest, TokenType typ
          * We are trying to satisfy the following constructor
          * string_view(const char* data, size_t len)
          */
-        std::string_view tail(source.data() + start + first_char, rest.size());
+        std::string_view tail(source_.data() + start_ + start, rest.size());
         // We then compare our substring with the rest of the lexeme we hope to match
         if (tail == rest) {
             // If our test passes we make a token from the type we passed in
@@ -284,27 +284,27 @@ void Scanner::make_token(TokenType ttype_t) {
     // this is a bit wasteful since a string_view would be more space efficient
     // We can't guarantee the source string will be around long enough for that
     // to not be an issue so this is a bit safer
-    std::string lexeme = source.substr(start, current - start);
-    tokens.emplace_back(ttype_t, lexeme, line);
+    std::string lexeme = source_.substr(start_, current_ - start_);
+    tokens_.emplace_back(ttype_t, lexeme, line_);
 }
 
 // Method to create error tokens
 void Scanner::error_token(std::string message) {
-    tokens.emplace_back(TokenType::ERROR, message, line);
+    tokens_.emplace_back(TokenType::ERROR, message, line_);
 }
 
 // Simmple helper to advance forward in the source string
-char Scanner::advance() { return source[current++]; }
+char Scanner::advance() { return source_[current_++]; }
 
 // Simple helper to peek at the current char without consuming
-char Scanner::peek() { return is_end() ? '\0' : source[current]; }
+char Scanner::peek() { return is_end() ? '\0' : source_[current_]; }
 
 // Simple helper to peek a single char forward
 char Scanner::peek_next() {
-    if (current + 1 >= source.length()) {
+    if (current_ + 1 >= source_.length()) {
         return '\0';
     }
-    return source[current + 1];
+    return source_[current_ + 1];
 }
 
 // Helper method to match an expected token to our source string
@@ -314,11 +314,11 @@ bool Scanner::match(char expected) {
         return false;
     }
     // Test to see if the current tok_type is expected for multichar operator
-    if (source[current] != expected) {
+    if (source_[current_] != expected) {
         return false;
     }
     // Otherwise pre increment current character and return true
-    ++current;
+    ++current_;
     return true;
 }
 
@@ -331,11 +331,11 @@ bool Scanner::is_alpha(char c) {
 }
 
 // Helper to check if we are at the end of the source code
-bool Scanner::is_end() { return current >= source.length(); }
+bool Scanner::is_end() { return current_ >= source_.length(); }
 
 // Helper method to print out our tokens during debugging
 void Scanner::debug() {
-    for (auto t : tokens) {
-        fmt::print("Token: {} {} {}\n", t.type, t.lexeme, t.line);
+    for (auto t : tokens_) {
+        fmt::print("Token: {} {} {}\n", t.type_, t.lexeme_, t.line_);
     }
 }

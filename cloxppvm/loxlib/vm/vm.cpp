@@ -2,57 +2,57 @@
 
 #include "vm.hpp"
 
-VM::VM(std::string source) : chunk("test chunk") {}
+VM::VM(std::string source) : chunk_("test chunk") {}
 
 InterpretResult VM::interpret() {
-    ip = 0;
+    ip_ = 0;
     return InterpretResult::INTERPRET_OK;
 }
 
 InterpretResult VM::run() {
     // We create an infinite loop to run the byte code
     for (;;) {
-        OpCode instruction = static_cast<OpCode>(chunk.code[ip]);
+        OpCode instruction = static_cast<OpCode>(chunk_.code_[ip_]);
         switch (instruction) {
         case OpCode::OP_CONSTANT: {
             // We look ahead to snag the index
-            Value constant = chunk.constants.values[chunk.code[ip + 1]];
+            Value constant = chunk_.constants_.values[chunk_.code_[ip_ + 1]];
             // We push our value onto the stack
-            stack.push(constant);
-            ip += 2;
+            stack_.push(constant);
+            ip_ += 2;
             break;
         }
         case OpCode::OP_ADD: {
             binary_op(std::plus<>{});
-            ip += 1;
+            ip_ += 1;
             break;
         }
         case OpCode::OP_SUBTRACT: {
             binary_op(std::minus<>{});
-            ip += 1;
+            ip_ += 1;
             break;
         }
         case OpCode::OP_DIVIDE: {
             binary_op(std::divides<>{});
-            ip += 1;
+            ip_ += 1;
             break;
         }
         case OpCode::OP_MULTIPLY: {
             binary_op(std::multiplies<>{});
-            ip += 1;
+            ip_ += 1;
             break;
         }
         case OpCode::OP_NEGATE: {
             // We need to store the top value
-            Value constant = stack.pop();
+            Value constant = stack_.pop();
             // We can then negate the value
-            stack.push((-constant));
-            ip += 1;
+            stack_.push((-constant));
+            ip_ += 1;
             break;
         }
         case OpCode::OP_RETURN: {
             // We simply print the top value then pop it off the stack
-            fmt::print("{}\n", stack.pop());
+            fmt::print("{}\n", stack_.pop());
             return InterpretResult::INTERPRET_OK;
             break;
         }
@@ -61,17 +61,17 @@ InterpretResult VM::run() {
 }
 
 void VM::debug_stack() {
-    for (int it = 0; it < stack.size(); ++it) {
-        fmt::print("{}", stack.pop());
+    for (int it = 0; it < stack_.size(); ++it) {
+        fmt::print("{}", stack_.pop());
     }
 }
 
 // A little helper for binary operators
 template <class Op> inline void VM::binary_op(Op op) {
     // We get the second value
-    double b = stack.pop();
+    double b = stack_.pop();
     // We then get the ssecond value
-    double a = stack.pop();
+    double a = stack_.pop();
     // We add a division by zero check
     if constexpr (std::is_same_v<Op, std::divides<void>>) {
         if (b == 0.0) {
@@ -80,5 +80,5 @@ template <class Op> inline void VM::binary_op(Op op) {
         }
     }
     // We then push the result of the operation onto the stack
-    stack.push(op(a, b));
+    stack_.push(op(a, b));
 }
