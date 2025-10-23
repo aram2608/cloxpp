@@ -41,6 +41,8 @@ inline auto fmt::formatter<OpCode>::format(OpCode op_code, format_context &ctx) 
 // Constructor - we simply initialize the chunk name
 Chunk::Chunk(std::string name) : name_(name) {}
 
+Chunk::Chunk() : name_{""} {}
+
 // Function overload to write chunk, we pass in the OpCode byte and current line
 void Chunk::write_chunk(OpCode byte, int line) {
     code_.push_back(static_cast<std::uint8_t>(byte));

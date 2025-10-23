@@ -52,7 +52,7 @@ InterpretResult VM::run() {
         }
         case OpCode::OP_RETURN: {
             // We simply print the top value then pop it off the stack
-            fmt::print("{}\n", stack_.pop());
+            fmt::println("{}", stack_.pop());
             return InterpretResult::INTERPRET_OK;
             break;
         }
@@ -62,7 +62,7 @@ InterpretResult VM::run() {
 
 void VM::debug_stack() {
     for (int it = 0; it < stack_.size(); ++it) {
-        fmt::print("{}", stack_.pop());
+        fmt::println("{}", stack_.pop());
     }
 }
 
@@ -75,7 +75,7 @@ template <class Op> inline void VM::binary_op(Op op) {
     // We add a division by zero check
     if constexpr (std::is_same_v<Op, std::divides<void>>) {
         if (b == 0.0) {
-            fmt::print(stderr, "Error: Division by zero\n");
+            fmt::println(stderr, "Error: Division by zero");
             exit(1);
         }
     }

@@ -29,6 +29,7 @@ template <> struct fmt::formatter<OpCode> : formatter<string_view> {
 };
 
 struct Chunk {
+    Chunk();
     Chunk(std::string name);
     // Funciton to push OpCodes onto our "stack"
     void write_chunk(OpCode byte, int line);

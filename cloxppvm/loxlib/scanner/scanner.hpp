@@ -7,8 +7,8 @@
 #include <map>
 
 struct Scanner {
-    Scanner(std::string source);
-    void scan_tokens();
+    Scanner(std::string &source);
+    std::vector<Token> scan_tokens();
     void scan();
     void make_token(TokenType ttype_t);
     void error_token(std::string message);

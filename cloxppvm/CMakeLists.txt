@@ -1,6 +1,5 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(cxxopts CONFIG REQUIRED)
-find_package(magic_enum CONFIG QUIET)
 
 add_library(loxlib
     loxlib/chunk/chunk.cpp
@@ -8,6 +7,7 @@ add_library(loxlib
     loxlib/vm/vm.cpp
     loxlib/compiler/compiler.cpp
     loxlib/scanner/scanner.cpp
+    loxlib/utilities/tokens.cpp
 )
 
 target_link_libraries(loxlib

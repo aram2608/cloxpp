@@ -619,16 +619,18 @@ bool Parser::match(initializer_list<TokenType> types) {
 // Function to a consume a token and return it
 // Useful for closing off statements or parenthesis, blocks, etc
 Token Parser::consume(TokenType type, std::string message) {
-    if (check(type))
+    if (check(type)) {
         return advance();
+    }
 
     throw error(peek(), message);
 }
 
 // Function to return true if the current token is of the given type
 bool Parser::check(TokenType type) {
-    if (is_end())
+    if (is_end()) {
         return false;
+    }
     return peek().type == type;
 }
 

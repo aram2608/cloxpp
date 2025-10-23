@@ -1,5 +1,5 @@
 #include "../loxlib/chunk/chunk.hpp"
-#include "../loxlib/scanner/scanner.hpp"
+#include "../loxlib/compiler/compiler.hpp"
 #include "../loxlib/vm/vm.hpp"
 
 #include <cxxopts.hpp>
@@ -69,9 +69,8 @@ int main(int argc, const char **argv) {
 
     std::filesystem::path file = argv[1];
     std::string source = slurp_file(file);
-    Scanner scanner = Scanner(source);
-    scanner.scan_tokens();
-    scanner.debug();
+    Compiler compiler = Compiler(source);
+    compiler.compile();
 
     // try {
     //     // We can now parse our options

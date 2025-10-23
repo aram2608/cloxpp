@@ -1,12 +1,12 @@
 #include "scanner/scanner.hpp"
 
-Scanner::Scanner(std::string source) : source_(source) {
+Scanner::Scanner(std::string &source) : source_(source) {
     start_ = 0;
     current_ = 0;
     line_ = 1;
 }
 
-void Scanner::scan_tokens() {
+std::vector<Token> Scanner::scan_tokens() {
     // We loop as long as we are not to the end of the file
     while (!is_end()) {
         // We save the starting position of the new lexeme
@@ -16,6 +16,7 @@ void Scanner::scan_tokens() {
     }
     // At the end of scanning we place an EOF token
     tokens_.emplace_back(TokenType::eof, "", line_);
+    return tokens_;
 }
 
 // The main logic to scan for tokens, we match the current char and pass off
@@ -163,7 +164,7 @@ void Scanner::identifier() {
     identifier_type();
 }
 
-// Main logic to check for the identifier type, 
+// Main logic to check for the identifier type,
 // An easier implementation is possible in C++ but this is closer to Rob's
 // funky trie (DFA) state machine type thing
 void Scanner::identifier_type() {
@@ -262,7 +263,7 @@ void Scanner::check_keyword(int start, std::string_view rest, TokenType type) {
          * We get a raw pointer to the very first character in our source string
          * we then add the start position of the lexeme and the first char
          * we give it a length of rest.size()
-         * 
+         *
          * We are trying to satisfy the following constructor
          * string_view(const char* data, size_t len)
          */
@@ -336,6 +337,6 @@ bool Scanner::is_end() { return current_ >= source_.length(); }
 // Helper method to print out our tokens during debugging
 void Scanner::debug() {
     for (auto t : tokens_) {
-        fmt::print("Token: {} {} {}\n", t.type_, t.lexeme_, t.line_);
+        fmt::println("Token: {} {} {}", t.type_, t.lexeme_, t.line_);
     }
 }

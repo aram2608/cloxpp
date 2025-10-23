@@ -17,7 +17,7 @@ class RuntimeError : public std::runtime_error {
     // We overload the runtime_error constructor and pass in a const char * and
     // token
     RuntimeError(Token token, std::string message)
-        // string.c_str() returns a pointer to the underlying character
+        // string.c_str() returns a pointer to the underlying characters
         : std::runtime_error{message.c_str()}, token{token} {}
 };
 
